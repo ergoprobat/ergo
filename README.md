@@ -15,6 +15,10 @@ Module rule: this module does not require `ergo-server`. The EDR JSON Schema is 
 - `ergo explain <slug>` prints the title, status, and Decision section of that file.
 - `ergo import` is reserved for the MADR and Nygard importer (T-021). It does not write a file.
 
+## Release
+
+A push to `main` opens a release-please pull request. Merging it tags `vX.Y.Z`. That tag builds binaries, `checksums.txt`, and a GHCR image `ghcr.io/ergoprobat/ergo`. Release notes are the generated changelog. Cosign signatures, SLSA provenance, and the SBOM are T-013. The Homebrew formula is published to `ergoprobat/homebrew-tap` when `HOMEBREW_TAP_TOKEN` is set on this repository.
+
 ## License
 
 Apache License, Version 2.0. See [LICENSE](LICENSE).

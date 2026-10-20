@@ -1,0 +1,76 @@
+version: 2
+
+project_name: ergo
+
+builds:
+  - id: ergo
+    main: ./cmd/ergo
+    binary: ergo
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X github.com/ergoprobat/ergo/internal/cli.Version={{ .Version }}
+      - -X github.com/ergoprobat/ergo/internal/cli.Commit={{ .Commit }}
+      - -X github.com/ergoprobat/ergo/internal/cli.Date={{ .Date }}
+
+archives:
+  - id: ergo
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+changelog:
+  disable: true
+
+release:
+  mode: append
+  github:
+    owner: ergoprobat
+    name: ergo
+
+brews:
+  - name: ergo
+    repository:
+      owner: ergoprobat
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    skip_upload: "{{ .Env.SKIP_HOMEBREW }}"
+    directory: Formula
+    homepage: https://ergoplatform.io
+    description: CLI that validates engineering decision records
+    license: Apache-2.0
+    commit_author:
+      name: Luca Bertelli
+      email: bertelli.luca@proton.me
+
+dockers_v2:
+  - ids:
+      - ergo
+    dockerfile: Dockerfile
+    images:
+      - ghcr.io/ergoprobat/ergo
+    tags:
+      - "{{ .Version }}"
+      - latest
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      org.opencontainers.image.licenses: Apache-2.0
+      org.opencontainers.image.source: https://github.com/ergoprobat/ergo

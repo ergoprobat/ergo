@@ -82,6 +82,16 @@ func TestCheckInvalid(t *testing.T) {
 	}
 }
 
+func TestHelpVersion(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	if code := Run([]string{"version"}, &stdout, &stderr); code != 0 {
+		t.Fatalf("code %d", code)
+	}
+	if !strings.Contains(stdout.String(), "ergo dev") {
+		t.Fatalf("output %q", stdout.String())
+	}
+}
+
 func TestCheckNone(t *testing.T) {
 	root := t.TempDir()
 	withDir(t, root)

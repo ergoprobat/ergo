@@ -41,3 +41,30 @@ jobs:
         with:
           version: v2.15.0
           install-mode: goinstall
+
+  release:
+    name: ci / release
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
+        with:
+          version: v2.18.3
+          install-only: true
+      - name: Check GoReleaser config
+        run: |
+          set -euo pipefail
+          set +e
+          goreleaser check
+          code="$?"
+          set -e
+          # Exit 2 means the config is valid and uses the formula publisher.
+          # GoReleaser 2.18 deprecates formulas in favor of casks. The tap
+          # install is `brew install ergoprobat/tap/ergo`, which is a formula.
+          if [ "$code" -eq 2 ]; then
+            exit 0
+          fi
+          exit "$code"

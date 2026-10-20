@@ -43,13 +43,24 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	case "import":
 		fprintln(stderr, "The MADR and Nygard importer is T-021.")
 		return 2
-	case "-h", "--help", "help":
-		fprintln(stdout, usage)
+	case "-h", "--help", "help", "version", "--version", "-v":
+		fprintln(stdout, helpText())
 		return 0
 	default:
 		fprintf(stderr, "unknown command %q\n%s\n", args[0], usage)
 		return 2
 	}
+}
+
+// Version, Commit, and Date are set with -X at release time.
+var (
+	Version = "dev"
+	Commit  = "none"
+	Date    = "unknown"
+)
+
+func helpText() string {
+	return fmt.Sprintf("ergo %s (%s, %s)\n\n%s", Version, Commit, Date, usage)
 }
 
 const usage = `ergo validates engineering decision records in a repository.

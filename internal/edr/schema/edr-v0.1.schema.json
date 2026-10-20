@@ -1,0 +1,284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ergoplatform.io/schema/edr/v0.1.json",
+  "title": "EDR v0.1 frontmatter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "edr",
+    "id",
+    "slug",
+    "title",
+    "status",
+    "owner",
+    "scope",
+    "valid_from",
+    "valid_to",
+    "review_by",
+    "supersedes",
+    "criticality",
+    "checks",
+    "waivers",
+    "sources",
+    "tags"
+  ],
+  "properties": {
+    "edr": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+    },
+    "slug": {
+      "$ref": "#/$defs/slug"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "proposed",
+        "accepted",
+        "verified",
+        "needs-review",
+        "rejected",
+        "superseded",
+        "deprecated"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "pattern": "^team:[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+    },
+    "scope": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/scopeItem"
+      }
+    },
+    "valid_from": {
+      "$ref": "#/$defs/date"
+    },
+    "valid_to": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "review_by": {
+      "$ref": "#/$defs/date"
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/slug"
+      }
+    },
+    "criticality": {
+      "enum": ["blocking", "warning", "advisory"]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/check"
+      }
+    },
+    "waivers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/waiver"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/slug"
+      }
+    },
+    "inferred": {
+      "type": "boolean"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "superseded"
+          }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "valid_to": {
+            "$ref": "#/$defs/date"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "verified"
+          }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "checks": {
+            "minItems": 1,
+            "contains": {
+              "type": "object",
+              "properties": {
+                "engine": {
+                  "enum": [
+                    "opa",
+                    "semgrep",
+                    "archunit",
+                    "depcruise",
+                    "checkov",
+                    "kyverno",
+                    "eslint",
+                    "importlinter",
+                    "ci-binding"
+                  ]
+                }
+              },
+              "required": ["engine"]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^(?:[0-9]{4})-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "scopeItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "org": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "paths": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "env": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engine"],
+      "properties": {
+        "engine": {
+          "enum": [
+            "opa",
+            "semgrep",
+            "archunit",
+            "depcruise",
+            "checkov",
+            "kyverno",
+            "eslint",
+            "importlinter",
+            "ci-binding",
+            "llm-advisory"
+          ]
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "job": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "enum": ["block", "warn", "advise"]
+        }
+      }
+    },
+    "waiver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason", "approver", "valid_from", "valid_to"],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approver": {
+          "type": "string",
+          "minLength": 1
+        },
+        "valid_from": {
+          "$ref": "#/$defs/date"
+        },
+        "valid_to": {
+          "$ref": "#/$defs/date"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "url"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://\\S+$"
+        }
+      }
+    }
+  }
+}

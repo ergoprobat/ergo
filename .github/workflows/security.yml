@@ -1,0 +1,23 @@
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security:
+    name: security
+    permissions:
+      actions: read
+      contents: read
+      packages: read
+      security-events: write
+    uses: ergoprobat/.github/.github/workflows/security.yml@de1d1c0141cb5944712fe1156bfcc6519d7b8ee9

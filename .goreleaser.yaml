@@ -71,6 +71,7 @@ dockers_v2:
     platforms:
       - linux/amd64
       - linux/arm64
+    sbom: "false"
     labels:
       org.opencontainers.image.licenses: Apache-2.0
       org.opencontainers.image.source: https://github.com/ergoprobat/ergo

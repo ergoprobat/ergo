@@ -1,0 +1,12 @@
+{
+  "config": {
+    "default": true,
+    // Prose is never hard-wrapped: one paragraph or list item per line.
+    "MD013": false,
+    "MD024": { "siblings_only": true },
+    "MD025": { "front_matter_title": "" },
+    "MD041": { "front_matter_title": "" }
+  },
+  "globs": ["**/*.md"],
+  "ignores": ["node_modules/**"]
+}

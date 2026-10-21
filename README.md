@@ -1,5 +1,7 @@
 # ergo
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/ergoprobat/ergo/badge)](https://scorecard.dev/viewer/?uri=github.com/ergoprobat/ergo)
+
 CLI, check compilers, agent hooks and local MCP server that turn engineering decisions into enforced checks.
 
 > Status: the CLI can initialize a repository, validate EDR files, and explain one decision. Compilers, hooks, and the MADR importer land in later changes.

@@ -26,4 +26,5 @@ jobs:
       ref: ${{ github.event_name == 'workflow_dispatch' && inputs.sign-tag || github.ref }}
       tag: ${{ github.event_name == 'workflow_dispatch' && inputs.sign-tag || github.ref_name }}
       sign-only: ${{ github.event_name == 'workflow_dispatch' }}
-    secrets: inherit
+    secrets:
+      HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}

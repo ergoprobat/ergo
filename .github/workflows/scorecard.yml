@@ -1,0 +1,20 @@
+name: scorecard
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "20 7 * * 1"
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  scorecard:
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+      security-events: write
+    uses: ergoprobat/.github/.github/workflows/scorecard.yml@ec03d934c0dd0bb3289c86b190fe34a5732705ca

@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/ergoprobat/ergo/compare/v0.1.1...v0.2.0) (2026-10-21)
+
+
+### Features
+
+* **cli:** import MADR and Nygard ADRs as EDR files ([1f3118d](https://github.com/ergoprobat/ergo/commit/1f3118d9943eacba7a9a33b77cb52dc79731d268))
+
+
+### Bug Fixes
+
+* **cli:** cite ERGO-19 for the unimplemented import command ([89947b8](https://github.com/ergoprobat/ergo/commit/89947b81aec46ab3f5c96cff30a230e076074f01))
+
 ## 0.1.1 (2026-10-21)
 
 ### Features

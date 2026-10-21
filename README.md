@@ -49,7 +49,7 @@ ergo explain <slug>
 - `ergo init` writes `.ergo/config.yaml` when that file is absent. The default glob is `docs/decisions/**/*.md`.
 - `ergo check` validates every matched EDR file against the draft 0.1 schema and the required headings. It does not run check engines.
 - `ergo explain <slug>` prints the title, status, and Decision section of that file.
-- `ergo import` is reserved for the MADR and Nygard importer (T-021). It does not write a file.
+- `ergo import` is reserved for the MADR and Nygard importer (ERGO-19). It does not write a file.
 
 ## CLI reference
 
@@ -60,7 +60,7 @@ Working directory is the repository root. There are no global flags beyond help 
 | `ergo init` | Create `.ergo/config.yaml` with `decisions: [docs/decisions/**/*.md]` when missing. Print `wrote .ergo/config.yaml` or `.ergo/config.yaml already exists`. Exit `0`, or `1` on I/O error, or `2` on bad usage. |
 | `ergo check` | Load config (or the default globs), match EDR files, validate each. Print `<path>: ok`, `<path>: <problem>`, or `no EDR files found`. Exit `0` when every file is valid or none match, `1` when any file fails, `2` on bad usage. |
 | `ergo explain <slug>` | Find the EDR whose front matter `slug` matches. Print `title:`, `status:`, then the `## Decision` body. Exit `0` on success, `1` when missing or ambiguous, `2` on bad usage. |
-| `ergo import` | Not implemented yet. Prints that the importer is T-021 and exits `2`. |
+| `ergo import` | Not implemented yet. Prints that the importer is ERGO-19 and exits `2`. |
 | `ergo help`, `ergo -h`, `ergo --help` | Print usage and exit `0`. |
 | `ergo version`, `ergo -v`, `ergo --version` | Print `ergo <version> (<commit>, <date>)` and usage, then exit `0`. |
 

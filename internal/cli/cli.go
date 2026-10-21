@@ -3,8 +3,11 @@ package cli
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/ergoprobat/ergo/internal/config"
 	"github.com/ergoprobat/ergo/internal/edr"
@@ -41,8 +44,11 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		}
 		return explainCmd(root, args[1], stdout, stderr)
 	case "import":
-		fprintln(stderr, "The MADR and Nygard importer is ERGO-19.")
-		return 2
+		if len(args) > 1 && args[1] == "" {
+			fprintln(stderr, "usage: ergo import [path...]")
+			return 2
+		}
+		return importCmd(root, args[1:], stdout, stderr)
 	case "-h", "--help", "help", "version", "--version", "-v":
 		fprintln(stdout, helpText())
 		return 0
@@ -69,7 +75,7 @@ usage:
   ergo init
   ergo check
   ergo explain <slug>
-  ergo import`
+  ergo import [path...]`
 
 func initCmd(root string, stdout, stderr io.Writer) int {
 	created, err := config.Init(root)
@@ -165,6 +171,112 @@ func explainCmd(root, slug string, stdout, stderr io.Writer) int {
 	}
 	fprintf(stdout, "title: %s\nstatus: %s\n\n%s\n", chosen.Title(), chosen.Status(), text)
 	return 0
+}
+
+func importCmd(root string, args []string, stdout, stderr io.Writer) int {
+	targets, err := importTargets(root, args)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	if len(targets) == 0 {
+		fprintln(stdout, "no ADR files found")
+		return 0
+	}
+	failed := false
+	for _, path := range targets {
+		shown := displayPath(root, path)
+		raw, err := os.ReadFile(path)
+		if err != nil {
+			fprintf(stdout, "%s: %s\n", shown, err)
+			failed = true
+			continue
+		}
+		if doc, err := edr.Parse(string(raw)); err == nil && len(edr.Validate(doc)) == 0 {
+			fprintf(stdout, "%s: skipped\n", shown)
+			continue
+		}
+		imported, err := edr.Import(filepath.Base(path), string(raw), time.Now())
+		if err != nil {
+			fprintf(stdout, "%s: %s\n", shown, err)
+			failed = true
+			continue
+		}
+		if err := os.WriteFile(path, []byte(imported), 0o644); err != nil {
+			fprintf(stdout, "%s: %s\n", shown, err)
+			failed = true
+			continue
+		}
+		if strings.Contains(imported, "\ninferred: true\n") {
+			fprintf(stdout, "%s: imported inferred\n", shown)
+			continue
+		}
+		fprintf(stdout, "%s: imported\n", shown)
+	}
+	if failed {
+		return 1
+	}
+	return 0
+}
+
+func importTargets(root string, args []string) ([]string, error) {
+	if len(args) == 0 {
+		var found []string
+		for _, dir := range []string{"docs/adr", "docs/decisions"} {
+			path := filepath.Join(root, filepath.FromSlash(dir))
+			info, err := os.Stat(path)
+			if err != nil || !info.IsDir() {
+				continue
+			}
+			files, err := markdownFiles(path)
+			if err != nil {
+				return nil, err
+			}
+			found = append(found, files...)
+		}
+		return found, nil
+	}
+	var found []string
+	for _, arg := range args {
+		if arg == "" {
+			return nil, fmt.Errorf("usage: ergo import [path...]")
+		}
+		path := arg
+		if !filepath.IsAbs(path) {
+			path = filepath.Join(root, path)
+		}
+		info, err := os.Stat(path)
+		if err != nil {
+			return nil, err
+		}
+		if !info.IsDir() {
+			found = append(found, path)
+			continue
+		}
+		files, err := markdownFiles(path)
+		if err != nil {
+			return nil, err
+		}
+		found = append(found, files...)
+	}
+	return found, nil
+}
+
+func markdownFiles(root string) ([]string, error) {
+	var found []string
+	err := filepath.WalkDir(root, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() {
+			return nil
+		}
+		if strings.EqualFold(filepath.Ext(path), ".md") {
+			found = append(found, path)
+		}
+		return nil
+	})
+	return found, err
 }
 
 func fprintf(w io.Writer, format string, args ...any) {

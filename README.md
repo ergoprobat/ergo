@@ -5,7 +5,7 @@
 
 CLI, check compilers, agent hooks and local MCP server that turn engineering decisions into enforced checks.
 
-> Status: the CLI can initialize a repository, validate EDR files, and explain one decision. Compilers, hooks, and the MADR importer land in later changes.
+> Status: the CLI can initialize a repository, validate EDR files, explain one decision, and import MADR or Nygard ADRs. Compilers and hooks land in later changes.
 
 This is the Apache-2.0 adoption surface for ergo. One Go workspace will hold the EDR library, the check compilers, the connector SDK, the compiler plugin SDK, policy bundles, the CLI, agent hooks, the local MCP server, rules-file generators and the documentation site.
 
@@ -49,7 +49,7 @@ ergo explain <slug>
 - `ergo init` writes `.ergo/config.yaml` when that file is absent. The default glob is `docs/decisions/**/*.md`.
 - `ergo check` validates every matched EDR file against the draft 0.1 schema and the required headings. It does not run check engines.
 - `ergo explain <slug>` prints the title, status, and Decision section of that file.
-- `ergo import` is reserved for the MADR and Nygard importer (ERGO-19). It does not write a file.
+- `ergo import` rewrites MADR and Nygard ADR files under `docs/adr` and `docs/decisions` into EDR files. Fields the source did not contain are filled in, and `inferred` is set to true. A file that is already a valid EDR file is left unchanged.
 
 ## CLI reference
 
@@ -60,7 +60,7 @@ Working directory is the repository root. There are no global flags beyond help 
 | `ergo init` | Create `.ergo/config.yaml` with `decisions: [docs/decisions/**/*.md]` when missing. Print `wrote .ergo/config.yaml` or `.ergo/config.yaml already exists`. Exit `0`, or `1` on I/O error, or `2` on bad usage. |
 | `ergo check` | Load config (or the default globs), match EDR files, validate each. Print `<path>: ok`, `<path>: <problem>`, or `no EDR files found`. Exit `0` when every file is valid or none match, `1` when any file fails, `2` on bad usage. |
 | `ergo explain <slug>` | Find the EDR whose front matter `slug` matches. Print `title:`, `status:`, then the `## Decision` body. Exit `0` on success, `1` when missing or ambiguous, `2` on bad usage. |
-| `ergo import` | Not implemented yet. Prints that the importer is ERGO-19 and exits `2`. |
+| `ergo import [path...]` | Rewrite each MADR or Nygard Markdown file in place as an EDR file. With no path, use `docs/adr` and `docs/decisions`. Print `<path>: imported inferred`, `<path>: skipped` for a file that already validates, `<path>: <problem>`, or `no ADR files found`. Exit `0` when every file is imported, skipped, or none are found, `1` when any file fails, `2` on bad usage. |
 | `ergo help`, `ergo -h`, `ergo --help` | Print usage and exit `0`. |
 | `ergo version`, `ergo -v`, `ergo --version` | Print `ergo <version> (<commit>, <date>)` and usage, then exit `0`. |
 

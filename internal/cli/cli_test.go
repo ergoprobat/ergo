@@ -53,12 +53,24 @@ func TestInitCheckExplain(t *testing.T) {
 		t.Fatalf("explain output %q", stdout.String())
 	}
 
+	stdout.Reset()
 	stderr.Reset()
-	if code := Run([]string{"import"}, &stdout, &stderr); code != 2 {
-		t.Fatalf("import code %d", code)
+	adr := filepath.Join(root, "docs", "adr", "0002-use-postgres.md")
+	if err := os.MkdirAll(filepath.Dir(adr), 0o755); err != nil {
+		t.Fatal(err)
 	}
-	if !strings.Contains(stderr.String(), "ERGO-19") {
-		t.Fatalf("import stderr %q", stderr.String())
+	nygard := "# Use Postgres\n\nDate: 2024-01-02\n\n## Status\n\nAccepted\n\n## Context\n\nThe catalog is relational.\n\n## Decision\n\nUse Postgres.\n\n## Consequences\n\nOne engine to operate.\n"
+	if err := os.WriteFile(adr, []byte(nygard), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if code := Run([]string{"import"}, &stdout, &stderr); code != 0 {
+		t.Fatalf("import code %d\n%s\n%s", code, stdout.String(), stderr.String())
+	}
+	if !strings.Contains(stdout.String(), "docs/adr/0002-use-postgres.md: imported inferred") {
+		t.Fatalf("import output %q", stdout.String())
+	}
+	if !strings.Contains(stdout.String(), "docs/decisions/01-tls.md: skipped") {
+		t.Fatalf("import did not skip the EDR file: %q", stdout.String())
 	}
 }
 

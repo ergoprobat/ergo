@@ -41,7 +41,7 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		}
 		return explainCmd(root, args[1], stdout, stderr)
 	case "import":
-		fprintln(stderr, "The MADR and Nygard importer is T-021.")
+		fprintln(stderr, "The MADR and Nygard importer is ERGO-19.")
 		return 2
 	case "-h", "--help", "help", "version", "--version", "-v":
 		fprintln(stdout, helpText())

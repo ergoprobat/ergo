@@ -57,7 +57,7 @@ func TestInitCheckExplain(t *testing.T) {
 	if code := Run([]string{"import"}, &stdout, &stderr); code != 2 {
 		t.Fatalf("import code %d", code)
 	}
-	if !strings.Contains(stderr.String(), "T-021") {
+	if !strings.Contains(stderr.String(), "ERGO-19") {
 		t.Fatalf("import stderr %q", stderr.String())
 	}
 }

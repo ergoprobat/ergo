@@ -1,6 +1,7 @@
 # ergo
 
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/ergoprobat/ergo/badge)](https://scorecard.dev/viewer/?uri=github.com/ergoprobat/ergo)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15758/badge)](https://www.bestpractices.dev/projects/15758)
 
 CLI, check compilers, agent hooks and local MCP server that turn engineering decisions into enforced checks.
 

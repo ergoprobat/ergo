@@ -17,7 +17,7 @@ Module rule: this module does not require `ergo-server`. The EDR JSON Schema is 
 
 ## Release
 
-A push to `main` opens a release-please pull request. Merging it tags `vX.Y.Z`. That tag builds binaries, `checksums.txt`, and a GHCR image `ghcr.io/ergoprobat/ergo`. Release notes are the generated changelog. Cosign signatures, SLSA provenance, and the SBOM are T-013. The Homebrew formula is published to `ergoprobat/homebrew-tap` when `HOMEBREW_TAP_TOKEN` is set on this repository.
+A push to `main` opens a release-please pull request. Merging it tags `vX.Y.Z`. From v0.1.1, that tag is built by the pinned reusable workflow in `ergoprobat/.github`. The build publishes binaries, `checksums.txt`, a CycloneDX SBOM, keyless cosign signatures, and GitHub artifact attestations. The image is `ghcr.io/ergoprobat/ergo`. v0.1.1 is the first SLSA Build Level 3 release. v0.1.0 keeps its original bytes and has cosign signatures and a CycloneDX SBOM; it is not Level 3. The GHCR package is still private. The Homebrew formula is published to `ergoprobat/homebrew-tap` when `HOMEBREW_TAP_TOKEN` is set on this repository.
 
 ## License
 

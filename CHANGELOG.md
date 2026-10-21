@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 (2026-10-21)
+
+### Features
+
+* **ci:** publish Level 3 provenance, cosign signatures, and a CycloneDX SBOM
+
 ## 0.1.0 (2026-10-20)
 
 ### Features

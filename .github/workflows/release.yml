@@ -4,37 +4,26 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      sign-tag:
+        description: Existing tag to sign without building
+        required: true
+        type: string
 
 permissions:
-  contents: write
-  packages: write
+  contents: read
 
 jobs:
-  goreleaser:
-    name: release / goreleaser
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
-        with:
-          go-version-file: go.mod
-      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
-        with:
-          driver: docker-container
-      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
-        with:
-          version: v2.18.3
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-          SKIP_HOMEBREW: ${{ secrets.HOMEBREW_TAP_TOKEN == '' }}
+  release:
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      attestations: write
+    uses: ergoprobat/.github/.github/workflows/release-cli.yml@c982f324efb4fabedc7f44acb7ef452cfa204bfe
+    with:
+      ref: ${{ github.event_name == 'workflow_dispatch' && inputs.sign-tag || github.ref }}
+      tag: ${{ github.event_name == 'workflow_dispatch' && inputs.sign-tag || github.ref_name }}
+      sign-only: ${{ github.event_name == 'workflow_dispatch' }}
+    secrets: inherit

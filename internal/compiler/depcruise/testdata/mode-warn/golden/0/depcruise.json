@@ -1,0 +1,25 @@
+{
+  "allowed": [
+    {
+      "from": {
+        "path": "^src/"
+      },
+      "to": {
+        "path": "^src/"
+      }
+    }
+  ],
+  "allowedSeverity": "warn",
+  "forbidden": [
+    {
+      "from": {
+        "path": "^src/<generated>/"
+      },
+      "name": "not-to-db",
+      "severity": "warn",
+      "to": {
+        "path": "^src/db/"
+      }
+    }
+  ]
+}

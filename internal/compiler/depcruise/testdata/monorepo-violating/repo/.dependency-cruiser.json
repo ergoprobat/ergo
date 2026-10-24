@@ -1,0 +1,39 @@
+{
+  "forbidden": [
+    {
+      "name": "ui-not-to-db",
+      "severity": "warn",
+      "comment": "A UI package must not import the database client.",
+      "from": {
+        "path": "^packages/ui/"
+      },
+      "to": {
+        "path": "^packages/db/"
+      }
+    },
+    {
+      "name": "no-circular",
+      "severity": "warn",
+      "from": {
+        "path": "^packages/"
+      },
+      "to": {
+        "circular": true
+      }
+    }
+  ],
+  "options": {
+    "doNotFollow": "node_modules",
+    "tsConfig": {
+      "fileName": "tsconfig.json"
+    },
+    "tsPreCompilationDeps": true,
+    "enhancedResolveOptions": {
+      "extensions": [
+        ".ts",
+        ".js",
+        ".json"
+      ]
+    }
+  }
+}

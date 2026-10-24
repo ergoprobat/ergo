@@ -3,11 +3,13 @@ package builtin
 import "testing"
 
 func TestRegistry(t *testing.T) {
-	got, ok := Registry().Lookup("opa")
-	if !ok {
-		t.Fatal("opa compiler is not registered")
-	}
-	if got.Engine() != "opa" || got.Version() == "" {
-		t.Fatalf("opa compiler %+v", got)
+	for _, engine := range []string{"opa", "depcruise"} {
+		got, ok := Registry().Lookup(engine)
+		if !ok {
+			t.Fatalf("%s compiler is not registered", engine)
+		}
+		if got.Engine() != engine || got.Version() == "" {
+			t.Fatalf("%s compiler %+v", engine, got)
+		}
 	}
 }

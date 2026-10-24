@@ -1,0 +1,35 @@
+{
+  "forbidden": [
+    {
+      "name": "kept",
+      "severity": "ignore",
+      "from": {
+        "path": "^src/"
+      },
+      "to": {
+        "path": "^src/"
+      }
+    },
+    {
+      "name": "raised",
+      "severity": "warn",
+      "from": {
+        "path": "^src/"
+      },
+      "to": {
+        "path": "^lib/"
+      }
+    }
+  ],
+  "allowed": [
+    {
+      "from": {
+        "path": "^src/"
+      },
+      "to": {
+        "path": "^src/"
+      }
+    }
+  ],
+  "allowedSeverity": "ignore"
+}

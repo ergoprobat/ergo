@@ -82,3 +82,27 @@ jobs:
             exit 0
           fi
           exit "$code"
+
+  depcruise:
+    name: ci / depcruise
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: internal/compiler/depcruise/testdata/tool/package-lock.json
+      - name: Install dependency-cruiser
+        working-directory: internal/compiler/depcruise/testdata/tool
+        run: npm ci --ignore-scripts
+      - name: Cruise the fixture monorepo
+        run: go test ./internal/compiler/depcruise -count=1
+        env:
+          ERGO_DEPCRUISE: ${{ github.workspace }}/internal/compiler/depcruise/testdata/tool/node_modules/.bin/dependency-cruiser

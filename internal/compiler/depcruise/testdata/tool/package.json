@@ -1,0 +1,9 @@
+{
+  "name": "ergo-depcruise-tool",
+  "private": true,
+  "description": "Pinned dependency-cruiser used by the compiler cruise test. Not a published package.",
+  "dependencies": {
+    "dependency-cruiser": "18.7.0",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QNFMJMD0J8KAYB4EMZ53ND",
+      "slug": "monorepo-clean",
+      "check_index": 0,
+      "engine": "depcruise",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "depcruise",
+      "compiler_version": "18.7.0",
+      "artifacts": [
+        {
+          "name": "depcruise.json",
+          "sha256": "de3861038784ffcd16cd869eadc26028f9f0ce0dc080e3aba1ce6098243e8e0b"
+        }
+      ]
+    }
+  ]
+}

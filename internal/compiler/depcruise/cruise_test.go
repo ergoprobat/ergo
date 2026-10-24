@@ -20,17 +20,15 @@ import (
 // The json reporter exits 0 and records the build result in summary.advisedExitCode.
 // The err reporter exits with that number. This test reads the json report.
 func TestCruise(t *testing.T) {
-	bin := os.Getenv("ERGO_DEPCRUISE")
-	if bin == "" {
+	if os.Getenv("ERGO_DEPCRUISE") == "" {
 		t.Skip("ERGO_DEPCRUISE is not set")
 	}
-	resolved, err := exec.LookPath(bin)
-	if err != nil {
+	if _, err := os.Stat(cruiseScript); err != nil {
 		t.Fatal(err)
 	}
 
 	t.Run("monorepo-clean", func(t *testing.T) {
-		got, err := cruise(t, resolved, "testdata/monorepo-clean")
+		got, err := cruise(t, "testdata/monorepo-clean")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -40,7 +38,7 @@ func TestCruise(t *testing.T) {
 	})
 
 	t.Run("monorepo-violating", func(t *testing.T) {
-		got, err := cruise(t, resolved, "testdata/monorepo-violating")
+		got, err := cruise(t, "testdata/monorepo-violating")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -75,7 +73,7 @@ type cruiseReport struct {
 	Violations []cruiseHit
 }
 
-func cruise(t *testing.T, bin, dir string) (cruiseReport, error) {
+func cruise(t *testing.T, dir string) (cruiseReport, error) {
 	t.Helper()
 	config := compileCase(t, dir)
 	configPath := filepath.Join(t.TempDir(), artifactName)
@@ -84,7 +82,11 @@ func cruise(t *testing.T, bin, dir string) (cruiseReport, error) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, bin, "--config", configPath, "--output-type", "json", "packages")
+	script, err := filepath.Abs(cruiseScript)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cmd := exec.CommandContext(ctx, "node", script, "--config", configPath, "--output-type", "json", "packages")
 	cmd.Dir = filepath.Join(dir, "repo")
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -130,6 +132,8 @@ func cruise(t *testing.T, bin, dir string) (cruiseReport, error) {
 	})
 	return cruiseReport{Error: parsed.Summary.Error, Advised: parsed.Summary.Advised, Violations: hits}, nil
 }
+
+const cruiseScript = "testdata/tool/node_modules/dependency-cruiser/bin/dependency-cruiser.mjs"
 
 func compileCase(t *testing.T, dir string) []byte {
 	t.Helper()

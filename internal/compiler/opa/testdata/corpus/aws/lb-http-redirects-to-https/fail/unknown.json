@@ -1,0 +1,22 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_lb_listener.http",
+      "mode": "managed",
+      "type": "aws_lb_listener",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "protocol": "HTTP",
+          "port": 80,
+          "default_action": null
+        },
+        "after_unknown": {
+          "default_action": true
+        }
+      }
+    }
+  ]
+}

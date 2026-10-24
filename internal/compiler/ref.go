@@ -22,9 +22,19 @@ func ReadRef(in Input) ([]byte, error) {
 	if in.Repo == nil {
 		return nil, &Error{Code: CodeRefMissing, Err: errors.New("no repository")}
 	}
+	info, err := fs.Stat(in.Repo, ref)
+	if err != nil {
+		return nil, classifyRef(err)
+	}
+	if info.Size() > MaxRefBytes {
+		return nil, &Error{Code: CodeRefTooLarge, Err: fmt.Errorf("ref %q is %d bytes", ref, info.Size())}
+	}
 	data, err := fs.ReadFile(in.Repo, ref)
 	if err != nil {
 		return nil, classifyRef(err)
+	}
+	if len(data) > MaxRefBytes {
+		return nil, &Error{Code: CodeRefTooLarge, Err: fmt.Errorf("ref %q is %d bytes", ref, len(data))}
 	}
 	return data, nil
 }

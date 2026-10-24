@@ -18,7 +18,7 @@ func TestReference(t *testing.T) {
 }
 
 // referenceCompiler packages the file named by ref. It is not linked into the binary.
-// Engine is opa so the fixture stays a valid EDR file. The OPA compiler is a later package.
+// Engine is opa so the fixture stays a valid EDR file. The built-in OPA compiler is internal/compiler/opa.
 type referenceCompiler struct{}
 
 func (referenceCompiler) Engine() string  { return "opa" }

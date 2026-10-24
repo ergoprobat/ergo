@@ -1,0 +1,21 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_instance.web",
+      "mode": "managed",
+      "type": "aws_instance",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "root_block_device": [
+            {
+              "encrypted": false
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

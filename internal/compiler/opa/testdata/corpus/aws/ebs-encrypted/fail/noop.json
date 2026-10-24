@@ -1,0 +1,17 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_ebs_volume.kept",
+      "mode": "managed",
+      "type": "aws_ebs_volume",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "after": {
+          "encrypted": false
+        }
+      }
+    }
+  ]
+}

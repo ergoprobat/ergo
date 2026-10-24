@@ -1,0 +1,18 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_kms_key.sign",
+      "mode": "managed",
+      "type": "aws_kms_key",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "enable_key_rotation": false,
+          "customer_master_key_spec": "RSA_3072"
+        }
+      }
+    }
+  ]
+}

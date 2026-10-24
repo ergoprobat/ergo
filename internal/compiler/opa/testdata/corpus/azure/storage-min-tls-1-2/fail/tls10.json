@@ -1,0 +1,17 @@
+{
+  "resource_changes": [
+    {
+      "address": "azurerm_storage_account.logs",
+      "mode": "managed",
+      "type": "azurerm_storage_account",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "min_tls_version": "TLS1_0"
+        }
+      }
+    }
+  ]
+}

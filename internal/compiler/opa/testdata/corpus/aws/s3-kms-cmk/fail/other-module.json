@@ -1,0 +1,55 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_s3_bucket.logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "bucket": "logs",
+          "id": "logs"
+        }
+      }
+    },
+    {
+      "address": "module.child.aws_s3_bucket.logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "bucket": "logs",
+          "id": "logs"
+        }
+      }
+    },
+    {
+      "address": "module.child.aws_s3_bucket_server_side_encryption_configuration.logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "bucket": "logs",
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {
+                  "sse_algorithm": "aws:kms",
+                  "kms_master_key_id": "arn:aws:kms:eu-central-1:123456789012:key/abcd"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

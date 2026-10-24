@@ -104,7 +104,4 @@ func TestRegistryFirstWins(t *testing.T) {
 	if !ok || got.Version() != "1" {
 		t.Fatalf("lookup %+v %v", got, ok)
 	}
-	if _, ok := Builtin().Lookup("opa"); ok {
-		t.Fatal("builtin registry should be empty")
-	}
 }

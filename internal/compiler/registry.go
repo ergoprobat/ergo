@@ -10,12 +10,6 @@ func NewRegistry(compilers ...Compiler) Registry {
 	return Registry{compilers: append([]Compiler(nil), compilers...)}
 }
 
-// Builtin is the compilers linked into the ergo binary.
-// Adding an engine means appending its constructor here.
-func Builtin() Registry {
-	return NewRegistry()
-}
-
 // Lookup returns the compiler for an EDR engine value.
 func (r Registry) Lookup(engine string) (Compiler, bool) {
 	for _, candidate := range r.compilers {

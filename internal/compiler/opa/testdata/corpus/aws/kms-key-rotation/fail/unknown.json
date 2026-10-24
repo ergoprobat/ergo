@@ -1,0 +1,20 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_kms_key.main",
+      "mode": "managed",
+      "type": "aws_kms_key",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "enable_key_rotation": null
+        },
+        "after_unknown": {
+          "enable_key_rotation": true
+        }
+      }
+    }
+  ]
+}

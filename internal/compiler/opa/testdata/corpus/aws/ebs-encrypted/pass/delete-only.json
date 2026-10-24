@@ -1,0 +1,15 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_ebs_volume.old",
+      "mode": "managed",
+      "type": "aws_ebs_volume",
+      "change": {
+        "actions": [
+          "delete"
+        ],
+        "after": null
+      }
+    }
+  ]
+}

@@ -65,6 +65,26 @@ func TestReadRef(t *testing.T) {
 	}
 }
 
+func TestReadRefTooLarge(t *testing.T) {
+	root := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(root, "policies"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	body := make([]byte, MaxRefBytes+1)
+	if err := os.WriteFile(filepath.Join(root, "policies", "big.rego"), body, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	repo, err := os.OpenRoot(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = repo.Close() })
+	_, err = ReadRef(Input{Check: edr.Check{Ref: "policies/big.rego"}, Repo: repo.FS()})
+	if CodeOf(err) != CodeRefTooLarge {
+		t.Fatalf("code %q err %v", CodeOf(err), err)
+	}
+}
+
 func TestReadRefNilRepo(t *testing.T) {
 	_, err := ReadRef(Input{Check: edr.Check{Ref: "policies/rule.txt"}})
 	if CodeOf(err) != CodeRefMissing {

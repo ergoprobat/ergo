@@ -1,0 +1,18 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_db_instance.pg",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "publicly_accessible": true,
+          "engine": "postgres"
+        }
+      }
+    }
+  ]
+}

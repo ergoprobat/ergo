@@ -1,0 +1,17 @@
+{
+  "resource_changes": [
+    {
+      "address": "azurerm_storage_account.logs",
+      "mode": "managed",
+      "type": "azurerm_storage_account",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "https_traffic_only_enabled": true
+        }
+      }
+    }
+  ]
+}

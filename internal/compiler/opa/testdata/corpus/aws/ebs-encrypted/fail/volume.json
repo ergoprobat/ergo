@@ -1,0 +1,17 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_ebs_volume.data",
+      "mode": "managed",
+      "type": "aws_ebs_volume",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "encrypted": false
+        }
+      }
+    }
+  ]
+}

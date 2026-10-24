@@ -1,0 +1,173 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_db_instance.mysql",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "engine": "mysql"
+        }
+      }
+    },
+    {
+      "address": "aws_rds_cluster.mysql",
+      "mode": "managed",
+      "type": "aws_rds_cluster",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "engine": "aurora-mysql"
+        }
+      }
+    },
+    {
+      "address": "aws_dynamodb_table.app",
+      "mode": "managed",
+      "type": "aws_dynamodb_table",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "app"
+        }
+      }
+    },
+    {
+      "address": "aws_docdb_cluster.app",
+      "mode": "managed",
+      "type": "aws_docdb_cluster",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "engine": "docdb"
+        }
+      }
+    },
+    {
+      "address": "aws_neptune_cluster.app",
+      "mode": "managed",
+      "type": "aws_neptune_cluster",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "engine": "neptune"
+        }
+      }
+    },
+    {
+      "address": "aws_redshift_cluster.app",
+      "mode": "managed",
+      "type": "aws_redshift_cluster",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "node_type": "ra3"
+        }
+      }
+    },
+    {
+      "address": "aws_elasticache_cluster.app",
+      "mode": "managed",
+      "type": "aws_elasticache_cluster",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "engine": "redis"
+        }
+      }
+    },
+    {
+      "address": "aws_elasticache_replication_group.app",
+      "mode": "managed",
+      "type": "aws_elasticache_replication_group",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "engine": "redis"
+        }
+      }
+    },
+    {
+      "address": "aws_memorydb_cluster.app",
+      "mode": "managed",
+      "type": "aws_memorydb_cluster",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "app"
+        }
+      }
+    },
+    {
+      "address": "azurerm_mssql_server.app",
+      "mode": "managed",
+      "type": "azurerm_mssql_server",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "app"
+        }
+      }
+    },
+    {
+      "address": "azurerm_mysql_flexible_server.app",
+      "mode": "managed",
+      "type": "azurerm_mysql_flexible_server",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "app"
+        }
+      }
+    },
+    {
+      "address": "azurerm_cosmosdb_account.app",
+      "mode": "managed",
+      "type": "azurerm_cosmosdb_account",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "app"
+        }
+      }
+    },
+    {
+      "address": "azurerm_redis_cache.app",
+      "mode": "managed",
+      "type": "azurerm_redis_cache",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "app"
+        }
+      }
+    }
+  ]
+}

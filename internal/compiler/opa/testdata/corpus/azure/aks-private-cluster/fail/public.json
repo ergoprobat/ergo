@@ -1,0 +1,17 @@
+{
+  "resource_changes": [
+    {
+      "address": "azurerm_kubernetes_cluster.app",
+      "mode": "managed",
+      "type": "azurerm_kubernetes_cluster",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "private_cluster_enabled": false
+        }
+      }
+    }
+  ]
+}

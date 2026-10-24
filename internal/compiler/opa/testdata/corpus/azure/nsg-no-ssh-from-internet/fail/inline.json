@@ -1,0 +1,27 @@
+{
+  "resource_changes": [
+    {
+      "address": "azurerm_network_security_group.app",
+      "mode": "managed",
+      "type": "azurerm_network_security_group",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "security_rule": [
+            {
+              "name": "ssh",
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "destination_port_range": "22",
+              "source_address_prefix": "Internet",
+              "destination_address_prefix": "*"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -21,6 +21,6 @@ empty=$(mktemp -d)
 $chk -d "$empty" -o json > captured/empty.json
 clean=$(mktemp -d)
 cp fixtures/pass.tf.fixture "$clean/main.tf"
-cp fixtures/Dockerfile.fixture "$clean/Dockerfile"
+cp fixtures/alpine.containerfile.fixture "$clean/Dockerfile"
 $chk -d "$clean" --framework terraform dockerfile -o json > captured/multi.json
 ```

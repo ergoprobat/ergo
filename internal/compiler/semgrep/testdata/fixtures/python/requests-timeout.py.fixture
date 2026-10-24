@@ -1,0 +1,11 @@
+import requests
+
+
+def bad(url):
+    # ruleid: python.requests-timeout
+    requests.get(url)
+
+
+def good(url):
+    # ok: python.requests-timeout
+    requests.get(url, timeout=5)

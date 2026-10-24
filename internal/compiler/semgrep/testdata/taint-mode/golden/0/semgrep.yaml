@@ -1,0 +1,11 @@
+rules:
+  - id: user-input-to-shell
+    languages:
+      - python
+    message: User input reaches a shell
+    mode: taint
+    pattern-sinks:
+      - pattern: sink(...)
+    pattern-sources:
+      - pattern: source(...)
+    severity: WARNING

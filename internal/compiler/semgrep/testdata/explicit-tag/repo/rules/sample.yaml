@@ -1,0 +1,6 @@
+rules:
+  - id: sample
+    message: !!str sample rule
+    languages:
+      - python
+    pattern: foo(...)

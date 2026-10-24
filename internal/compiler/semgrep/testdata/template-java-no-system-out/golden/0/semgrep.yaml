@@ -1,0 +1,13 @@
+rules:
+  - id: java.no-system-out
+    languages:
+      - java
+    message: Logging must not use System.out
+    metadata:
+      title: Java logging does not use System.out
+    pattern-either:
+      - pattern: System.out.print(...)
+      - pattern: System.out.println(...)
+      - pattern: System.err.print(...)
+      - pattern: System.err.println(...)
+    severity: ERROR

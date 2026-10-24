@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QV9THH5K2GCVSPMQ4CDTTN",
+      "slug": "severity-replaced",
+      "check_index": 0,
+      "engine": "semgrep",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "semgrep",
+      "compiler_version": "1.182.1",
+      "artifacts": [
+        {
+          "name": "semgrep.yaml",
+          "sha256": "7696f445eba275ac92eaa2859b91a13ab9e3e22ef183f44cc47f5018d3e0ee72"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+rules:
+  - id: one
+    id: two
+    message: sample rule
+    languages:
+      - python
+    pattern: foo(...)

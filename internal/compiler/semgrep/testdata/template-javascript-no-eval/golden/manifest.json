@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QV9TJGDJ0N3JZV8ENEKARN",
+      "slug": "template-javascript-no-eval",
+      "check_index": 0,
+      "engine": "semgrep",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "semgrep",
+      "compiler_version": "1.182.1",
+      "artifacts": [
+        {
+          "name": "semgrep.yaml",
+          "sha256": "33f91c5bb8dd9da815610c8dbd9a7bc0c61d555edbb4021b937a736d0486c7df"
+        }
+      ]
+    }
+  ]
+}

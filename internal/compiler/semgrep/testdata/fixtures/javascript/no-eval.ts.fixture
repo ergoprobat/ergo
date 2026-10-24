@@ -1,0 +1,9 @@
+function bad(code: string): unknown {
+  // ruleid: javascript.no-eval
+  return eval(code);
+}
+
+function good(text: string): unknown {
+  // ok: javascript.no-eval
+  return JSON.parse(text);
+}

@@ -1,0 +1,4 @@
+rules:
+  - id: sample
+    message: sample rule
+    pattern: foo(...)

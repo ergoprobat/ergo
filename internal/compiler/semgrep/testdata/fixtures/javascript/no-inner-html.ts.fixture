@@ -1,0 +1,9 @@
+function bad(el: { innerHTML: string }, name: string): void {
+  // ruleid: javascript.no-inner-html
+  el.innerHTML = name;
+}
+
+function good(el: { textContent: string }, name: string): void {
+  // ok: javascript.no-inner-html
+  el.textContent = name;
+}

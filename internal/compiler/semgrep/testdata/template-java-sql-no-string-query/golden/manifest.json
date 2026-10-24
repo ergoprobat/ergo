@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QV9TJVJZPXFSJ0085H19Z1",
+      "slug": "template-java-sql-no-string-query",
+      "check_index": 0,
+      "engine": "semgrep",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "semgrep",
+      "compiler_version": "1.182.1",
+      "artifacts": [
+        {
+          "name": "semgrep.yaml",
+          "sha256": "ef61cfb0a46688ceb75f417db5123f1a47f124f555749f99d2fc3903fc788d32"
+        }
+      ]
+    }
+  ]
+}

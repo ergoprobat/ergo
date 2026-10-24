@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QV9THSABWKBW4GV1W0QBRX",
+      "slug": "template-go-http-client-timeout",
+      "check_index": 0,
+      "engine": "semgrep",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "semgrep",
+      "compiler_version": "1.182.1",
+      "artifacts": [
+        {
+          "name": "semgrep.yaml",
+          "sha256": "58a3d21a4e6cb6193daad6de4258a5d1dabdd4aa98ad7e84c7969a3df77eac78"
+        }
+      ]
+    }
+  ]
+}

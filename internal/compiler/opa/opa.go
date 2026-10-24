@@ -11,8 +11,6 @@ import (
 )
 
 const (
-	// CodeTemplateUnknown means ref names an ergo: template that is not built in.
-	CodeTemplateUnknown = "template-unknown"
 	// CodeTemplateTarget means an ergo: template check does not target a Terraform plan.
 	CodeTemplateTarget = "template-target"
 	// CodeRegoParse means the Rego module could not be parsed as Rego v1.
@@ -24,10 +22,9 @@ const (
 	// CodeRegoNoDeny means the module has no multi-value deny rule.
 	CodeRegoNoDeny = "rego-no-deny"
 
-	templatePrefix = "ergo:"
-	planTarget     = "terraform-plan"
-	policyName     = "policy.rego"
-	libName        = "terraform.rego"
+	planTarget = "terraform-plan"
+	policyName = "policy.rego"
+	libName    = "terraform.rego"
 )
 
 // Compiler is the built-in OPA engine.
@@ -46,7 +43,7 @@ func (Compiler) Version() string { return version.Version }
 // A ref that starts with ergo: selects a built-in template and also writes terraform.rego.
 // Any other ref is one repository file.
 func (Compiler) Compile(in compiler.Input) ([]compiler.Artifact, error) {
-	if strings.HasPrefix(in.Check.Ref, templatePrefix) {
+	if strings.HasPrefix(in.Check.Ref, compiler.TemplatePrefix) {
 		return compileTemplate(in)
 	}
 	return compileRepo(in)
@@ -56,10 +53,10 @@ func compileTemplate(in compiler.Input) ([]compiler.Artifact, error) {
 	if in.Check.Target != planTarget {
 		return nil, &compiler.Error{Code: CodeTemplateTarget, Err: fmt.Errorf("target %q", in.Check.Target)}
 	}
-	id := strings.TrimPrefix(in.Check.Ref, templatePrefix)
+	id := strings.TrimPrefix(in.Check.Ref, compiler.TemplatePrefix)
 	src, ok := lookup(id)
 	if !ok {
-		return nil, &compiler.Error{Code: CodeTemplateUnknown, Err: fmt.Errorf("template %q", id)}
+		return nil, &compiler.Error{Code: compiler.CodeTemplateUnknown, Err: fmt.Errorf("template %q", id)}
 	}
 	lib := libSource()
 	if err := vet(id+".rego", src, true, lib); err != nil {

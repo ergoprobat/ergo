@@ -1,0 +1,16 @@
+package sample
+
+import (
+	"fmt"
+	"log/slog"
+)
+
+func bad(name string) {
+	// ruleid: go.use-slog
+	fmt.Printf("hello %s", name)
+}
+
+func good(name string) {
+	// ok: go.use-slog
+	slog.Info("hello", "name", name)
+}

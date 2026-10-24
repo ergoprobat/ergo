@@ -1,0 +1,7 @@
+rules:
+  - id: no-shell-string
+    languages:
+      - python
+    message: Do not pass a single string to a shell
+    pattern: subprocess.run($CMD, shell=True)
+    severity: WARNING

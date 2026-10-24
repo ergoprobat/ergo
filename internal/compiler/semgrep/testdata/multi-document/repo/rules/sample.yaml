@@ -1,0 +1,13 @@
+rules:
+  - id: sample
+    message: sample rule
+    languages:
+      - python
+    pattern: foo(...)
+---
+rules:
+  - id: sample
+    message: sample rule
+    languages:
+      - python
+    pattern: foo(...)

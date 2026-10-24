@@ -1,0 +1,17 @@
+rules:
+  - id: go.http-client-timeout
+    languages:
+      - go
+    message: HTTP clients must set a timeout
+    metadata:
+      title: Go HTTP clients set a timeout
+    patterns:
+      - pattern-either:
+          - pattern: http.Client{...}
+          - pattern: '&http.Client{...}'
+          - pattern: http.Get(...)
+          - pattern: http.Post(...)
+          - pattern: http.Head(...)
+      - pattern-not: 'http.Client{..., Timeout: $T, ...}'
+      - pattern-not: '&http.Client{..., Timeout: $T, ...}'
+    severity: ERROR

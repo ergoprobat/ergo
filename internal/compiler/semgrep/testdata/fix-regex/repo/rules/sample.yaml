@@ -1,0 +1,9 @@
+rules:
+  - id: sample
+    message: sample rule
+    languages:
+      - python
+    pattern: foo(...)
+    fix-regex:
+      regex: foo
+      replacement: bar

@@ -1,0 +1,24 @@
+rules:
+  - id: python.requests-timeout
+    languages:
+      - python
+    message: HTTP requests must set a timeout
+    metadata:
+      title: Python HTTP requests set a timeout
+    patterns:
+      - pattern-either:
+          - pattern: requests.get(...)
+          - pattern: requests.post(...)
+          - pattern: requests.put(...)
+          - pattern: requests.patch(...)
+          - pattern: requests.delete(...)
+          - pattern: requests.head(...)
+          - pattern: requests.request(...)
+      - pattern-not: requests.get(..., timeout=$T, ...)
+      - pattern-not: requests.post(..., timeout=$T, ...)
+      - pattern-not: requests.put(..., timeout=$T, ...)
+      - pattern-not: requests.patch(..., timeout=$T, ...)
+      - pattern-not: requests.delete(..., timeout=$T, ...)
+      - pattern-not: requests.head(..., timeout=$T, ...)
+      - pattern-not: requests.request(..., timeout=$T, ...)
+    severity: ERROR

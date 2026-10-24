@@ -367,3 +367,9 @@ var wantTemplateIDs = []string{
 	"azure/storage-no-public-blob",
 	"terraform/postgres-only",
 }
+
+func TestLibIsNotATemplate(t *testing.T) {
+	if _, ok := lookup("lib/terraform"); ok {
+		t.Fatal("lib/terraform is a template")
+	}
+}

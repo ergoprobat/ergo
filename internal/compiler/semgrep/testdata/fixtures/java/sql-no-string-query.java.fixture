@@ -1,0 +1,13 @@
+import java.sql.Statement;
+
+class Sample {
+    void bad(Statement stmt, String id) {
+        // ruleid: java.sql-no-string-query
+        stmt.executeQuery("select " + id);
+    }
+
+    void good(Statement stmt) {
+        // ok: java.sql-no-string-query
+        stmt.executeQuery("select 1");
+    }
+}

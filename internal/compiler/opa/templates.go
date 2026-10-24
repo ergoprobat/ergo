@@ -5,6 +5,8 @@ import (
 	"io/fs"
 	"sort"
 	"strings"
+
+	"github.com/ergoprobat/ergo/internal/compiler"
 )
 
 //go:embed templates
@@ -21,7 +23,9 @@ func libSource() []byte {
 }
 
 func lookup(id string) ([]byte, bool) {
-	if !validTemplateID(id) {
+	provider, _, _ := strings.Cut(id, "/")
+	// lib holds the helper module, which is not a decision template.
+	if provider == "lib" || !compiler.ValidTemplateID(id) {
 		return nil, false
 	}
 	data, err := templateFiles.ReadFile(templateRoot + "/" + id + ".rego")
@@ -53,26 +57,6 @@ func templateIDs() []string {
 	}
 	sort.Strings(ids)
 	return ids
-}
-
-func validTemplateID(id string) bool {
-	provider, name, ok := strings.Cut(id, "/")
-	if !ok || strings.Contains(name, "/") || provider == "lib" {
-		return false
-	}
-	return templateToken(provider) && templateToken(name)
-}
-
-func templateToken(value string) bool {
-	if value == "" {
-		return false
-	}
-	for _, r := range value {
-		if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
-			return false
-		}
-	}
-	return true
 }
 
 func packagePath(id string) string {

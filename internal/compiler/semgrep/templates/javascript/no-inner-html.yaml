@@ -1,0 +1,11 @@
+rules:
+  - id: javascript.no-inner-html
+    message: DOM updates must not assign innerHTML
+    languages:
+      - javascript
+      - typescript
+    metadata:
+      title: JavaScript and TypeScript do not assign innerHTML
+    pattern-either:
+      - pattern: $EL.innerHTML = $X
+      - pattern: document.write(...)

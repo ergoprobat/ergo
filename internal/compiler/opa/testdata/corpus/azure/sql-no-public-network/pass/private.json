@@ -1,0 +1,17 @@
+{
+  "resource_changes": [
+    {
+      "address": "azurerm_mssql_server.app",
+      "mode": "managed",
+      "type": "azurerm_mssql_server",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "public_network_access_enabled": false
+        }
+      }
+    }
+  ]
+}

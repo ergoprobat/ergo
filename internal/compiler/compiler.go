@@ -16,6 +16,12 @@ const (
 	CodeRefOutside = "ref-outside-repo"
 	// CodeRefMissing means ref names a file that is not in the repository.
 	CodeRefMissing = "ref-missing"
+	// CodeRefTooLarge means ref is larger than MaxRefBytes.
+	CodeRefTooLarge = "ref-too-large"
+
+	// MaxRefBytes is the largest file a ref may read.
+	// The cap is the compile budget for a repository policy: the parser never sees a larger file.
+	MaxRefBytes = 1 << 20
 	// CodeArtifactName means an artifact path is empty, duplicated, or not a relative path.
 	CodeArtifactName = "artifact-name"
 	// CodeDuplicateID means two in-force records share a decision id.

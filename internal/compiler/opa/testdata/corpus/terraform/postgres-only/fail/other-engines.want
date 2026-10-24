@@ -1,0 +1,13 @@
+aws_db_instance.mysql
+aws_rds_cluster.mysql
+aws_dynamodb_table.app
+aws_docdb_cluster.app
+aws_neptune_cluster.app
+aws_redshift_cluster.app
+aws_elasticache_cluster.app
+aws_elasticache_replication_group.app
+aws_memorydb_cluster.app
+azurerm_mssql_server.app
+azurerm_mysql_flexible_server.app
+azurerm_cosmosdb_account.app
+azurerm_redis_cache.app

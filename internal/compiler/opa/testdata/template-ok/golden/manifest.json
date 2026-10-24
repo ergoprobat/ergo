@@ -1,0 +1,23 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5C5QEHHNXJ3D7X2ZCMGXQT7",
+      "slug": "template-ok",
+      "check_index": 0,
+      "engine": "opa",
+      "mode": "block",
+      "compiler": "opa",
+      "compiler_version": "1.21.4",
+      "artifacts": [
+        {
+          "name": "policy.rego",
+          "sha256": "b42d5987a61c0f6e1a20fe95c93590d89fab9ba0189ec49b66b9673bce38e840"
+        },
+        {
+          "name": "terraform.rego",
+          "sha256": "4f605e0da4ab006c6c85b9b6546a29ff1914ca9c04a684d860c3246bed61099e"
+        }
+      ]
+    }
+  ]
+}

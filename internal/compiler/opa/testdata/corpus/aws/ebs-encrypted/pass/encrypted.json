@@ -1,0 +1,61 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_ebs_volume.data",
+      "mode": "managed",
+      "type": "aws_ebs_volume",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "encrypted": true
+        }
+      }
+    },
+    {
+      "address": "aws_instance.web",
+      "mode": "managed",
+      "type": "aws_instance",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "root_block_device": [
+            {
+              "encrypted": true
+            }
+          ],
+          "ebs_block_device": [
+            {
+              "encrypted": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "aws_launch_template.app",
+      "mode": "managed",
+      "type": "aws_launch_template",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "block_device_mappings": [
+            {
+              "device_name": "/dev/xvda",
+              "ebs": [
+                {
+                  "encrypted": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

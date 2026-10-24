@@ -1,0 +1,56 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_db_instance.pg",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "engine": "postgres"
+        }
+      }
+    },
+    {
+      "address": "aws_rds_cluster.pg",
+      "mode": "managed",
+      "type": "aws_rds_cluster",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "engine": "aurora-postgresql"
+        }
+      }
+    },
+    {
+      "address": "azurerm_postgresql_flexible_server.pg",
+      "mode": "managed",
+      "type": "azurerm_postgresql_flexible_server",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "pg"
+        }
+      }
+    },
+    {
+      "address": "aws_s3_bucket.logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "bucket": "logs"
+        }
+      }
+    }
+  ]
+}

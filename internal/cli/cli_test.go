@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ergoprobat/ergo/internal/compiler/builtin"
 )
 
 func TestInitCheckExplain(t *testing.T) {
@@ -273,6 +274,26 @@ func TestCompile(t *testing.T) {
 			t.Fatalf("code %d stderr %s", code, stderr.String())
 		}
 	})
+}
+
+func TestCompileBuiltinTemplate(t *testing.T) {
+	now := time.Date(2026, 2, 1, 12, 0, 0, 0, time.UTC)
+	root := t.TempDir()
+	withDir(t, root)
+	writeRepoFile(t, root, "docs/decisions/s3.md", compileRecord(idA, "s3-kms", "accepted", "blocking", "2026-01-01", "", "  - engine: opa\n    target: terraform-plan\n    ref: ergo:aws/s3-kms-cmk\n"))
+	stdout, stderr, code := compileAt(t, now, builtin.Registry())
+	if code != 0 {
+		t.Fatalf("code %d\n%s\n%s", code, stdout, stderr)
+	}
+	if !strings.Contains(stdout, "docs/decisions/s3.md: checks[0] (opa): compiled 2 artifacts") {
+		t.Fatalf("stdout %s", stdout)
+	}
+	if !strings.Contains(readBuild(t, root, idA+"/0/policy.rego"), "package ergo.templates.aws.s3_kms_cmk") {
+		t.Fatal("policy.rego is not the S3 template")
+	}
+	if !strings.Contains(readBuild(t, root, idA+"/0/terraform.rego"), "package ergo.lib.terraform") {
+		t.Fatal("terraform.rego is not the helper module")
+	}
 }
 
 func compileAt(t *testing.T, now time.Time, reg compiler.Registry) (string, string, int) {

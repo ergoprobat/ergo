@@ -1,0 +1,19 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5C5QEHHNXJ3D7X2ZCMGXQT7",
+      "slug": "repo-policy",
+      "check_index": 0,
+      "engine": "opa",
+      "mode": "block",
+      "compiler": "opa",
+      "compiler_version": "1.21.4",
+      "artifacts": [
+        {
+          "name": "policy.rego",
+          "sha256": "7648c065b11b154878acf1d937102774d3ac471fb91a4b7ce6f0d95607956433"
+        }
+      ]
+    }
+  ]
+}

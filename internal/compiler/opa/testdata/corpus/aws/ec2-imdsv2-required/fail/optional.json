@@ -1,0 +1,22 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_instance.web",
+      "mode": "managed",
+      "type": "aws_instance",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "metadata_options": [
+            {
+              "http_tokens": "optional",
+              "http_endpoint": "enabled"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

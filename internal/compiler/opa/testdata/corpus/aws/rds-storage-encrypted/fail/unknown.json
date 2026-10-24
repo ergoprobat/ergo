@@ -1,0 +1,21 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_db_instance.pg",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "storage_encrypted": null,
+          "engine": "postgres"
+        },
+        "after_unknown": {
+          "storage_encrypted": true
+        }
+      }
+    }
+  ]
+}

@@ -5,7 +5,7 @@
 
 CLI, check compilers, agent hooks and local MCP server that turn engineering decisions into enforced checks.
 
-> Status: the CLI can initialize a repository, validate EDR files, explain one decision, import MADR or Nygard ADRs, and compile in-force checks. No engine is registered yet, so `ergo compile` reports each check and writes an empty manifest. Hooks land in later changes.
+> Status: the CLI can initialize a repository, validate EDR files, explain one decision, import MADR or Nygard ADRs, and compile in-force checks. The OPA compiler is registered. A check with `ref: ergo:<provider>/<name>` and `target: terraform-plan` compiles a built-in template. Repository Rego is one `.rego` file. The template list is [docs/templates.md](docs/templates.md). `ergo compile` does not evaluate a plan. Hooks land in later changes.
 
 This is the Apache-2.0 adoption surface for ergo. One Go workspace will hold the EDR library, the check compilers, the connector SDK, the compiler plugin SDK, policy bundles, the CLI, agent hooks, the local MCP server, rules-file generators and the documentation site.
 
@@ -50,7 +50,7 @@ ergo explain <slug>
 - `ergo check` validates every matched EDR file against the draft 0.1 schema and the required headings. It does not run check engines.
 - `ergo explain <slug>` prints the title, status, and Decision section of that file.
 - `ergo import` rewrites MADR and Nygard ADR files under `docs/adr` and `docs/decisions` into EDR files. Fields the source did not contain are filled in, and `inferred` is set to true. A file that is already a valid EDR file is left unchanged.
-- `ergo compile` compiles checks on records that are in force today. A record is in force when its status is `accepted`, `verified`, or `needs-review` and today falls in `[valid_from, valid_to)`. It replaces `.ergo/build/` with a manifest and the artifact files. The directory contains a `.gitignore` of `*`. A check with no registered compiler is reported and skipped. `llm-advisory` is reported as advisory and is not compiled. An explicit check `mode` is kept. Otherwise `blocking`, `warning`, and `advisory` become `block`, `warn`, and `advise`.
+- `ergo compile` compiles checks on records that are in force today. A record is in force when its status is `accepted`, `verified`, or `needs-review` and today falls in `[valid_from, valid_to)`. It replaces `.ergo/build/` with a manifest and the artifact files. The directory contains a `.gitignore` of `*`. A check with no registered compiler is reported and skipped. `llm-advisory` is reported as advisory and is not compiled. An explicit check `mode` is kept. Otherwise `blocking`, `warning`, and `advisory` become `block`, `warn`, and `advise`. For `engine: opa`, `ref: ergo:<provider>/<name>` selects a built-in Terraform plan template and requires `target: terraform-plan`. Any other `ref` is one Rego file in the repository. The compiler writes `policy.rego` after the module parses, and `terraform.rego` for a template. It does not evaluate the plan.
 
 ## CLI reference
 
@@ -62,7 +62,7 @@ Working directory is the repository root. There are no global flags beyond help 
 | `ergo check` | Load config (or the default globs), match EDR files, validate each. Print `<path>: ok`, `<path>: <problem>`, or `no EDR files found`. Exit `0` when every file is valid or none match, `1` when any file fails, `2` on bad usage. |
 | `ergo explain <slug>` | Find the EDR whose front matter `slug` matches. Print `title:`, `status:`, then the `## Decision` body. Exit `0` on success, `1` when missing or ambiguous, `2` on bad usage. |
 | `ergo import [path...]` | Rewrite each MADR or Nygard Markdown file in place as an EDR file. With no path, use `docs/adr` and `docs/decisions`. Print `<path>: imported inferred`, `<path>: skipped` for a file that already validates, `<path>: <problem>`, or `no ADR files found`. Exit `0` when every file is imported, skipped, or none are found, `1` when any file fails, `2` on bad usage. |
-| `ergo compile` | Compile checks on in-force records into `.ergo/build/`. Print `<path>: checks[N] (engine): compiled K artifacts`, `<path>: checks[N] (engine): no compiler`, `<path>: checks[N] (engine): advisory, not compiled`, `<path>: skipped, not in force`, or `no EDR files found`. Exit `0` when every in-force check compiles or has no compiler, `1` when a record is invalid, a compile fails, two records share an id, or `.ergo/build` is a symlink, `2` on bad usage. A failure leaves the previous build in place. |
+| `ergo compile` | Compile checks on in-force records into `.ergo/build/`. An OPA check with `ref: ergo:<provider>/<name>` and `target: terraform-plan` compiles a built-in template ([docs/templates.md](docs/templates.md)). Print `<path>: checks[N] (engine): compiled K artifacts`, `<path>: checks[N] (engine): no compiler`, `<path>: checks[N] (engine): advisory, not compiled`, `<path>: skipped, not in force`, or `no EDR files found`. Exit `0` when every in-force check compiles or has no compiler, `1` when a record is invalid, a compile fails, two records share an id, or `.ergo/build` is a symlink, `2` on bad usage. A failure leaves the previous build in place. |
 | `ergo help`, `ergo -h`, `ergo --help` | Print usage and exit `0`. |
 | `ergo version`, `ergo -v`, `ergo --version` | Print `ergo <version> (<commit>, <date>)` and usage, then exit `0`. |
 

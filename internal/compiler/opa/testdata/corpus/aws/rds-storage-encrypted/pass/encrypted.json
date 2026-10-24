@@ -1,0 +1,32 @@
+{
+  "resource_changes": [
+    {
+      "address": "aws_db_instance.pg",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "storage_encrypted": true,
+          "engine": "postgres"
+        }
+      }
+    },
+    {
+      "address": "aws_rds_cluster.pg",
+      "mode": "managed",
+      "type": "aws_rds_cluster",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "storage_encrypted": true,
+          "engine": "aurora-postgresql"
+        }
+      }
+    }
+  ]
+}

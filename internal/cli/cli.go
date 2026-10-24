@@ -10,12 +10,13 @@ import (
 	"time"
 
 	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ergoprobat/ergo/internal/compiler/builtin"
 	"github.com/ergoprobat/ergo/internal/config"
 	"github.com/ergoprobat/ergo/internal/edr"
 )
 
 // deps is the clock and compiler registry for one invocation.
-// Tests inject both. The binary uses the local clock and Builtin.
+// Tests inject both. The binary uses the local clock and the built-in registry.
 type deps struct {
 	now      func() time.Time
 	registry compiler.Registry
@@ -23,7 +24,7 @@ type deps struct {
 
 // Run executes one CLI invocation. args excludes the program name.
 func Run(args []string, stdout, stderr io.Writer) int {
-	return run(args, stdout, stderr, deps{now: time.Now, registry: compiler.Builtin()})
+	return run(args, stdout, stderr, deps{now: time.Now, registry: builtin.Registry()})
 }
 
 func run(args []string, stdout, stderr io.Writer, d deps) int {

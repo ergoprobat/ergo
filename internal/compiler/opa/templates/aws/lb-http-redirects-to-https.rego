@@ -42,6 +42,7 @@ secure_protocol(rc) if tf.equals(rc, ["protocol"], "GENEVE")
 
 redirects(rc) if {
 	actions := object.get(rc.change.after, "default_action", [])
+	is_array(actions)
 	count(actions) > 0
 	every i, action in actions {
 		is_object(action)

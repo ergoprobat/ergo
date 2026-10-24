@@ -1,0 +1,4 @@
+# The plan fixture is the input the checks are tested against, so it violates them on purpose.
+scan:
+  skip-dirs:
+    - internal/compiler/opa/testdata/plans

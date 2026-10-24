@@ -8,6 +8,9 @@ import (
 	"fmt"
 	"io/fs"
 	"sort"
+	"time"
+
+	"github.com/ergoprobat/ergo/internal/edr"
 )
 
 // Entry is one compiled check in the manifest. The framework fills every field.
@@ -17,9 +20,21 @@ type Entry struct {
 	CheckIndex      int                `json:"check_index"`
 	Engine          string             `json:"engine"`
 	Mode            string             `json:"mode"`
+	Target          string             `json:"target"`
+	ValidFrom       string             `json:"valid_from"`
+	ValidTo         *string            `json:"valid_to"`
+	Env             []string           `json:"env"`
+	Waivers         []ManifestWaiver   `json:"waivers"`
 	Compiler        string             `json:"compiler"`
 	CompilerVersion string             `json:"compiler_version"`
 	Artifacts       []ManifestArtifact `json:"artifacts"`
+}
+
+// ManifestWaiver is one waiver stamped from the record, dates as YYYY-MM-DD.
+type ManifestWaiver struct {
+	Approver  string `json:"approver"`
+	ValidFrom string `json:"valid_from"`
+	ValidTo   string `json:"valid_to"`
 }
 
 // ManifestArtifact is the name and digest of one emitted file.
@@ -62,11 +77,59 @@ func Assemble(engine Compiler, in Input, artifacts []Artifact) (Entry, []Artifac
 		CheckIndex:      in.Index,
 		Engine:          in.Check.Engine,
 		Mode:            mode,
+		Target:          in.Check.Target,
+		ValidFrom:       in.Record.ValidFrom.Format(dateLayout),
+		ValidTo:         dateText(in.Record.ValidTo),
+		Env:             envList(in.Record),
+		Waivers:         waiverList(in.Record),
 		Compiler:        engine.Engine(),
 		CompilerVersion: engine.Version(),
 		Artifacts:       listed,
 	}
 	return entry, ordered, nil
+}
+
+const dateLayout = "2006-01-02"
+
+func dateText(value *time.Time) *string {
+	if value == nil {
+		return nil
+	}
+	text := value.Format(dateLayout)
+	return &text
+}
+
+// envList returns the sorted environments the record applies in.
+// nil means the record applies in every environment, because one scope item names none.
+func envList(rec edr.Record) []string {
+	seen := map[string]struct{}{}
+	var envs []string
+	for _, item := range rec.Scope {
+		if len(item.Env) == 0 {
+			return nil
+		}
+		for _, env := range item.Env {
+			if _, ok := seen[env]; ok {
+				continue
+			}
+			seen[env] = struct{}{}
+			envs = append(envs, env)
+		}
+	}
+	sort.Strings(envs)
+	return envs
+}
+
+func waiverList(rec edr.Record) []ManifestWaiver {
+	waivers := make([]ManifestWaiver, 0, len(rec.Waivers))
+	for _, waiver := range rec.Waivers {
+		waivers = append(waivers, ManifestWaiver{
+			Approver:  waiver.Approver,
+			ValidFrom: waiver.ValidFrom.Format(dateLayout),
+			ValidTo:   waiver.ValidTo.Format(dateLayout),
+		})
+	}
+	return waivers
 }
 
 // MarshalManifest encodes entries as deterministic JSON.
@@ -82,6 +145,9 @@ func MarshalManifest(entries []Entry) ([]byte, error) {
 	for i := range ordered {
 		if ordered[i].Artifacts == nil {
 			ordered[i].Artifacts = []ManifestArtifact{}
+		}
+		if ordered[i].Waivers == nil {
+			ordered[i].Waivers = []ManifestWaiver{}
 		}
 	}
 	if ordered == nil {

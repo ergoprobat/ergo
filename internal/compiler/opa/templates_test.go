@@ -9,10 +9,12 @@ import (
 	"sort"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/open-policy-agent/opa/v1/ast"
 	"github.com/open-policy-agent/opa/v1/rego"
 
+	"github.com/ergoprobat/ergo/internal/compiler"
 	"github.com/ergoprobat/ergo/internal/compiler/compilertest"
 )
 
@@ -116,12 +118,18 @@ func evaluateCorpus(t *testing.T, id, policy, lib string) {
 		if len(got) != 0 {
 			t.Errorf("pass %s denied %v", name, got)
 		}
+		if eval := evalDenials(t, policy, lib, plan); !sameDenials(got, eval) {
+			t.Errorf("pass %s evaluator %v direct %v", name, eval, got)
+		}
 	}
 	for name, plan := range fail {
 		got := denials(t, packagePath(id), policy, lib, plan)
 		want := readWant(t, filepath.Join(root, "fail", strings.TrimSuffix(name, ".json")+".want"))
 		if strings.Join(sortedKeys(got), "\n") != strings.Join(want, "\n") {
 			t.Errorf("fail %s addresses %v want %v messages %#v", name, sortedKeys(got), want, got)
+		}
+		if eval := evalDenials(t, policy, lib, plan); !sameDenials(got, eval) {
+			t.Errorf("fail %s evaluator %v direct %v", name, eval, got)
 		}
 		for addr, msgs := range got {
 			for _, msg := range msgs {
@@ -170,6 +178,39 @@ func readWant(t *testing.T, path string) []string {
 	}
 	sort.Strings(lines)
 	return lines
+}
+
+func evalDenials(t *testing.T, policy, lib string, plan []byte) map[string][]string {
+	t.Helper()
+	value, err := planValue(plan)
+	if err != nil {
+		t.Fatal(err)
+	}
+	parsed := Plan{raw: plan, value: value}
+	outcome := EvalCheck(compiler.Entry{}, map[string][]byte{
+		"policy.rego":    []byte(policy),
+		"terraform.rego": []byte(lib),
+	}, parsed, time.Now())
+	if outcome.Err != nil {
+		t.Fatal(outcome.Err)
+	}
+	out := map[string][]string{}
+	for _, violation := range outcome.Violations {
+		out[violation.Address] = append(out[violation.Address], violation.Message)
+	}
+	return out
+}
+
+func sameDenials(left, right map[string][]string) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	for addr, msgs := range left {
+		if strings.Join(msgs, "\n") != strings.Join(right[addr], "\n") {
+			return false
+		}
+	}
+	return true
 }
 
 func denials(t *testing.T, pkg, policy, lib string, plan []byte) map[string][]string {

@@ -46,6 +46,33 @@ func TestInForce(t *testing.T) {
 	}
 }
 
+func TestWaiverInForce(t *testing.T) {
+	from := date(t, "2026-03-01")
+	to := date(t, "2026-04-01")
+	waiver := Waiver{ValidFrom: from, ValidTo: to}
+	tests := []struct {
+		name string
+		now  time.Time
+		want bool
+	}{
+		{name: "start date included", now: date(t, "2026-03-01"), want: true},
+		{name: "day before the start", now: date(t, "2026-02-28"), want: false},
+		{name: "day before the end", now: date(t, "2026-03-31"), want: true},
+		{name: "end date excluded", now: date(t, "2026-04-01"), want: false},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := waiver.InForce(test.now); got != test.want {
+				t.Fatalf("InForce() = %v, want %v", got, test.want)
+			}
+		})
+	}
+	inverted := Waiver{ValidFrom: to, ValidTo: from}
+	if inverted.InForce(date(t, "2026-03-15")) {
+		t.Fatal("a waiver whose start is after its end should never bind")
+	}
+}
+
 func TestEffectiveMode(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -139,6 +166,48 @@ func TestRecordFromChecks(t *testing.T) {
 	second := rec.Checks[1]
 	if second.Engine != "ci-binding" || second.Job != "checkov / CKV_AWS_145" || second.Ref != "" {
 		t.Fatalf("second %+v", second)
+	}
+	if len(rec.Scope) != 1 || rec.Scope[0].Env != nil {
+		t.Fatalf("scope %+v", rec.Scope)
+	}
+	if len(rec.Waivers) != 0 {
+		t.Fatalf("waivers %+v", rec.Waivers)
+	}
+}
+
+func TestRecordFromScopeAndWaivers(t *testing.T) {
+	text := strings.Replace(recordShell(), "scope:\n  - org: acme", `scope:
+  - org: acme
+    env: [prod, stage]
+  - repo: acme/payments`, 1)
+	text = strings.Replace(text, "waivers: []", `waivers:
+  - reason: migration window
+    approver: team:platform
+    valid_from: 2026-03-01
+    valid_to: 2026-04-01`, 1)
+	doc, err := Parse(text)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if problems := Validate(doc); len(problems) != 0 {
+		t.Fatal(problems)
+	}
+	rec, err := RecordFrom(doc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rec.Scope) != 2 || len(rec.Scope[0].Env) != 2 || rec.Scope[1].Env != nil {
+		t.Fatalf("scope %+v", rec.Scope)
+	}
+	if rec.Scope[0].Env[0] != "prod" || rec.Scope[0].Env[1] != "stage" {
+		t.Fatalf("env %+v", rec.Scope[0].Env)
+	}
+	if len(rec.Waivers) != 1 {
+		t.Fatalf("waivers %+v", rec.Waivers)
+	}
+	waiver := rec.Waivers[0]
+	if waiver.Approver != "team:platform" || waiver.ValidFrom.Format("2006-01-02") != "2026-03-01" || waiver.ValidTo.Format("2006-01-02") != "2026-04-01" {
+		t.Fatalf("waiver %+v", waiver)
 	}
 }
 

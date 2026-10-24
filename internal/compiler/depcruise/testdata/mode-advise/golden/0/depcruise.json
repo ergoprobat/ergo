@@ -1,0 +1,14 @@
+{
+  "forbidden": [
+    {
+      "from": {
+        "path": "^packages/ui/"
+      },
+      "name": "not-to-db",
+      "severity": "info",
+      "to": {
+        "path": "^packages/db/"
+      }
+    }
+  ]
+}

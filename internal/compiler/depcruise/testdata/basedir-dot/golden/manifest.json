@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QPZ4ZR6RE9EJJ4D7Z105VS",
+      "slug": "basedir-dot",
+      "check_index": 0,
+      "engine": "depcruise",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "depcruise",
+      "compiler_version": "18.7.0",
+      "artifacts": [
+        {
+          "name": "depcruise.json",
+          "sha256": "3c161cd1720c1cd526ea4160f94c4f8596f4b4f595d9508ad12bba9279bfbc7e"
+        }
+      ]
+    }
+  ]
+}

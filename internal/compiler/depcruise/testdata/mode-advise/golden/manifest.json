@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QNFMJMC84HMCRB5XRP16KR",
+      "slug": "mode-advise",
+      "check_index": 0,
+      "engine": "depcruise",
+      "mode": "advise",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "depcruise",
+      "compiler_version": "18.7.0",
+      "artifacts": [
+        {
+          "name": "depcruise.json",
+          "sha256": "62a9d265781ecdd284e876e60cd5a04e941db3c84838df561eeb47d0167c0b02"
+        }
+      ]
+    }
+  ]
+}

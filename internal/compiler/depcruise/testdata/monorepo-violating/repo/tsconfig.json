@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@acme/db": [
+        "packages/db/src/index.ts"
+      ],
+      "@acme/ui": [
+        "packages/ui/src/index.ts"
+      ]
+    },
+    "strict": true,
+    "noEmit": true
+  },
+  "include": [
+    "packages"
+  ]
+}

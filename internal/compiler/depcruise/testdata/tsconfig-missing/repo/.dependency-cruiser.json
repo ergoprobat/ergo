@@ -1,0 +1,19 @@
+{
+  "forbidden": [
+    {
+      "name": "not-to-db",
+      "severity": "warn",
+      "from": {
+        "path": "^packages/ui/"
+      },
+      "to": {
+        "path": "^packages/db/"
+      }
+    }
+  ],
+  "options": {
+    "tsConfig": {
+      "fileName": "missing-tsconfig.json"
+    }
+  }
+}

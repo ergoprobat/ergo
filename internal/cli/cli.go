@@ -12,6 +12,8 @@ import (
 
 	"github.com/ergoprobat/ergo/internal/compiler"
 	"github.com/ergoprobat/ergo/internal/compiler/builtin"
+	"github.com/ergoprobat/ergo/internal/compiler/checkov"
+	"github.com/ergoprobat/ergo/internal/compiler/cibinding"
 	"github.com/ergoprobat/ergo/internal/compiler/opa"
 	"github.com/ergoprobat/ergo/internal/config"
 	"github.com/ergoprobat/ergo/internal/edr"
@@ -92,6 +94,8 @@ usage:
   ergo init
   ergo check
   ergo check plan <plan.json|-> [--env name] [--report file]
+  ergo check ci <evidence.json|-> --sha <sha> [--env name] [--report file]
+  ergo check checkov <results.json|-> [--env name] [--report file]
   ergo explain <slug>
   ergo import [path...]
   ergo compile`
@@ -115,11 +119,17 @@ func checkCmd(root string, args []string, stdout, stderr io.Writer, d deps) int 
 	if len(args) == 0 {
 		return checkFiles(root, stdout, stderr)
 	}
-	if args[0] != "plan" {
-		fprintln(stderr, "usage: ergo check plan <plan.json|-> [--env name] [--report file]")
+	switch args[0] {
+	case "plan":
+		return planCmd(root, args[1:], stdout, stderr, d)
+	case "ci":
+		return ciCmd(root, args[1:], stdout, stderr, d)
+	case "checkov":
+		return checkovCmd(root, args[1:], stdout, stderr, d)
+	default:
+		fprintln(stderr, checkUsage)
 		return 2
 	}
-	return planCmd(root, args[1:], stdout, stderr, d)
 }
 
 func checkFiles(root string, stdout, stderr io.Writer) int {
@@ -162,7 +172,12 @@ func checkFiles(root string, stdout, stderr io.Writer) int {
 	return 0
 }
 
-const planUsage = "usage: ergo check plan <plan.json|-> [--env name] [--report file]"
+const (
+	planUsage    = "usage: ergo check plan <plan.json|-> [--env name] [--report file]"
+	ciUsage      = "usage: ergo check ci <evidence.json|-> --sha <sha> [--env name] [--report file]"
+	checkovUsage = "usage: ergo check checkov <results.json|-> [--env name] [--report file]"
+	checkUsage   = planUsage + "\n" + ciUsage + "\n" + checkovUsage
+)
 
 func planCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
 	opts, err := parsePlanArgs(args)
@@ -204,49 +219,16 @@ func planCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
 		PlanSHA256:    plan.SHA256(),
 		BuildSHA256:   build.SHA256(),
 	}
-	failed := false
-	selected := 0
-	for _, entry := range build.Entries {
-		if !entry.Selected(opts.env, now) {
-			continue
-		}
-		selected++
-		artifacts, err := build.Artifacts(entry)
-		if err != nil {
-			fprintln(stderr, err)
-			return 1
-		}
-		outcome := opa.EvalCheck(entry, artifacts, plan, now)
-		verdict := compiler.Verdict{
-			DecisionID: entry.DecisionID,
-			Slug:       entry.Slug,
-			CheckIndex: entry.CheckIndex,
-			Mode:       entry.Mode,
-			Result:     "pass",
-		}
-		switch {
-		case outcome.Err != nil:
-			verdict.Result = "error"
-			failed = true
-			fprintf(stdout, "%s: checks[%d] (%s): error: %s\n", entry.Slug, entry.CheckIndex, entry.Mode, outcome.Err)
-		case len(outcome.Violations) > 0 && outcome.Waived:
-			verdict.Result = "waived"
-			verdict.Violations = len(outcome.Violations)
-			fprintf(stdout, "%s: checks[%d] (%s): waived\n", entry.Slug, entry.CheckIndex, entry.Mode)
-		case len(outcome.Violations) > 0:
-			verdict.Result = "fail"
-			verdict.Violations = len(outcome.Violations)
-			if entry.Mode == "block" {
-				failed = true
-			}
-			for _, violation := range outcome.Violations {
-				fprintf(stdout, "%s: checks[%d] (%s): %s\n", entry.Slug, entry.CheckIndex, entry.Mode, violationLine(violation))
-			}
-		default:
-			fprintf(stdout, "%s: checks[%d] (%s): pass\n", entry.Slug, entry.CheckIndex, entry.Mode)
-		}
-		report.Verdicts = append(report.Verdicts, verdict)
+	verdicts, failed, selected, err := evaluateChecks(stdout, build, func(entry compiler.Entry) bool {
+		return entry.Selected(opts.env, now)
+	}, func(entry compiler.Entry, artifacts map[string][]byte) compiler.Outcome {
+		return opa.EvalCheck(entry, artifacts, plan, now)
+	})
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
 	}
+	report.Verdicts = verdicts
 	if selected == 0 {
 		fprintln(stdout, "no checks selected")
 	}
@@ -265,6 +247,146 @@ func planCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
 		return 1
 	}
 	return 0
+}
+
+func ciCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
+	opts, err := parseBoundArgs(args, ciUsage, true)
+	if err != nil {
+		fprintln(stderr, err)
+		return 2
+	}
+	if !cibinding.ValidCommitSHA(opts.sha) {
+		fprintln(stderr, ciUsage)
+		return 2
+	}
+	if d.now == nil {
+		d.now = time.Now
+	}
+	reader, err := openInput(opts.path)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	defer func() { _ = reader.Close() }()
+	evidence, err := cibinding.ReadEvidence(reader, opts.sha)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	build, err := compiler.LoadBuild(root)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	now := d.now()
+	verdicts, failed, selected, err := evaluateChecks(stdout, build, func(entry compiler.Entry) bool {
+		return entry.Engine == "ci-binding" && entry.Applies(opts.env, now)
+	}, func(entry compiler.Entry, artifacts map[string][]byte) compiler.Outcome {
+		return cibinding.EvalCheck(entry, artifacts, evidence, now)
+	})
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	if selected == 0 {
+		fprintln(stdout, "no checks selected")
+	}
+	report := compiler.CIReport{
+		ReportVersion:  compiler.ReportVersion,
+		ErgoVersion:    Version,
+		EvaluatedAt:    now.UTC(),
+		Env:            opts.env,
+		CommitSHA:      opts.sha,
+		EvidenceSHA256: evidence.SHA256(),
+		BuildSHA256:    build.SHA256(),
+		Verdicts:       verdicts,
+	}
+	if opts.report != "" {
+		raw, err := compiler.MarshalCIReport(report)
+		if err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		if err := writeReport(opts.report, raw); err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+	}
+	if failed {
+		return 1
+	}
+	return 0
+}
+
+func checkovCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
+	opts, err := parseBoundArgs(args, checkovUsage, false)
+	if err != nil {
+		fprintln(stderr, err)
+		return 2
+	}
+	if d.now == nil {
+		d.now = time.Now
+	}
+	reader, err := openInput(opts.path)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	defer func() { _ = reader.Close() }()
+	results, err := checkov.ReadResults(reader)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	build, err := compiler.LoadBuild(root)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	now := d.now()
+	verdicts, failed, selected, err := evaluateChecks(stdout, build, func(entry compiler.Entry) bool {
+		return entry.Engine == "checkov" && entry.Applies(opts.env, now)
+	}, func(entry compiler.Entry, artifacts map[string][]byte) compiler.Outcome {
+		return checkov.EvalCheck(entry, artifacts, results, now)
+	})
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	if selected == 0 {
+		fprintln(stdout, "no checks selected")
+	}
+	report := compiler.CheckovReport{
+		ReportVersion:  compiler.ReportVersion,
+		ErgoVersion:    Version,
+		EvaluatedAt:    now.UTC(),
+		Env:            opts.env,
+		EvidenceSHA256: results.SHA256(),
+		BuildSHA256:    build.SHA256(),
+		Verdicts:       verdicts,
+	}
+	if opts.report != "" {
+		raw, err := compiler.MarshalCheckovReport(report)
+		if err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		if err := writeReport(opts.report, raw); err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+	}
+	if failed {
+		return 1
+	}
+	return 0
+}
+
+func openInput(path string) (io.ReadCloser, error) {
+	if path == "-" {
+		return io.NopCloser(os.Stdin), nil
+	}
+	return os.Open(path)
 }
 
 type planOptions struct {
@@ -298,6 +420,48 @@ func parsePlanArgs(args []string) (planOptions, error) {
 	}
 	if opts.path == "" {
 		return planOptions{}, fmt.Errorf("%s", planUsage)
+	}
+	return opts, nil
+}
+
+type boundOptions struct {
+	path   string
+	env    string
+	report string
+	sha    string
+}
+
+func parseBoundArgs(args []string, usage string, sha bool) (boundOptions, error) {
+	var opts boundOptions
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case "--env":
+			if opts.env != "" || i+1 >= len(args) || strings.HasPrefix(args[i+1], "-") {
+				return boundOptions{}, fmt.Errorf("%s", usage)
+			}
+			i++
+			opts.env = args[i]
+		case "--report":
+			if opts.report != "" || i+1 >= len(args) || strings.HasPrefix(args[i+1], "-") {
+				return boundOptions{}, fmt.Errorf("%s", usage)
+			}
+			i++
+			opts.report = args[i]
+		case "--sha":
+			if !sha || opts.sha != "" || i+1 >= len(args) || strings.HasPrefix(args[i+1], "-") {
+				return boundOptions{}, fmt.Errorf("%s", usage)
+			}
+			i++
+			opts.sha = args[i]
+		default:
+			if strings.HasPrefix(args[i], "-") || opts.path != "" {
+				return boundOptions{}, fmt.Errorf("%s", usage)
+			}
+			opts.path = args[i]
+		}
+	}
+	if opts.path == "" || (sha && opts.sha == "") {
+		return boundOptions{}, fmt.Errorf("%s", usage)
 	}
 	return opts, nil
 }
@@ -348,7 +512,59 @@ func writeReport(path string, raw []byte) error {
 	return nil
 }
 
-func violationLine(violation opa.Violation) string {
+// evaluateChecks runs match against the build and prints one line per selected check.
+// hard is true when a block-mode check fails or any check errors.
+func evaluateChecks(stdout io.Writer, build compiler.Build, match func(compiler.Entry) bool, eval func(compiler.Entry, map[string][]byte) compiler.Outcome) (verdicts []compiler.Verdict, hard bool, selected int, err error) {
+	for _, entry := range build.Entries {
+		if !match(entry) {
+			continue
+		}
+		selected++
+		artifacts, artErr := build.Artifacts(entry)
+		if artErr != nil {
+			return nil, true, selected, artErr
+		}
+		verdict, failed := verdictOf(stdout, entry, eval(entry, artifacts))
+		if failed {
+			hard = true
+		}
+		verdicts = append(verdicts, verdict)
+	}
+	return verdicts, hard, selected, nil
+}
+
+func verdictOf(stdout io.Writer, entry compiler.Entry, outcome compiler.Outcome) (compiler.Verdict, bool) {
+	verdict := compiler.Verdict{
+		DecisionID: entry.DecisionID,
+		Slug:       entry.Slug,
+		CheckIndex: entry.CheckIndex,
+		Mode:       entry.Mode,
+		Result:     "pass",
+	}
+	switch {
+	case outcome.Err != nil:
+		verdict.Result = "error"
+		fprintf(stdout, "%s: checks[%d] (%s): error: %s\n", entry.Slug, entry.CheckIndex, entry.Mode, outcome.Err)
+		return verdict, true
+	case len(outcome.Violations) > 0 && outcome.Waived:
+		verdict.Result = "waived"
+		verdict.Violations = len(outcome.Violations)
+		fprintf(stdout, "%s: checks[%d] (%s): waived\n", entry.Slug, entry.CheckIndex, entry.Mode)
+		return verdict, false
+	case len(outcome.Violations) > 0:
+		verdict.Result = "fail"
+		verdict.Violations = len(outcome.Violations)
+		for _, violation := range outcome.Violations {
+			fprintf(stdout, "%s: checks[%d] (%s): %s\n", entry.Slug, entry.CheckIndex, entry.Mode, violationLine(violation))
+		}
+		return verdict, entry.Mode == "block"
+	default:
+		fprintf(stdout, "%s: checks[%d] (%s): pass\n", entry.Slug, entry.CheckIndex, entry.Mode)
+		return verdict, false
+	}
+}
+
+func violationLine(violation compiler.Violation) string {
 	if violation.Address == "" {
 		return violation.Message
 	}

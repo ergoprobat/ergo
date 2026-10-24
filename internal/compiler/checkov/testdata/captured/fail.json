@@ -1,0 +1,97 @@
+{
+    "check_type": "terraform",
+    "results": {
+        "passed_checks": [],
+        "failed_checks": [
+            {
+                "check_id": "CKV_AWS_24",
+                "bc_check_id": "BC_AWS_NETWORKING_1",
+                "check_name": "Ensure no security groups allow ingress from 0.0.0.0:0 to port 22",
+                "check_result": {
+                    "result": "FAILED",
+                    "evaluated_keys": [
+                        "ingress/[0]/from_port",
+                        "ingress/[0]/to_port",
+                        "ingress/[0]/cidr_blocks",
+                        "ingress/[0]/ipv6_cidr_blocks"
+                    ]
+                },
+                "code_block": [
+                    [
+                        1,
+                        "resource \"aws_security_group\" \"admin\" {\n"
+                    ],
+                    [
+                        2,
+                        "  ingress {\n"
+                    ],
+                    [
+                        3,
+                        "    description = \"ssh from anywhere\"\n"
+                    ],
+                    [
+                        4,
+                        "    from_port   = 22\n"
+                    ],
+                    [
+                        5,
+                        "    to_port     = 22\n"
+                    ],
+                    [
+                        6,
+                        "    protocol    = \"tcp\"\n"
+                    ],
+                    [
+                        7,
+                        "    cidr_blocks = [\"0.0.0.0/0\"]\n"
+                    ],
+                    [
+                        8,
+                        "  }\n"
+                    ],
+                    [
+                        9,
+                        "}\n"
+                    ]
+                ],
+                "file_path": "/fail.tf",
+                "file_abs_path": "/var/folders/41/lz50mxx1201d4mzg0qcvf12m0000gn/T/tmp.LF4bEdzjDt/fail.tf",
+                "repo_file_path": "/var/folders/41/lz50mxx1201d4mzg0qcvf12m0000gn/T/tmp.LF4bEdzjDt/fail.tf",
+                "file_line_range": [
+                    1,
+                    9
+                ],
+                "resource": "aws_security_group.admin",
+                "evaluations": null,
+                "check_class": "checkov.terraform.checks.resource.aws.SecurityGroupUnrestrictedIngress22",
+                "fixed_definition": null,
+                "entity_tags": null,
+                "caller_file_path": null,
+                "caller_file_line_range": null,
+                "resource_address": null,
+                "severity": null,
+                "bc_category": null,
+                "benchmarks": null,
+                "description": null,
+                "short_description": null,
+                "vulnerability_details": null,
+                "connected_node": null,
+                "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/networking-1-port-security",
+                "details": [],
+                "check_len": null,
+                "definition_context_file_path": "/var/folders/41/lz50mxx1201d4mzg0qcvf12m0000gn/T/tmp.LF4bEdzjDt/fail.tf"
+            }
+        ],
+        "skipped_checks": [],
+        "parsing_errors": []
+    },
+    "summary": {
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "parsing_errors": 0,
+        "resource_count": 1,
+        "checkov_version": "3.2.495"
+    },
+    "url": "Add an api key '--bc-api-key <api-key>' to see more detailed insights via https://bridgecrew.cloud"
+}

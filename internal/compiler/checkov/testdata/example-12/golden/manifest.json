@@ -1,0 +1,30 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5C5QEHVBS2Q67NPD1BPZ2EM",
+      "slug": "admin-port-from-bastion",
+      "check_index": 0,
+      "engine": "checkov",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-06-01",
+      "valid_to": null,
+      "env": null,
+      "waivers": [
+        {
+          "approver": "Ada Lovelace",
+          "valid_from": "2026-06-01",
+          "valid_to": "2026-06-30"
+        }
+      ],
+      "compiler": "checkov",
+      "compiler_version": "3.2.495",
+      "artifacts": [
+        {
+          "name": "binding.json",
+          "sha256": "b7c57551f83fc9e70dab88cfb428071903bbd84f5da11d39489ca4306172e363"
+        }
+      ]
+    }
+  ]
+}

@@ -164,13 +164,9 @@ func (b Build) Artifacts(entry Entry) (map[string][]byte, error) {
 	return out, nil
 }
 
-// Selected reports whether the entry is evaluated for env on the calendar date of now.
-// An entry applies when it is an opa check for a Terraform plan, its decision is in force,
+// Applies reports whether the decision is in force on the calendar date of now
 // and env is empty or the decision names that environment.
-func (e Entry) Selected(env string, now time.Time) bool {
-	if e.Engine != opaEngine || e.Target != planTarget {
-		return false
-	}
+func (e Entry) Applies(env string, now time.Time) bool {
 	from, err := time.Parse(dateLayout, e.ValidFrom)
 	if err != nil {
 		return false
@@ -192,6 +188,56 @@ func (e Entry) Selected(env string, now time.Time) bool {
 		return true
 	}
 	return contains(e.Env, env)
+}
+
+// Selected reports whether the entry is an in-force OPA check for a Terraform plan.
+func (e Entry) Selected(env string, now time.Time) bool {
+	if e.Engine != opaEngine || e.Target != planTarget {
+		return false
+	}
+	return e.Applies(env, now)
+}
+
+// Violation is one denial from a check. The terminal prints it. The report stores only the count.
+type Violation struct {
+	Message string
+	Address string
+}
+
+// Outcome is the result of evaluating one check.
+// Waived is set when violations were found and a waiver in force covers them.
+type Outcome struct {
+	Violations []Violation
+	Waived     bool
+	Err        error
+}
+
+// Cover applies an in-force waiver to violations. An error is never waived.
+func Cover(entry Entry, outcome Outcome, now time.Time) Outcome {
+	if outcome.Err != nil || len(outcome.Violations) == 0 {
+		outcome.Waived = false
+		return outcome
+	}
+	outcome.Waived = Waived(entry, now)
+	return outcome
+}
+
+// Waived reports whether a waiver on the entry binds on the calendar date of now.
+func Waived(entry Entry, now time.Time) bool {
+	for _, waiver := range entry.Waivers {
+		from, err := time.Parse(dateLayout, waiver.ValidFrom)
+		if err != nil {
+			continue
+		}
+		to, err := time.Parse(dateLayout, waiver.ValidTo)
+		if err != nil {
+			continue
+		}
+		if (edr.Waiver{ValidFrom: from, ValidTo: to}).InForce(now) {
+			return true
+		}
+	}
+	return false
 }
 
 func contains(values []string, want string) bool {
@@ -224,22 +270,66 @@ type PlanReport struct {
 	Verdicts      []Verdict `json:"verdicts"`
 }
 
+// CIReport is the verdict report for ergo check ci.
+type CIReport struct {
+	ReportVersion  int       `json:"report_version"`
+	ErgoVersion    string    `json:"ergo_version"`
+	EvaluatedAt    time.Time `json:"evaluated_at"`
+	Env            string    `json:"env"`
+	CommitSHA      string    `json:"commit_sha"`
+	EvidenceSHA256 string    `json:"evidence_sha256"`
+	BuildSHA256    string    `json:"build_sha256"`
+	Verdicts       []Verdict `json:"verdicts"`
+}
+
+// CheckovReport is the verdict report for ergo check checkov.
+type CheckovReport struct {
+	ReportVersion  int       `json:"report_version"`
+	ErgoVersion    string    `json:"ergo_version"`
+	EvaluatedAt    time.Time `json:"evaluated_at"`
+	Env            string    `json:"env"`
+	EvidenceSHA256 string    `json:"evidence_sha256"`
+	BuildSHA256    string    `json:"build_sha256"`
+	Verdicts       []Verdict `json:"verdicts"`
+}
+
 // ReportVersion is the report contract version.
 const ReportVersion = 1
 
-// MarshalReport encodes a report as deterministic JSON.
+// MarshalReport encodes a plan report as deterministic JSON.
 // evaluated_at is UTC with a trailing Z and no fractional seconds.
 func MarshalReport(report PlanReport) ([]byte, error) {
-	report.EvaluatedAt = report.EvaluatedAt.UTC().Truncate(time.Second)
-	if report.Verdicts == nil {
-		report.Verdicts = []Verdict{}
+	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
+	return encodeReport(report)
+}
+
+// MarshalCIReport encodes a CI evidence report as deterministic JSON.
+func MarshalCIReport(report CIReport) ([]byte, error) {
+	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
+	return encodeReport(report)
+}
+
+// MarshalCheckovReport encodes a Checkov report as deterministic JSON.
+func MarshalCheckovReport(report CheckovReport) ([]byte, error) {
+	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
+	return encodeReport(report)
+}
+
+func finishReport(evaluated time.Time, verdicts []Verdict) (time.Time, []Verdict) {
+	evaluated = evaluated.UTC().Truncate(time.Second)
+	if verdicts == nil {
+		verdicts = []Verdict{}
 	}
-	sort.Slice(report.Verdicts, func(i, j int) bool {
-		if report.Verdicts[i].DecisionID != report.Verdicts[j].DecisionID {
-			return report.Verdicts[i].DecisionID < report.Verdicts[j].DecisionID
+	sort.Slice(verdicts, func(i, j int) bool {
+		if verdicts[i].DecisionID != verdicts[j].DecisionID {
+			return verdicts[i].DecisionID < verdicts[j].DecisionID
 		}
-		return report.Verdicts[i].CheckIndex < report.Verdicts[j].CheckIndex
+		return verdicts[i].CheckIndex < verdicts[j].CheckIndex
 	})
+	return evaluated, verdicts
+}
+
+func encodeReport(report any) ([]byte, error) {
 	raw, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
 		return nil, err

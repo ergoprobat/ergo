@@ -1,0 +1,96 @@
+{
+    "check_type": "terraform",
+    "results": {
+        "passed_checks": [],
+        "failed_checks": [],
+        "skipped_checks": [
+            {
+                "check_id": "CKV_AWS_24",
+                "bc_check_id": "BC_AWS_NETWORKING_1",
+                "check_name": "Ensure no security groups allow ingress from 0.0.0.0:0 to port 22",
+                "check_result": {
+                    "result": "SKIPPED",
+                    "suppress_comment": "Vendor appliance during cutover"
+                },
+                "code_block": [
+                    [
+                        1,
+                        "resource \"aws_security_group\" \"admin\" {\n"
+                    ],
+                    [
+                        2,
+                        "  #checkov:skip=CKV_AWS_24:Vendor appliance during cutover\n"
+                    ],
+                    [
+                        3,
+                        "  ingress {\n"
+                    ],
+                    [
+                        4,
+                        "    description = \"ssh from anywhere\"\n"
+                    ],
+                    [
+                        5,
+                        "    from_port   = 22\n"
+                    ],
+                    [
+                        6,
+                        "    to_port     = 22\n"
+                    ],
+                    [
+                        7,
+                        "    protocol    = \"tcp\"\n"
+                    ],
+                    [
+                        8,
+                        "    cidr_blocks = [\"0.0.0.0/0\"]\n"
+                    ],
+                    [
+                        9,
+                        "  }\n"
+                    ],
+                    [
+                        10,
+                        "}\n"
+                    ]
+                ],
+                "file_path": "/skip.tf",
+                "file_abs_path": "/var/folders/41/lz50mxx1201d4mzg0qcvf12m0000gn/T/tmp.LF4bEdzjDt/skip.tf",
+                "repo_file_path": "/var/folders/41/lz50mxx1201d4mzg0qcvf12m0000gn/T/tmp.LF4bEdzjDt/skip.tf",
+                "file_line_range": [
+                    1,
+                    10
+                ],
+                "resource": "aws_security_group.admin",
+                "evaluations": null,
+                "check_class": "checkov.terraform.checks.resource.aws.SecurityGroupUnrestrictedIngress22",
+                "fixed_definition": null,
+                "entity_tags": null,
+                "caller_file_path": null,
+                "caller_file_line_range": null,
+                "resource_address": null,
+                "severity": null,
+                "bc_category": null,
+                "benchmarks": null,
+                "description": null,
+                "short_description": null,
+                "vulnerability_details": null,
+                "connected_node": null,
+                "guideline": "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/networking-1-port-security",
+                "details": [],
+                "check_len": null,
+                "definition_context_file_path": "/var/folders/41/lz50mxx1201d4mzg0qcvf12m0000gn/T/tmp.LF4bEdzjDt/skip.tf"
+            }
+        ],
+        "parsing_errors": []
+    },
+    "summary": {
+        "passed": 0,
+        "failed": 0,
+        "skipped": 1,
+        "parsing_errors": 0,
+        "resource_count": 1,
+        "checkov_version": "3.2.495"
+    },
+    "url": "Add an api key '--bc-api-key <api-key>' to see more detailed insights via https://bridgecrew.cloud"
+}

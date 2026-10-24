@@ -8,4 +8,4 @@ Regenerate both files from this directory:
 ./capture.sh
 ```
 
-The script needs `terraform` and `tofu` on `PATH` and network access for `init`. Tests read the committed files and do not run either tool.
+The script needs `terraform` and `tofu` on `PATH` and network access for `init`. Tests read the committed files and do not run either tool. The configuration is non-compliant on purpose, and the repository scanners skip this directory.

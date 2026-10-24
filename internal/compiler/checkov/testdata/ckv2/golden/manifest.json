@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5C5QEHVBS2Q67NPD1BPZ2EM",
+      "slug": "graph-check",
+      "check_index": 0,
+      "engine": "checkov",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-06-01",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "checkov",
+      "compiler_version": "3.2.495",
+      "artifacts": [
+        {
+          "name": "binding.json",
+          "sha256": "a432758ad613a054878d015b332d276848b25c6b9d520499b2db0637bcf6fa2e"
+        }
+      ]
+    }
+  ]
+}

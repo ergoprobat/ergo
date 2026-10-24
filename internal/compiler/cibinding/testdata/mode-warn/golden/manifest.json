@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01JAB3K9ZQ7Y6T0V5M8W2E4R1N",
+      "slug": "job-warn",
+      "check_index": 0,
+      "engine": "ci-binding",
+      "mode": "warn",
+      "target": "",
+      "valid_from": "2026-11-01",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "ci-binding",
+      "compiler_version": "1",
+      "artifacts": [
+        {
+          "name": "binding.json",
+          "sha256": "f74ab29cb412ba630d8a0a18bb5dff876c9249225662a1a1fa3be0efaa5f529f"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "entries": [
+    {
+      "decision_id": "01JAB3K9ZQ7Y6T0V5M8W2E4R1N",
+      "slug": "s3-kms-cmk-required",
+      "check_index": 1,
+      "engine": "ci-binding",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-11-01",
+      "valid_to": null,
+      "env": [
+        "prod"
+      ],
+      "waivers": [],
+      "compiler": "ci-binding",
+      "compiler_version": "1",
+      "artifacts": [
+        {
+          "name": "binding.json",
+          "sha256": "387ffc7211d0c396db9118a1584d5b2fef1528e78b734fd783d32f41ccaa8144"
+        }
+      ]
+    }
+  ]
+}

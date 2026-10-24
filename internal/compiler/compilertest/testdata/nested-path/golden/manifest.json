@@ -1,0 +1,19 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5C5QEHHNXJ3D7X2ZCMGXQT7",
+      "slug": "nested-path",
+      "check_index": 0,
+      "engine": "opa",
+      "mode": "warn",
+      "compiler": "opa",
+      "compiler_version": "0",
+      "artifacts": [
+        {
+          "name": "policies/deep/rule.txt",
+          "sha256": "64896f89fd11190013b70103e603a1c5826e56b7fb7d2197ab279b0690043599"
+        }
+      ]
+    }
+  ]
+}

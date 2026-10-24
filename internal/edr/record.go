@@ -1,0 +1,183 @@
+package edr
+
+import (
+	"fmt"
+	"time"
+)
+
+// Check is one object from the checks array.
+type Check struct {
+	Engine string
+	Target string
+	Ref    string
+	Job    string
+	Mode   string
+}
+
+// Record is the frontmatter a compiler needs from a validated document.
+type Record struct {
+	ID          string
+	Slug        string
+	Status      string
+	Criticality string
+	ValidFrom   time.Time
+	ValidTo     *time.Time
+	Checks      []Check
+}
+
+// RecordFrom decodes a document that has already passed validation.
+func RecordFrom(doc Document) (Record, error) {
+	var rec Record
+	var err error
+	if rec.ID, err = requireString(doc.Front, "id"); err != nil {
+		return Record{}, err
+	}
+	if rec.Slug, err = requireString(doc.Front, "slug"); err != nil {
+		return Record{}, err
+	}
+	if rec.Status, err = requireString(doc.Front, "status"); err != nil {
+		return Record{}, err
+	}
+	if rec.Criticality, err = requireString(doc.Front, "criticality"); err != nil {
+		return Record{}, err
+	}
+	from, err := requireString(doc.Front, "valid_from")
+	if err != nil {
+		return Record{}, err
+	}
+	rec.ValidFrom, err = parseDate("valid_from", from)
+	if err != nil {
+		return Record{}, err
+	}
+	rawTo, ok := doc.Front["valid_to"]
+	if !ok {
+		return Record{}, fmt.Errorf("valid_to: missing")
+	}
+	if rawTo != nil {
+		text, ok := rawTo.(string)
+		if !ok {
+			return Record{}, fmt.Errorf("valid_to: not a date")
+		}
+		parsed, err := parseDate("valid_to", text)
+		if err != nil {
+			return Record{}, err
+		}
+		rec.ValidTo = &parsed
+	}
+	rec.Checks, err = checksFrom(doc.Front["checks"])
+	if err != nil {
+		return Record{}, err
+	}
+	return rec, nil
+}
+
+// InForce reports whether the record binds on the calendar date of now.
+// The interval is half-open: valid_from is included and valid_to is excluded.
+// A null valid_to does not end. The status must be accepted, verified, or needs-review.
+// The date comes from now's location, so time.Now uses the local calendar day.
+func (r Record) InForce(now time.Time) bool {
+	switch r.Status {
+	case "accepted", "verified", "needs-review":
+	default:
+		return false
+	}
+	today := calendarDate(now)
+	if today.Before(r.ValidFrom) {
+		return false
+	}
+	if r.ValidTo != nil && !today.Before(*r.ValidTo) {
+		return false
+	}
+	return true
+}
+
+// EffectiveMode returns the check mode, or the mode implied by criticality
+// when the check omits one: blocking to block, warning to warn, advisory to advise.
+func (c Check) EffectiveMode(criticality string) (string, error) {
+	if c.Mode != "" {
+		return c.Mode, nil
+	}
+	switch criticality {
+	case "blocking":
+		return "block", nil
+	case "warning":
+		return "warn", nil
+	case "advisory":
+		return "advise", nil
+	default:
+		return "", fmt.Errorf("criticality %q has no mode", criticality)
+	}
+}
+
+func calendarDate(now time.Time) time.Time {
+	year, month, day := now.Date()
+	return time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+}
+
+func parseDate(key, text string) (time.Time, error) {
+	parsed, err := time.Parse("2006-01-02", text)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("%s: %w", key, err)
+	}
+	return parsed, nil
+}
+
+func requireString(front map[string]any, key string) (string, error) {
+	raw, ok := front[key]
+	if !ok || raw == nil {
+		return "", fmt.Errorf("%s: missing", key)
+	}
+	text, ok := raw.(string)
+	if !ok || text == "" {
+		return "", fmt.Errorf("%s: missing", key)
+	}
+	return text, nil
+}
+
+func checksFrom(raw any) ([]Check, error) {
+	if raw == nil {
+		return []Check{}, nil
+	}
+	items, ok := raw.([]any)
+	if !ok {
+		return nil, fmt.Errorf("checks: not an array")
+	}
+	checks := make([]Check, 0, len(items))
+	for i, item := range items {
+		mapping, ok := item.(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("checks[%d]: not an object", i)
+		}
+		check := Check{}
+		var err error
+		if check.Engine, err = requireString(mapping, "engine"); err != nil {
+			return nil, fmt.Errorf("checks[%d]: %w", i, err)
+		}
+		if check.Target, err = optionalString(mapping, "target"); err != nil {
+			return nil, fmt.Errorf("checks[%d]: %w", i, err)
+		}
+		if check.Ref, err = optionalString(mapping, "ref"); err != nil {
+			return nil, fmt.Errorf("checks[%d]: %w", i, err)
+		}
+		if check.Job, err = optionalString(mapping, "job"); err != nil {
+			return nil, fmt.Errorf("checks[%d]: %w", i, err)
+		}
+		if check.Mode, err = optionalString(mapping, "mode"); err != nil {
+			return nil, fmt.Errorf("checks[%d]: %w", i, err)
+		}
+		checks = append(checks, check)
+	}
+	return checks, nil
+}
+
+func optionalString(front map[string]any, key string) (string, error) {
+	raw, ok := front[key]
+	if !ok || raw == nil {
+		return "", nil
+	}
+	text, ok := raw.(string)
+	if !ok {
+		return "", fmt.Errorf("%s: not a string", key)
+	}
+	return text, nil
+}

@@ -1,0 +1,34 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5C5QEHHNXJ3D7X2ZCMGXQT7",
+      "slug": "two-checks",
+      "check_index": 0,
+      "engine": "opa",
+      "mode": "block",
+      "compiler": "opa",
+      "compiler_version": "0",
+      "artifacts": [
+        {
+          "name": "policies/one.txt",
+          "sha256": "2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806"
+        }
+      ]
+    },
+    {
+      "decision_id": "01M5C5QEHHNXJ3D7X2ZCMGXQT7",
+      "slug": "two-checks",
+      "check_index": 1,
+      "engine": "opa",
+      "mode": "warn",
+      "compiler": "opa",
+      "compiler_version": "0",
+      "artifacts": [
+        {
+          "name": "policies/two.txt",
+          "sha256": "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a"
+        }
+      ]
+    }
+  ]
+}

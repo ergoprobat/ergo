@@ -9,12 +9,24 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ergoprobat/ergo/internal/compiler"
 	"github.com/ergoprobat/ergo/internal/config"
 	"github.com/ergoprobat/ergo/internal/edr"
 )
 
+// deps is the clock and compiler registry for one invocation.
+// Tests inject both. The binary uses the local clock and Builtin.
+type deps struct {
+	now      func() time.Time
+	registry compiler.Registry
+}
+
 // Run executes one CLI invocation. args excludes the program name.
 func Run(args []string, stdout, stderr io.Writer) int {
+	return run(args, stdout, stderr, deps{now: time.Now, registry: compiler.Builtin()})
+}
+
+func run(args []string, stdout, stderr io.Writer, d deps) int {
 	if len(args) == 0 {
 		fprintln(stderr, usage)
 		return 2
@@ -49,6 +61,12 @@ func Run(args []string, stdout, stderr io.Writer) int {
 			return 2
 		}
 		return importCmd(root, args[1:], stdout, stderr)
+	case "compile":
+		if len(args) != 1 {
+			fprintln(stderr, "usage: ergo compile")
+			return 2
+		}
+		return compileCmd(root, stdout, stderr, d)
 	case "-h", "--help", "help", "version", "--version", "-v":
 		fprintln(stdout, helpText())
 		return 0
@@ -69,13 +87,14 @@ func helpText() string {
 	return fmt.Sprintf("ergo %s (%s, %s)\n\n%s", Version, Commit, Date, usage)
 }
 
-const usage = `ergo validates engineering decision records in a repository.
+const usage = `ergo reads and compiles engineering decision records in a repository.
 
 usage:
   ergo init
   ergo check
   ergo explain <slug>
-  ergo import [path...]`
+  ergo import [path...]
+  ergo compile`
 
 func initCmd(root string, stdout, stderr io.Writer) int {
 	created, err := config.Init(root)
@@ -171,6 +190,120 @@ func explainCmd(root, slug string, stdout, stderr io.Writer) int {
 	}
 	fprintf(stdout, "title: %s\nstatus: %s\n\n%s\n", chosen.Title(), chosen.Status(), text)
 	return 0
+}
+
+func compileCmd(root string, stdout, stderr io.Writer, d deps) int {
+	if d.now == nil {
+		d.now = time.Now
+	}
+	cfg, _, err := config.Load(root)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	files, err := edr.Match(root, cfg.Decisions)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	if len(files) == 0 {
+		fprintln(stdout, "no EDR files found")
+		if err := compiler.WriteBuild(root, nil, nil); err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		return 0
+	}
+	type loaded struct {
+		shown string
+		rec   edr.Record
+	}
+	var docs []loaded
+	failed := false
+	for _, path := range files {
+		shown := displayPath(root, path)
+		doc, err := edr.ReadFile(path)
+		if err != nil {
+			fprintf(stdout, "%s: %s\n", shown, err)
+			failed = true
+			continue
+		}
+		problems := edr.Validate(doc)
+		if len(problems) > 0 {
+			failed = true
+			for _, problem := range problems {
+				fprintf(stdout, "%s: %s\n", shown, problem)
+			}
+			continue
+		}
+		rec, err := edr.RecordFrom(doc)
+		if err != nil {
+			fprintf(stdout, "%s: %s\n", shown, err)
+			failed = true
+			continue
+		}
+		docs = append(docs, loaded{shown: shown, rec: rec})
+	}
+	if failed {
+		return 1
+	}
+
+	repo, err := os.OpenRoot(root)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	defer func() { _ = repo.Close() }()
+
+	now := d.now()
+	var ids []compiler.DecisionRef
+	var compiled []compiler.Compiled
+	var lines []string
+	seen := map[string]string{}
+	for _, item := range docs {
+		if !item.rec.InForce(now) {
+			lines = append(lines, fmt.Sprintf("%s: skipped, not in force", item.shown))
+			continue
+		}
+		if prev, ok := seen[item.rec.ID]; ok {
+			fprintf(stdout, "%s: duplicate-id: %s\n", item.shown, prev)
+			return 1
+		}
+		seen[item.rec.ID] = item.shown
+		ids = append(ids, compiler.DecisionRef{Path: item.shown, ID: item.rec.ID})
+		part, reports, err := compiler.CompileRecord(d.registry, item.rec, repo.FS())
+		if err != nil {
+			fprintf(stdout, "%s: %s\n", item.shown, err)
+			return 1
+		}
+		compiled = append(compiled, part...)
+		for _, report := range reports {
+			lines = append(lines, compileLine(item.shown, report))
+		}
+	}
+	if err := compiler.WriteBuild(root, ids, compiled); err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	for _, line := range lines {
+		fprintln(stdout, line)
+	}
+	return 0
+}
+
+func compileLine(shown string, report compiler.Report) string {
+	switch report.Kind {
+	case compiler.ReportAdvisory:
+		return fmt.Sprintf("%s: checks[%d] (%s): advisory, not compiled", shown, report.Index, report.Engine)
+	case compiler.ReportNoCompiler:
+		return fmt.Sprintf("%s: checks[%d] (%s): no compiler", shown, report.Index, report.Engine)
+	default:
+		word := "artifacts"
+		if report.Count == 1 {
+			word = "artifact"
+		}
+		return fmt.Sprintf("%s: checks[%d] (%s): compiled %d %s", shown, report.Index, report.Engine, report.Count, word)
+	}
 }
 
 func importCmd(root string, args []string, stdout, stderr io.Writer) int {

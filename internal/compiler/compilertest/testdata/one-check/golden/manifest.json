@@ -1,0 +1,19 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5C5QEHHNXJ3D7X2ZCMGXQT7",
+      "slug": "one-check",
+      "check_index": 0,
+      "engine": "opa",
+      "mode": "block",
+      "compiler": "opa",
+      "compiler_version": "0",
+      "artifacts": [
+        {
+          "name": "policies/rule.txt",
+          "sha256": "2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5C5QEHHNXJ3D7X2ZCMGXQT7",
+      "slug": "mixed-engines",
+      "check_index": 1,
+      "engine": "opa",
+      "mode": "block",
+      "compiler": "opa",
+      "compiler_version": "0",
+      "artifacts": [
+        {
+          "name": "policies/rule.txt",
+          "sha256": "6b79867175a1f0160044a8adb8b1b4f7a7e6f3ef76efeeaa633191f1f6c83d7d"
+        }
+      ]
+    }
+  ]
+}

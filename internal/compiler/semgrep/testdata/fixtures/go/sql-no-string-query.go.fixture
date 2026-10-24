@@ -1,0 +1,13 @@
+package sample
+
+import "database/sql"
+
+func bad(db *sql.DB, id string) {
+	// ruleid: go.sql-no-string-query
+	_, _ = db.Query("select " + id)
+}
+
+func good(db *sql.DB) {
+	// ok: go.sql-no-string-query
+	_, _ = db.Query("select 1")
+}

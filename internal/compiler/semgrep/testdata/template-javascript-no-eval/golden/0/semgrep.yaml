@@ -1,0 +1,12 @@
+rules:
+  - id: javascript.no-eval
+    languages:
+      - javascript
+      - typescript
+    message: Code must not evaluate strings
+    metadata:
+      title: JavaScript and TypeScript do not evaluate strings
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+    severity: ERROR

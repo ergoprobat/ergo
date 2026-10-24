@@ -1,0 +1,5 @@
+rules:
+  - id: sample
+    languages:
+      - python
+    pattern: foo(...)

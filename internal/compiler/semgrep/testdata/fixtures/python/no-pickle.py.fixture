@@ -1,0 +1,12 @@
+import json
+import pickle
+
+
+def bad(data):
+    # ruleid: python.no-pickle
+    pickle.loads(data)
+
+
+def good(data):
+    # ok: python.no-pickle
+    json.loads(data)

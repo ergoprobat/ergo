@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QV9THX4283G92D91C80220",
+      "slug": "template-go-sql-no-string-query",
+      "check_index": 0,
+      "engine": "semgrep",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "semgrep",
+      "compiler_version": "1.182.1",
+      "artifacts": [
+        {
+          "name": "semgrep.yaml",
+          "sha256": "1bc9d71832df0f23d9ea3bf3607a4148107ecec7d8133b7f25e35b5a2035f54e"
+        }
+      ]
+    }
+  ]
+}

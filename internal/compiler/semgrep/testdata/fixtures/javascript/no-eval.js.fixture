@@ -1,0 +1,9 @@
+function bad(code) {
+  // ruleid: javascript.no-eval
+  return eval(code);
+}
+
+function good(text) {
+  // ok: javascript.no-eval
+  return JSON.parse(text);
+}

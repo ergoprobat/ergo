@@ -1,0 +1,22 @@
+rules:
+  - id: go.sql-no-string-query
+    languages:
+      - go
+    message: SQL queries must use placeholders
+    metadata:
+      title: Go SQL queries use placeholders
+    patterns:
+      - pattern-either:
+          - pattern: $DB.Query($Q, ...)
+          - pattern: $DB.QueryContext($CTX, $Q, ...)
+          - pattern: $DB.Exec($Q, ...)
+          - pattern: $DB.ExecContext($CTX, $Q, ...)
+          - pattern: $DB.QueryRow($Q, ...)
+          - pattern: $DB.QueryRowContext($CTX, $Q, ...)
+      - pattern-not: $DB.Query("...", ...)
+      - pattern-not: $DB.QueryContext($CTX, "...", ...)
+      - pattern-not: $DB.Exec("...", ...)
+      - pattern-not: $DB.ExecContext($CTX, "...", ...)
+      - pattern-not: $DB.QueryRow("...", ...)
+      - pattern-not: $DB.QueryRowContext($CTX, "...", ...)
+    severity: ERROR

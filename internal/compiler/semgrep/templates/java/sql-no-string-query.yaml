@@ -1,0 +1,17 @@
+rules:
+  - id: java.sql-no-string-query
+    message: SQL queries must use placeholders
+    languages:
+      - java
+    metadata:
+      title: Java SQL queries use placeholders
+    patterns:
+      - pattern-either:
+          - pattern: $S.executeQuery($Q)
+          - pattern: $S.executeUpdate($Q)
+          - pattern: $S.execute($Q)
+          - pattern: $C.prepareStatement($Q)
+      - pattern-not: $S.executeQuery("...")
+      - pattern-not: $S.executeUpdate("...")
+      - pattern-not: $S.execute("...")
+      - pattern-not: $C.prepareStatement("...")

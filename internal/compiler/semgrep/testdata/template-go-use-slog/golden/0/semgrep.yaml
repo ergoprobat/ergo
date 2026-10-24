@@ -1,0 +1,15 @@
+rules:
+  - id: go.use-slog
+    languages:
+      - go
+    message: Logging must use slog
+    metadata:
+      title: Go logging uses slog
+    pattern-either:
+      - pattern: fmt.Print(...)
+      - pattern: fmt.Printf(...)
+      - pattern: fmt.Println(...)
+      - pattern: log.Print(...)
+      - pattern: log.Printf(...)
+      - pattern: log.Println(...)
+    severity: ERROR

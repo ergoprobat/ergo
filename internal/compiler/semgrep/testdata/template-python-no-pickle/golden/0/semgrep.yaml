@@ -1,0 +1,12 @@
+rules:
+  - id: python.no-pickle
+    languages:
+      - python
+    message: Deserialization must not use pickle
+    metadata:
+      title: Python deserialization does not use pickle
+    pattern-either:
+      - pattern: pickle.load(...)
+      - pattern: pickle.loads(...)
+      - pattern: pickle.Unpickler(...)
+    severity: ERROR

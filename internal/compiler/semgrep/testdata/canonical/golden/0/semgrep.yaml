@@ -1,0 +1,7 @@
+rules:
+  - id: no-eval
+    languages:
+      - python
+    message: Do not eval
+    pattern: eval(...)
+    severity: WARNING

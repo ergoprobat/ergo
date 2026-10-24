@@ -1,0 +1,7 @@
+rules:
+  - id: sample
+    languages:
+      - python
+    message: sample rule
+    pattern: foo(...)
+    severity: INFO

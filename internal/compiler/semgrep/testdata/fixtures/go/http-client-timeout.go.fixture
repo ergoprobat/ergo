@@ -1,0 +1,23 @@
+package sample
+
+import (
+	"net/http"
+	"time"
+)
+
+func badGet() {
+	// ruleid: go.http-client-timeout
+	_, _ = http.Get("https://example.com")
+}
+
+func badClient() {
+	// ruleid: go.http-client-timeout
+	client := &http.Client{}
+	_ = client
+}
+
+func good() {
+	// ok: go.http-client-timeout
+	client := &http.Client{Timeout: time.Second}
+	_ = client
+}

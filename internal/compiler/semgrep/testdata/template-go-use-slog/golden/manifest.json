@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QV9TJ1BE0T08RJRCTAR0TZ",
+      "slug": "template-go-use-slog",
+      "check_index": 0,
+      "engine": "semgrep",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "semgrep",
+      "compiler_version": "1.182.1",
+      "artifacts": [
+        {
+          "name": "semgrep.yaml",
+          "sha256": "8d5213b0a5e3632c4b87736a56a29acdf53b0521d68a39a77377a6eb40f98970"
+        }
+      ]
+    }
+  ]
+}

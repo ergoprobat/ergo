@@ -1,0 +1,11 @@
+import subprocess
+
+
+def bad(cmd):
+    # ruleid: python.no-shell-true
+    subprocess.run(cmd, shell=True)
+
+
+def good():
+    # ok: python.no-shell-true
+    subprocess.run(["ls", "-l"], shell=True)

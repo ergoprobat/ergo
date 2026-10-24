@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QV9THDCVQ13DQ29G0VQ9AF",
+      "slug": "canonical",
+      "check_index": 0,
+      "engine": "semgrep",
+      "mode": "warn",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "semgrep",
+      "compiler_version": "1.182.1",
+      "artifacts": [
+        {
+          "name": "semgrep.yaml",
+          "sha256": "b2bbd3abafeb11e3df8167e8d4c49477cd7c8db692c1b9c94ba126a06e1f821c"
+        }
+      ]
+    }
+  ]
+}

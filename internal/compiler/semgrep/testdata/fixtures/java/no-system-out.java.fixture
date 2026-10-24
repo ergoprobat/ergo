@@ -1,0 +1,11 @@
+class Sample {
+    void bad() {
+        // ruleid: java.no-system-out
+        System.out.println("x");
+    }
+
+    void good(Logger logger) {
+        // ok: java.no-system-out
+        logger.info("x");
+    }
+}

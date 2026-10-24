@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QV9TJ80AASVVVMSKS4WSV6",
+      "slug": "template-python-no-shell-true",
+      "check_index": 0,
+      "engine": "semgrep",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "semgrep",
+      "compiler_version": "1.182.1",
+      "artifacts": [
+        {
+          "name": "semgrep.yaml",
+          "sha256": "684f9afd49b8fdb1a350cf1798b7f23cf5817740316130355750becccb067d63"
+        }
+      ]
+    }
+  ]
+}

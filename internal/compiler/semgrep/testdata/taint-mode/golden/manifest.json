@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QV9TH99MKQ0R21YCV4TG8H",
+      "slug": "taint-mode",
+      "check_index": 0,
+      "engine": "semgrep",
+      "mode": "warn",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "semgrep",
+      "compiler_version": "1.182.1",
+      "artifacts": [
+        {
+          "name": "semgrep.yaml",
+          "sha256": "f02ad7d2c14bfbe050c7794846f9b2ed050416ec9f408eb6edcedb81664c6f67"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5QV9TGY7PWJMK59BZBM7HEJ",
+      "slug": "ref-yml",
+      "check_index": 0,
+      "engine": "semgrep",
+      "mode": "warn",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "semgrep",
+      "compiler_version": "1.182.1",
+      "artifacts": [
+        {
+          "name": "semgrep.yaml",
+          "sha256": "5135b372a5bcce306b01b3dc1a08661a96037e862e8a648cbc660e0113a6cd22"
+        }
+      ]
+    }
+  ]
+}

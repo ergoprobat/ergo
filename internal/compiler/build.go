@@ -161,5 +161,9 @@ func swapBuild(dest, stage string) error {
 	}
 	// The new build is in place. A leftover backup is removed on the next run.
 	_ = os.RemoveAll(backup)
+	// The manifest names waiver approvers. The directory stays private to the user.
+	if err := os.Chmod(dest, 0o700); err != nil {
+		return err
+	}
 	return nil
 }

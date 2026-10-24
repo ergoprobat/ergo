@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/ergoprobat/ergo/internal/compiler"
 	"github.com/ergoprobat/ergo/internal/compiler/builtin"
+	"github.com/ergoprobat/ergo/internal/compiler/opa"
 	"github.com/ergoprobat/ergo/internal/config"
 	"github.com/ergoprobat/ergo/internal/edr"
 )
@@ -45,11 +47,7 @@ func run(args []string, stdout, stderr io.Writer, d deps) int {
 		}
 		return initCmd(root, stdout, stderr)
 	case "check":
-		if len(args) != 1 {
-			fprintln(stderr, "usage: ergo check")
-			return 2
-		}
-		return checkCmd(root, stdout, stderr)
+		return checkCmd(root, args[1:], stdout, stderr, d)
 	case "explain":
 		if len(args) != 2 || args[1] == "" {
 			fprintln(stderr, "usage: ergo explain <slug>")
@@ -93,6 +91,7 @@ const usage = `ergo reads and compiles engineering decision records in a reposit
 usage:
   ergo init
   ergo check
+  ergo check plan <plan.json|-> [--env name] [--report file]
   ergo explain <slug>
   ergo import [path...]
   ergo compile`
@@ -112,7 +111,18 @@ func initCmd(root string, stdout, stderr io.Writer) int {
 	return 0
 }
 
-func checkCmd(root string, stdout, stderr io.Writer) int {
+func checkCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
+	if len(args) == 0 {
+		return checkFiles(root, stdout, stderr)
+	}
+	if args[0] != "plan" {
+		fprintln(stderr, "usage: ergo check plan <plan.json|-> [--env name] [--report file]")
+		return 2
+	}
+	return planCmd(root, args[1:], stdout, stderr, d)
+}
+
+func checkFiles(root string, stdout, stderr io.Writer) int {
 	cfg, _, err := config.Load(root)
 	if err != nil {
 		fprintln(stderr, err)
@@ -150,6 +160,199 @@ func checkCmd(root string, stdout, stderr io.Writer) int {
 		return 1
 	}
 	return 0
+}
+
+const planUsage = "usage: ergo check plan <plan.json|-> [--env name] [--report file]"
+
+func planCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
+	opts, err := parsePlanArgs(args)
+	if err != nil {
+		fprintln(stderr, err)
+		return 2
+	}
+	if d.now == nil {
+		d.now = time.Now
+	}
+	var reader io.Reader
+	if opts.path == "-" {
+		reader = os.Stdin
+	} else {
+		file, err := os.Open(opts.path)
+		if err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		defer func() { _ = file.Close() }()
+		reader = file
+	}
+	plan, err := opa.ReadPlan(reader)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	build, err := compiler.LoadBuild(root)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	now := d.now()
+	report := compiler.PlanReport{
+		ReportVersion: compiler.ReportVersion,
+		ErgoVersion:   Version,
+		EvaluatedAt:   now.UTC(),
+		Env:           opts.env,
+		PlanSHA256:    plan.SHA256(),
+		BuildSHA256:   build.SHA256(),
+	}
+	failed := false
+	selected := 0
+	for _, entry := range build.Entries {
+		if !entry.Selected(opts.env, now) {
+			continue
+		}
+		selected++
+		artifacts, err := build.Artifacts(entry)
+		if err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		outcome := opa.EvalCheck(entry, artifacts, plan, now)
+		verdict := compiler.Verdict{
+			DecisionID: entry.DecisionID,
+			Slug:       entry.Slug,
+			CheckIndex: entry.CheckIndex,
+			Mode:       entry.Mode,
+			Result:     "pass",
+		}
+		switch {
+		case outcome.Err != nil:
+			verdict.Result = "error"
+			failed = true
+			fprintf(stdout, "%s: checks[%d] (%s): error: %s\n", entry.Slug, entry.CheckIndex, entry.Mode, outcome.Err)
+		case len(outcome.Violations) > 0 && outcome.Waived:
+			verdict.Result = "waived"
+			verdict.Violations = len(outcome.Violations)
+			fprintf(stdout, "%s: checks[%d] (%s): waived\n", entry.Slug, entry.CheckIndex, entry.Mode)
+		case len(outcome.Violations) > 0:
+			verdict.Result = "fail"
+			verdict.Violations = len(outcome.Violations)
+			if entry.Mode == "block" {
+				failed = true
+			}
+			for _, violation := range outcome.Violations {
+				fprintf(stdout, "%s: checks[%d] (%s): %s\n", entry.Slug, entry.CheckIndex, entry.Mode, violationLine(violation))
+			}
+		default:
+			fprintf(stdout, "%s: checks[%d] (%s): pass\n", entry.Slug, entry.CheckIndex, entry.Mode)
+		}
+		report.Verdicts = append(report.Verdicts, verdict)
+	}
+	if selected == 0 {
+		fprintln(stdout, "no checks selected")
+	}
+	if opts.report != "" {
+		raw, err := compiler.MarshalReport(report)
+		if err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		if err := writeReport(opts.report, raw); err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+	}
+	if failed {
+		return 1
+	}
+	return 0
+}
+
+type planOptions struct {
+	path   string
+	env    string
+	report string
+}
+
+func parsePlanArgs(args []string) (planOptions, error) {
+	var opts planOptions
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case "--env":
+			if opts.env != "" || i+1 >= len(args) || strings.HasPrefix(args[i+1], "-") {
+				return planOptions{}, fmt.Errorf("%s", planUsage)
+			}
+			i++
+			opts.env = args[i]
+		case "--report":
+			if opts.report != "" || i+1 >= len(args) || strings.HasPrefix(args[i+1], "-") {
+				return planOptions{}, fmt.Errorf("%s", planUsage)
+			}
+			i++
+			opts.report = args[i]
+		default:
+			if strings.HasPrefix(args[i], "-") || opts.path != "" {
+				return planOptions{}, fmt.Errorf("%s", planUsage)
+			}
+			opts.path = args[i]
+		}
+	}
+	if opts.path == "" {
+		return planOptions{}, fmt.Errorf("%s", planUsage)
+	}
+	return opts, nil
+}
+
+// writeReport replaces path with raw. A symlink is refused. The file mode is 0600.
+func writeReport(path string, raw []byte) error {
+	info, err := os.Lstat(path)
+	if err == nil && info.Mode()&os.ModeSymlink != 0 {
+		return fmt.Errorf("%s is a symlink", path)
+	}
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return err
+	}
+	dir := filepath.Dir(path)
+	parent, err := os.Lstat(dir)
+	if err != nil {
+		return err
+	}
+	if parent.Mode()&os.ModeSymlink != 0 {
+		return fmt.Errorf("%s is a symlink", dir)
+	}
+	temp, err := os.CreateTemp(dir, ".report-*")
+	if err != nil {
+		return err
+	}
+	tempName := temp.Name()
+	ok := false
+	defer func() {
+		if !ok {
+			_ = os.Remove(tempName)
+		}
+	}()
+	if err := temp.Chmod(0o600); err != nil {
+		_ = temp.Close()
+		return err
+	}
+	if _, err := temp.Write(raw); err != nil {
+		_ = temp.Close()
+		return err
+	}
+	if err := temp.Close(); err != nil {
+		return err
+	}
+	if err := os.Rename(tempName, path); err != nil {
+		return err
+	}
+	ok = true
+	return nil
+}
+
+func violationLine(violation opa.Violation) string {
+	if violation.Address == "" {
+		return violation.Message
+	}
+	return violation.Address + ": " + violation.Message
 }
 
 func explainCmd(root, slug string, stdout, stderr io.Writer) int {

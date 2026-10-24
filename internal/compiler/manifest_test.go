@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ergoprobat/ergo/internal/edr"
 )
@@ -21,9 +22,18 @@ func (s stubCompiler) Compile(Input) ([]Artifact, error) {
 
 func TestAssembleSortsAndStampsMode(t *testing.T) {
 	in := Input{
-		Record: edr.Record{ID: "01M5C5QEHHNXJ3D7X2ZCMGXQT7", Slug: "tls", Criticality: "warning"},
-		Check:  edr.Check{Engine: "opa"},
-		Index:  1,
+		Record: edr.Record{
+			ID: "01M5C5QEHHNXJ3D7X2ZCMGXQT7", Slug: "tls", Criticality: "warning",
+			ValidFrom: time.Date(2026, 1, 15, 0, 0, 0, 0, time.UTC),
+			Scope:     []edr.ScopeItem{{Env: []string{"prod"}}, {}},
+			Waivers: []edr.Waiver{{
+				Approver:  "team:platform",
+				ValidFrom: time.Date(2026, 3, 1, 0, 0, 0, 0, time.UTC),
+				ValidTo:   time.Date(2026, 4, 1, 0, 0, 0, 0, time.UTC),
+			}},
+		},
+		Check: edr.Check{Engine: "opa", Target: "terraform-plan"},
+		Index: 1,
 	}
 	entry, artifacts, err := Assemble(stubCompiler{engine: "opa", version: "test"}, in, []Artifact{
 		{Name: "b.txt", Data: []byte("b")},
@@ -34,6 +44,15 @@ func TestAssembleSortsAndStampsMode(t *testing.T) {
 	}
 	if entry.Mode != "warn" || entry.Compiler != "opa" || entry.CompilerVersion != "test" || entry.CheckIndex != 1 {
 		t.Fatalf("entry %+v", entry)
+	}
+	if entry.Target != "terraform-plan" || entry.ValidFrom != "2026-01-15" || entry.ValidTo != nil {
+		t.Fatalf("validity %+v", entry)
+	}
+	if entry.Env != nil {
+		t.Fatalf("env %+v, a scope item with no env applies everywhere", entry.Env)
+	}
+	if len(entry.Waivers) != 1 || entry.Waivers[0].Approver != "team:platform" || entry.Waivers[0].ValidTo != "2026-04-01" {
+		t.Fatalf("waivers %+v", entry.Waivers)
 	}
 	if artifacts[0].Name != "a.txt" || artifacts[1].Name != "b.txt" {
 		t.Fatalf("order %+v", artifacts)
@@ -93,8 +112,21 @@ func TestMarshalManifestOrdersEntries(t *testing.T) {
 	if first < 0 || second < 0 || first > second {
 		t.Fatalf("check order %s", text)
 	}
-	if !strings.Contains(text, `"entries": []`) && strings.Contains(text, "null") {
+	if strings.Contains(text, `"artifacts": null`) {
 		t.Fatalf("nil artifacts became null: %s", text)
+	}
+}
+
+func TestEnvList(t *testing.T) {
+	got := envList(edr.Record{Scope: []edr.ScopeItem{
+		{Env: []string{"prod", "stage"}},
+		{Env: []string{"prod", "dev"}},
+	}})
+	if strings.Join(got, ",") != "dev,prod,stage" {
+		t.Fatalf("env %v", got)
+	}
+	if envList(edr.Record{}) != nil {
+		t.Fatal("no scope should apply everywhere")
 	}
 }
 

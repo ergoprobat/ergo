@@ -14,6 +14,19 @@ type Check struct {
 	Mode   string
 }
 
+// ScopeItem is one object from the scope array.
+// An empty Env means the item applies in every environment.
+type ScopeItem struct {
+	Env []string
+}
+
+// Waiver is one object from the waivers array.
+type Waiver struct {
+	Approver  string
+	ValidFrom time.Time
+	ValidTo   time.Time
+}
+
 // Record is the frontmatter a compiler needs from a validated document.
 type Record struct {
 	ID          string
@@ -22,7 +35,9 @@ type Record struct {
 	Criticality string
 	ValidFrom   time.Time
 	ValidTo     *time.Time
+	Scope       []ScopeItem
 	Checks      []Check
+	Waivers     []Waiver
 }
 
 // RecordFrom decodes a document that has already passed validation.
@@ -64,11 +79,27 @@ func RecordFrom(doc Document) (Record, error) {
 		}
 		rec.ValidTo = &parsed
 	}
+	rec.Scope, err = scopeFrom(doc.Front["scope"])
+	if err != nil {
+		return Record{}, err
+	}
 	rec.Checks, err = checksFrom(doc.Front["checks"])
 	if err != nil {
 		return Record{}, err
 	}
+	rec.Waivers, err = waiversFrom(doc.Front["waivers"])
+	if err != nil {
+		return Record{}, err
+	}
 	return rec, nil
+}
+
+// WaiverInForce reports whether the waiver binds on the calendar date of now.
+// The interval is half-open, like a record: valid_from is included and valid_to is excluded.
+// A waiver whose valid_from is after valid_to never binds.
+func (w Waiver) InForce(now time.Time) bool {
+	today := calendarDate(now)
+	return !today.Before(w.ValidFrom) && today.Before(w.ValidTo)
 }
 
 // InForce reports whether the record binds on the calendar date of now.
@@ -132,6 +163,80 @@ func requireString(front map[string]any, key string) (string, error) {
 		return "", fmt.Errorf("%s: missing", key)
 	}
 	return text, nil
+}
+
+func scopeFrom(raw any) ([]ScopeItem, error) {
+	items, ok := raw.([]any)
+	if !ok {
+		return nil, fmt.Errorf("scope: not an array")
+	}
+	scope := make([]ScopeItem, 0, len(items))
+	for i, item := range items {
+		mapping, ok := item.(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("scope[%d]: not an object", i)
+		}
+		envs, err := stringList(mapping["env"])
+		if err != nil {
+			return nil, fmt.Errorf("scope[%d]: env: %w", i, err)
+		}
+		scope = append(scope, ScopeItem{Env: envs})
+	}
+	return scope, nil
+}
+
+func waiversFrom(raw any) ([]Waiver, error) {
+	items, ok := raw.([]any)
+	if !ok {
+		return nil, fmt.Errorf("waivers: not an array")
+	}
+	waivers := make([]Waiver, 0, len(items))
+	for i, item := range items {
+		mapping, ok := item.(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("waivers[%d]: not an object", i)
+		}
+		waiver := Waiver{}
+		var err error
+		if waiver.Approver, err = requireString(mapping, "approver"); err != nil {
+			return nil, fmt.Errorf("waivers[%d]: %w", i, err)
+		}
+		from, err := requireString(mapping, "valid_from")
+		if err != nil {
+			return nil, fmt.Errorf("waivers[%d]: %w", i, err)
+		}
+		if waiver.ValidFrom, err = parseDate("valid_from", from); err != nil {
+			return nil, fmt.Errorf("waivers[%d]: %w", i, err)
+		}
+		to, err := requireString(mapping, "valid_to")
+		if err != nil {
+			return nil, fmt.Errorf("waivers[%d]: %w", i, err)
+		}
+		if waiver.ValidTo, err = parseDate("valid_to", to); err != nil {
+			return nil, fmt.Errorf("waivers[%d]: %w", i, err)
+		}
+		waivers = append(waivers, waiver)
+	}
+	return waivers, nil
+}
+
+func stringList(raw any) ([]string, error) {
+	if raw == nil {
+		return nil, nil
+	}
+	items, ok := raw.([]any)
+	if !ok {
+		return nil, fmt.Errorf("not an array")
+	}
+	out := make([]string, 0, len(items))
+	for _, item := range items {
+		text, ok := item.(string)
+		if !ok || text == "" {
+			return nil, fmt.Errorf("not a string")
+		}
+		out = append(out, text)
+	}
+	return out, nil
 }
 
 func checksFrom(raw any) ([]Check, error) {

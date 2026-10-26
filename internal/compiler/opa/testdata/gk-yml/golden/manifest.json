@@ -1,0 +1,28 @@
+{
+  "entries": [
+    {
+      "decision_id": "00REEWJD16GPWCC7S6H7J24ZQH",
+      "slug": "gk-yml",
+      "check_index": 0,
+      "engine": "opa",
+      "mode": "block",
+      "target": "gatekeeper",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "opa",
+      "compiler_version": "1.21.4",
+      "artifacts": [
+        {
+          "name": "constraint-template.yaml",
+          "sha256": "1b034ad529b9df5c44f4e207b86cd01a55e659884cad318c8dd006ce2b30b447"
+        },
+        {
+          "name": "constraint.yaml",
+          "sha256": "d19a7256619b58f9a71001fc42195ea9b94b21b962c8857ed08f6c2b581a9f36"
+        }
+      ]
+    }
+  ]
+}

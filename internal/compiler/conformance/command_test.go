@@ -42,6 +42,32 @@ func javaOutput(t *testing.T, timeout time.Duration, dir string, args ...string)
 	return runCommand(t, ctx, exec.CommandContext(ctx, "java", args...), dir)
 }
 
+func kyvernoOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	return toolOutput(t, timeout, dir, "../kyverno/testdata/tool/bin/kyverno", args...)
+}
+
+func gatorOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	return toolOutput(t, timeout, dir, "../opa/testdata/tool/bin/gator", args...)
+}
+
+func eslintOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	return toolOutput(t, timeout, dir, "../eslint/testdata/tool/node_modules/.bin/eslint", args...)
+}
+
+func toolOutput(t *testing.T, timeout time.Duration, dir, bin string, args ...string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	abs, err := filepath.Abs(bin)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	t.Cleanup(cancel)
+	return runCommand(t, ctx, exec.CommandContext(ctx, abs, args...), dir)
+}
+
 func lintImportsOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)

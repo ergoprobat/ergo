@@ -149,7 +149,9 @@ jobs:
         with:
           node-version: "24"
           cache: npm
-          cache-dependency-path: internal/compiler/depcruise/testdata/tool/package-lock.json
+          cache-dependency-path: |
+            internal/compiler/depcruise/testdata/tool/package-lock.json
+            internal/compiler/eslint/testdata/tool/package-lock.json
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.13"
@@ -178,5 +180,12 @@ jobs:
           python -m venv "${RUNNER_TEMP}/importlinter"
           "${RUNNER_TEMP}/importlinter/bin/pip" install --require-hashes --no-deps -r internal/compiler/importlinter/testdata/tool/requirements.txt
           echo "${RUNNER_TEMP}/importlinter/bin" >> "$GITHUB_PATH"
+      - name: Install ESLint
+        working-directory: internal/compiler/eslint/testdata/tool
+        run: npm ci --ignore-scripts
+      - name: Install Kyverno
+        run: bash internal/compiler/kyverno/testdata/tool/install.sh
+      - name: Install gator
+        run: bash internal/compiler/opa/testdata/tool/install.sh
       - name: Run the conformance suite
         run: go test -tags conformance ./internal/compiler/conformance -count=1

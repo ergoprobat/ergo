@@ -21,6 +21,12 @@ const (
 	archunitBad       = "../archunit/testdata/billing-violating"
 	importlinterClean = "../importlinter/testdata/shop-clean"
 	importlinterBad   = "../importlinter/testdata/shop-violating"
+	kyvernoClean      = "../kyverno/testdata/cluster-clean"
+	kyvernoBad        = "../kyverno/testdata/cluster-violating"
+	gatekeeperClean   = "../opa/testdata/gatekeeper-clean"
+	gatekeeperBad     = "../opa/testdata/gatekeeper-violating"
+	eslintClean       = "../eslint/testdata/app-clean"
+	eslintBad         = "../eslint/testdata/app-violating"
 )
 
 func TestSubjects(t *testing.T) {
@@ -98,6 +104,36 @@ func TestSubjects(t *testing.T) {
 		}
 		if !hasSuffix(t, filepath.Join(dir, "repo"), ".py.fixture") {
 			t.Errorf("%s has no Python fixture", dir)
+		}
+	}
+	for _, dir := range []string{kyvernoClean, kyvernoBad} {
+		for _, name := range []string{"record.md", filepath.Join("repo", "policies", "run-as-non-root.yaml")} {
+			if _, err := os.Stat(filepath.Join(dir, name)); err != nil {
+				t.Errorf("%s/%s: %v", dir, name, err)
+			}
+		}
+		if !hasSuffix(t, filepath.Join(dir, "repo"), ".yaml.fixture") {
+			t.Errorf("%s has no manifest fixture", dir)
+		}
+	}
+	for _, dir := range []string{gatekeeperClean, gatekeeperBad} {
+		for _, name := range []string{"record.md", filepath.Join("repo", "gatekeeper.yaml")} {
+			if _, err := os.Stat(filepath.Join(dir, name)); err != nil {
+				t.Errorf("%s/%s: %v", dir, name, err)
+			}
+		}
+		if !hasSuffix(t, filepath.Join(dir, "repo"), ".yaml.fixture") {
+			t.Errorf("%s has no manifest fixture", dir)
+		}
+	}
+	for _, dir := range []string{eslintClean, eslintBad} {
+		for _, name := range []string{"record.md", filepath.Join("repo", "eslint-ts.json"), filepath.Join("repo", "eslint-js.json")} {
+			if _, err := os.Stat(filepath.Join(dir, name)); err != nil {
+				t.Errorf("%s/%s: %v", dir, name, err)
+			}
+		}
+		if !hasSuffix(t, filepath.Join(dir, "repo"), ".ts.fixture") || !hasSuffix(t, filepath.Join(dir, "repo"), ".js.fixture") {
+			t.Errorf("%s has no script fixture", dir)
 		}
 	}
 }

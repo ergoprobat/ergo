@@ -1,0 +1,23 @@
+# comment above the policy
+kind: ValidatingPolicy
+apiVersion: policies.kyverno.io/v1
+metadata:
+  annotations:
+    team: security
+  name: run-as-non-root
+  labels:
+    app: billing
+spec:
+  validations:
+    - message: runAsNonRoot must be true
+      expression: has(object.spec.securityContext) && has(object.spec.securityContext.runAsNonRoot) && object.spec.securityContext.runAsNonRoot == true
+  failurePolicy: Fail
+  matchConstraints:
+    matchPolicy: Equivalent
+    resourceRules:
+      - resources:
+          - pods
+        apiVersions:
+          - v1
+        apiGroups:
+          - ""

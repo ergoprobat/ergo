@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "0AC0VXMTE2D0PMYV44ESK2MW1T",
+      "slug": "mode-advise",
+      "check_index": 0,
+      "engine": "kyverno",
+      "mode": "advise",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "kyverno",
+      "compiler_version": "1.19.2",
+      "artifacts": [
+        {
+          "name": "kyverno.yaml",
+          "sha256": "512ee38ba901f4e174465c6e87c1684072185a488f35c83d136fadd07bebb50f"
+        }
+      ]
+    }
+  ]
+}

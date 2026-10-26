@@ -8,6 +8,7 @@ import (
 
 	"github.com/ergoprobat/ergo/internal/compiler"
 	"github.com/ergoprobat/ergo/internal/compiler/compilertest"
+	"github.com/ergoprobat/ergo/internal/compiler/strictyaml"
 	"github.com/ergoprobat/ergo/internal/edr"
 )
 
@@ -41,11 +42,11 @@ func TestUpperExtension(t *testing.T) {
 
 func TestDeepDocument(t *testing.T) {
 	var b strings.Builder
-	for i := 0; i < maxYAMLDepth+5; i++ {
+	for i := 0; i < strictyaml.MaxDepth+5; i++ {
 		b.WriteString(strings.Repeat("  ", i))
 		b.WriteString("a:\n")
 	}
-	b.WriteString(strings.Repeat("  ", maxYAMLDepth+5))
+	b.WriteString(strings.Repeat("  ", strictyaml.MaxDepth+5))
 	b.WriteString("b: 1\n")
 	_, err := compileConfig([]byte(b.String()), "warn")
 	if compiler.CodeOf(err) != CodeYAML {

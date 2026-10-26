@@ -1,0 +1,28 @@
+{
+  "entries": [
+    {
+      "decision_id": "0MTFDWZZT0JE85JX7V83PFB3VC",
+      "slug": "gk-mode-advise",
+      "check_index": 0,
+      "engine": "opa",
+      "mode": "advise",
+      "target": "gatekeeper",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "opa",
+      "compiler_version": "1.21.4",
+      "artifacts": [
+        {
+          "name": "constraint-template.yaml",
+          "sha256": "1b034ad529b9df5c44f4e207b86cd01a55e659884cad318c8dd006ce2b30b447"
+        },
+        {
+          "name": "constraint.yaml",
+          "sha256": "9c04105c87bab11c38545d9f2020986e100df03f7a7b688733f7764436af89a7"
+        }
+      ]
+    }
+  ]
+}

@@ -22,9 +22,10 @@ const (
 	// CodeRegoNoDeny means the module has no multi-value deny rule.
 	CodeRegoNoDeny = "rego-no-deny"
 
-	planTarget = "terraform-plan"
-	policyName = "policy.rego"
-	libName    = "terraform.rego"
+	planTarget       = "terraform-plan"
+	gatekeeperTarget = "gatekeeper"
+	policyName       = "policy.rego"
+	libName          = "terraform.rego"
 )
 
 // Compiler is the built-in OPA engine.
@@ -41,8 +42,12 @@ func (Compiler) Version() string { return version.Version }
 
 // Compile writes policy.rego for one Rego module.
 // A ref that starts with ergo: selects a built-in template and also writes terraform.rego.
-// Any other ref is one repository file.
+// target gatekeeper reads one YAML file of a ConstraintTemplate and a Constraint.
+// Any other ref is one repository Rego file.
 func (Compiler) Compile(in compiler.Input) ([]compiler.Artifact, error) {
+	if in.Check.Target == gatekeeperTarget {
+		return compileGatekeeper(in)
+	}
 	if strings.HasPrefix(in.Check.Ref, compiler.TemplatePrefix) {
 		return compileTemplate(in)
 	}

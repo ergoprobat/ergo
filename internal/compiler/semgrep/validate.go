@@ -1,10 +1,8 @@
 package semgrep
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"regexp"
 	"sort"
 	"strings"
@@ -12,6 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ergoprobat/ergo/internal/compiler/strictyaml"
 )
 
 // allowedRuleKeys are the Semgrep rule keys compile keeps.
@@ -52,15 +51,6 @@ var taintLists = []string{"pattern-propagators", "pattern-sanitizers", "pattern-
 
 var ruleIDPattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]*$`)
 
-// maxYAMLDepth is the deepest mapping or list compile will walk.
-// yaml.v3 has already built the tree, so the byte cap bounds the work.
-// The depth cap is what keeps that walk off the call stack.
-// maxYAMLNodes stops a wide tree from turning one compile into a long walk.
-const (
-	maxYAMLDepth = 64
-	maxYAMLNodes = 100000
-)
-
 var patternStringKeys = map[string]struct{}{
 	"pattern":            {},
 	"pattern-inside":     {},
@@ -75,13 +65,11 @@ func compileConfig(src []byte, mode string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	root, err := decodeDocument(src)
+	docs, err := strictyaml.Documents(src, CodeYAML, 1)
 	if err != nil {
 		return nil, err
 	}
-	if err := rejectStructure(root); err != nil {
-		return nil, err
-	}
+	root := docs[0]
 	rules, err := ruleList(root)
 	if err != nil {
 		return nil, err
@@ -93,89 +81,11 @@ func compileConfig(src []byte, mode string) ([]byte, error) {
 		}
 		setSeverity(rule, severity)
 	}
-	out, err := canonicalYAML(root)
+	out, err := strictyaml.Canonical(root)
 	if err != nil {
 		return nil, fmt.Errorf("encode semgrep rules: %w", err)
 	}
 	return out, nil
-}
-
-func decodeDocument(src []byte) (*yaml.Node, error) {
-	dec := yaml.NewDecoder(bytes.NewReader(src))
-	var doc yaml.Node
-	if err := dec.Decode(&doc); err != nil {
-		if errors.Is(err, io.EOF) {
-			return nil, &compiler.Error{Code: CodeYAML, Err: errors.New("empty file")}
-		}
-		return nil, &compiler.Error{Code: CodeYAML, Err: err}
-	}
-	var extra yaml.Node
-	err := dec.Decode(&extra)
-	if err == nil {
-		return nil, &compiler.Error{Code: CodeYAML, Err: errors.New("more than one document")}
-	}
-	if !errors.Is(err, io.EOF) {
-		return nil, &compiler.Error{Code: CodeYAML, Err: err}
-	}
-	if doc.Kind != yaml.DocumentNode || len(doc.Content) != 1 {
-		return nil, &compiler.Error{Code: CodeYAML, Err: errors.New("not one document")}
-	}
-	return doc.Content[0], nil
-}
-
-func rejectStructure(node *yaml.Node) error {
-	return walkStructure(node, 0, new(int))
-}
-
-func walkStructure(node *yaml.Node, depth int, nodes *int) error {
-	if node == nil {
-		return &compiler.Error{Code: CodeYAML, Err: errors.New("empty document")}
-	}
-	*nodes++
-	if depth > maxYAMLDepth || *nodes > maxYAMLNodes {
-		return &compiler.Error{Code: CodeYAML, Err: errors.New("document is too large")}
-	}
-	if node.Kind == yaml.AliasNode {
-		return &compiler.Error{Code: CodeYAML, Err: errors.New("alias")}
-	}
-	if node.Anchor != "" {
-		return &compiler.Error{Code: CodeYAML, Err: fmt.Errorf("anchor %q", node.Anchor)}
-	}
-	if node.Style&yaml.TaggedStyle != 0 {
-		return &compiler.Error{Code: CodeYAML, Err: fmt.Errorf("tag %s", node.Tag)}
-	}
-	if node.Kind != yaml.MappingNode {
-		for _, child := range node.Content {
-			if err := walkStructure(child, depth+1, nodes); err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-	if len(node.Content)%2 != 0 {
-		return &compiler.Error{Code: CodeYAML, Err: errors.New("broken mapping")}
-	}
-	seen := map[string]struct{}{}
-	for i := 0; i < len(node.Content); i += 2 {
-		key := node.Content[i]
-		if err := walkStructure(key, depth+1, nodes); err != nil {
-			return err
-		}
-		if key.Kind != yaml.ScalarNode || key.ShortTag() != "!!str" {
-			return &compiler.Error{Code: CodeYAML, Err: errors.New("mapping key is not a string")}
-		}
-		if key.Value == "<<" {
-			return &compiler.Error{Code: CodeYAML, Err: errors.New("merge key")}
-		}
-		if _, ok := seen[key.Value]; ok {
-			return &compiler.Error{Code: CodeYAML, Err: fmt.Errorf("duplicate key %q", key.Value)}
-		}
-		seen[key.Value] = struct{}{}
-		if err := walkStructure(node.Content[i+1], depth+1, nodes); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func ruleList(root *yaml.Node) (*yaml.Node, error) {

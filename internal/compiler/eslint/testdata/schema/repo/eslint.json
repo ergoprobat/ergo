@@ -1,0 +1,9 @@
+{
+  "files": [
+    "a.js"
+  ],
+  "rules": {
+    "eqeqeq": "error"
+  },
+  "env": {}
+}

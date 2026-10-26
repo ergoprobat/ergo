@@ -1,0 +1,8 @@
+[importlinter]
+root_packages = billing
+
+[importlinter:contract:public-api]
+name = Public API
+type = protected
+protected_modules = billing.internal
+allowed_importers = billing.api

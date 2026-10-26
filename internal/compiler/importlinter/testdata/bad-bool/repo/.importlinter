@@ -1,0 +1,9 @@
+[importlinter]
+root_packages = shop
+
+[importlinter:contract:one]
+name = One
+type = forbidden
+source_modules = shop
+forbidden_modules = shop.infra
+allow_indirect_imports = yes

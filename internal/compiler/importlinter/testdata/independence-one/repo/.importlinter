@@ -1,0 +1,7 @@
+[importlinter]
+root_packages = shop
+
+[importlinter:contract:one]
+name = One module
+type = independence
+modules = shop.api

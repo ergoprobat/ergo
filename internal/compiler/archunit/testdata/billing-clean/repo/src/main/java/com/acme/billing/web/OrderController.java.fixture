@@ -1,0 +1,9 @@
+package com.acme.billing.web;
+
+import com.acme.billing.domain.Order;
+
+public class OrderController {
+    public String show() {
+        return new Order().id();
+    }
+}

@@ -1,0 +1,13 @@
+package com.acme.billing.domain;
+
+import com.acme.billing.web.OrderController;
+
+public class Order {
+    public String id() {
+        return "order";
+    }
+
+    public String leak() {
+        return new OrderController().show();
+    }
+}

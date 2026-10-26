@@ -1,0 +1,1 @@
+{"packages":["com.acme"],"packages":["com.acme"],"rules":[{"name":"one","type":"forbidden","source_packages":["com.acme.."],"forbidden_packages":["com.acme.web.."]}]}

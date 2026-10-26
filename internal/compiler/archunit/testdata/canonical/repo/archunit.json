@@ -1,0 +1,11 @@
+{
+  "rules": [
+    {
+      "type": "forbidden",
+      "forbidden_packages": ["com.acme.web.."],
+      "source_packages": ["com.acme.domain.."],
+      "name": "canonical-order"
+    }
+  ],
+  "packages": ["com.acme"]
+}

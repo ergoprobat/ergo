@@ -11,12 +11,16 @@ import (
 )
 
 const (
-	opaTemplates     = "../opa/templates"
-	opaCorpus        = "../opa/testdata/corpus"
-	semgrepTemplates = "../semgrep/templates"
-	semgrepFixtures  = "../semgrep/testdata/fixtures"
-	depcruiseClean   = "../depcruise/testdata/monorepo-clean"
-	depcruiseBad     = "../depcruise/testdata/monorepo-violating"
+	opaTemplates      = "../opa/templates"
+	opaCorpus         = "../opa/testdata/corpus"
+	semgrepTemplates  = "../semgrep/templates"
+	semgrepFixtures   = "../semgrep/testdata/fixtures"
+	depcruiseClean    = "../depcruise/testdata/monorepo-clean"
+	depcruiseBad      = "../depcruise/testdata/monorepo-violating"
+	archunitClean     = "../archunit/testdata/billing-clean"
+	archunitBad       = "../archunit/testdata/billing-violating"
+	importlinterClean = "../importlinter/testdata/shop-clean"
+	importlinterBad   = "../importlinter/testdata/shop-violating"
 )
 
 func TestSubjects(t *testing.T) {
@@ -76,6 +80,44 @@ func TestSubjects(t *testing.T) {
 			}
 		}
 	}
+	for _, dir := range []string{archunitClean, archunitBad} {
+		for _, name := range []string{"record.md", filepath.Join("repo", "archunit.json")} {
+			if _, err := os.Stat(filepath.Join(dir, name)); err != nil {
+				t.Errorf("%s/%s: %v", dir, name, err)
+			}
+		}
+		if !hasSuffix(t, filepath.Join(dir, "repo"), ".java.fixture") {
+			t.Errorf("%s has no Java fixture", dir)
+		}
+	}
+	for _, dir := range []string{importlinterClean, importlinterBad} {
+		for _, name := range []string{"record.md", filepath.Join("repo", ".importlinter")} {
+			if _, err := os.Stat(filepath.Join(dir, name)); err != nil {
+				t.Errorf("%s/%s: %v", dir, name, err)
+			}
+		}
+		if !hasSuffix(t, filepath.Join(dir, "repo"), ".py.fixture") {
+			t.Errorf("%s has no Python fixture", dir)
+		}
+	}
+}
+
+func hasSuffix(t *testing.T, dir, suffix string) bool {
+	t.Helper()
+	found := false
+	err := filepath.WalkDir(dir, func(path string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if !entry.IsDir() && strings.HasSuffix(path, suffix) {
+			found = true
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return found
 }
 
 func templateIDs(t *testing.T, root, suffix, skip string) []string {

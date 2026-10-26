@@ -1,0 +1,7 @@
+{
+  "packages": ["com.acme"],
+  "rules": [
+    {"name": "same", "type": "forbidden", "source_packages": ["com.acme.domain.."], "forbidden_packages": ["com.acme.web.."]},
+    {"name": "same", "type": "forbidden", "source_packages": ["com.acme.api.."], "forbidden_packages": ["com.acme.db.."]}
+  ]
+}

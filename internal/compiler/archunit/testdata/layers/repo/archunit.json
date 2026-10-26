@@ -1,0 +1,13 @@
+{
+  "packages": ["com.acme.orders"],
+  "rules": [
+    {
+      "name": "orders-layers",
+      "type": "layers",
+      "layers": [
+        {"name": "api", "packages": ["com.acme.orders.api.."]},
+        {"name": "domain", "packages": ["com.acme.orders.domain.."]}
+      ]
+    }
+  ]
+}

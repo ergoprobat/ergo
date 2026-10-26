@@ -1,0 +1,30 @@
+package ergo.d01m5wvyed4wp805q4xv2pahs8b.c0;
+
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+class ArchitectureTest {
+    private static JavaClasses classes;
+
+    @BeforeAll
+    static void importClasses() {
+        classes = new ClassFileImporter()
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
+                .importPackages("com.acme");
+    }
+
+    @Test
+    void rule_canonical_order() {
+        noClasses()
+                .that().resideInAnyPackage("com.acme.domain..")
+                .should().dependOnClassesThat().resideInAnyPackage("com.acme.web..")
+                .as("canonical-order")
+                .check(classes);
+    }
+}

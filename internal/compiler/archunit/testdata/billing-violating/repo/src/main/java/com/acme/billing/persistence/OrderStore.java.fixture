@@ -1,0 +1,8 @@
+package com.acme.billing.persistence;
+
+import com.acme.billing.domain.Order;
+
+public class OrderStore {
+    public void save(Order order) {
+    }
+}

@@ -1,0 +1,8 @@
+[importlinter]
+include_external_packages = true
+
+[importlinter:contract:one]
+name = One
+type = forbidden
+source_modules = shop
+forbidden_modules = shop.infra

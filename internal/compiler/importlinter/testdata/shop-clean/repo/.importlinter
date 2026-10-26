@@ -1,0 +1,25 @@
+[importlinter]
+root_packages =
+    shop
+
+[importlinter:contract:layers]
+name = Layers
+type = layers
+layers =
+    shop.api
+    shop.domain
+
+[importlinter:contract:independence]
+name = Independence
+type = independence
+modules =
+    shop.billing
+    shop.shipping
+
+[importlinter:contract:forbidden]
+name = Forbidden
+type = forbidden
+source_modules =
+    shop.domain
+forbidden_modules =
+    shop.infra

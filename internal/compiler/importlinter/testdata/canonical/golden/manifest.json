@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5WVYECPKTTQTPPR7379XXFK",
+      "slug": "canonical",
+      "check_index": 0,
+      "engine": "importlinter",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "importlinter",
+      "compiler_version": "2.15",
+      "artifacts": [
+        {
+          "name": "importlinter.ini",
+          "sha256": "4c19f4e79740d7c47ba14574aec24f0e3af65f9129c30b88cd7d81fb5fc9eaa2"
+        }
+      ]
+    }
+  ]
+}

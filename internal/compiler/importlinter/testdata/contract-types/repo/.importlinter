@@ -1,0 +1,42 @@
+[importlinter]
+root_packages = shop
+
+[importlinter:contract:forbidden]
+name = Forbidden
+type = forbidden
+source_modules = shop.api
+forbidden_modules = shop.infra
+allow_indirect_imports = false
+as_packages = true
+ignore_imports =
+    shop.api -> shop.infra
+
+[importlinter:contract:layers]
+name = Layers
+type = layers
+layers =
+    shop.api | shop.web
+    (shop.domain)
+containers = shop
+exhaustive = true
+exhaustive_ignores = shop.util
+
+[importlinter:contract:independence]
+name = Independence
+type = independence
+modules =
+    shop.billing
+    shop.shipping
+
+[importlinter:contract:protected]
+name = Protected
+type = protected
+protected_modules = shop.domain
+allowed_importers = shop.api
+
+[importlinter:contract:siblings]
+name = Siblings
+type = acyclic_siblings
+ancestors = shop
+depth = 1
+skip_descendants = shop.tests

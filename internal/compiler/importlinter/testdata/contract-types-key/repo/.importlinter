@@ -1,0 +1,4 @@
+[importlinter]
+root_packages = shop
+contract_types =
+    forbidden: example.Contract

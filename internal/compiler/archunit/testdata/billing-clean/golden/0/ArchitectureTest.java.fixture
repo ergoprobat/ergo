@@ -1,0 +1,45 @@
+package ergo.d01m5wvyech306k6ddjxr2vapcs.c0;
+
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
+
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+class ArchitectureTest {
+    private static JavaClasses classes;
+
+    @BeforeAll
+    static void importClasses() {
+        classes = new ClassFileImporter()
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
+                .importPackages("com.acme.billing");
+    }
+
+    @Test
+    void rule_domain_not_to_adapters() {
+        noClasses()
+                .that().resideInAnyPackage("com.acme.billing.domain..")
+                .should().dependOnClassesThat().resideInAnyPackage("com.acme.billing.web..", "com.acme.billing.persistence..")
+                .as("domain-not-to-adapters")
+                .check(classes);
+    }
+
+    @Test
+    void rule_layers() {
+        layeredArchitecture()
+                .consideringOnlyDependenciesInLayers()
+                .layer("web").definedBy("com.acme.billing.web..")
+                .layer("domain").definedBy("com.acme.billing.domain..")
+                .layer("persistence").definedBy("com.acme.billing.persistence..")
+                .whereLayer("web").mayNotBeAccessedByAnyLayer()
+                .whereLayer("domain").mayOnlyBeAccessedByLayers("web")
+                .whereLayer("persistence").mayOnlyBeAccessedByLayers("web", "domain")
+                .as("layers")
+                .check(classes);
+    }
+}

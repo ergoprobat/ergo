@@ -1,0 +1,6 @@
+package com.acme.billing.persistence;
+
+public class OrderStore {
+    public void save() {
+    }
+}

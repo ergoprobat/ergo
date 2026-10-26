@@ -8,6 +8,7 @@ import (
 	"errors"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -25,6 +26,60 @@ func nodeOutput(t *testing.T, timeout time.Duration, dir string, args ...string)
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	t.Cleanup(cancel)
 	return runCommand(t, ctx, exec.CommandContext(ctx, "node", args...), dir)
+}
+
+func javacOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	t.Cleanup(cancel)
+	return runCommand(t, ctx, exec.CommandContext(ctx, "javac", args...), dir)
+}
+
+func javaOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	t.Cleanup(cancel)
+	return runCommand(t, ctx, exec.CommandContext(ctx, "java", args...), dir)
+}
+
+func lintImportsOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	t.Cleanup(cancel)
+	return runCommand(t, ctx, exec.CommandContext(ctx, "lint-imports", args...), dir)
+}
+
+func copyFixtureTree(t *testing.T, src string) string {
+	t.Helper()
+	dest := t.TempDir()
+	err := filepath.WalkDir(src, func(path string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		rel, err := filepath.Rel(src, path)
+		if err != nil {
+			return err
+		}
+		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".fixture") {
+			rel = filepath.Join(filepath.Dir(rel), strings.TrimSuffix(entry.Name(), ".fixture"))
+		}
+		target := filepath.Join(dest, rel)
+		if entry.IsDir() {
+			return os.MkdirAll(target, 0o755)
+		}
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+			return err
+		}
+		return os.WriteFile(target, data, 0o644)
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return dest
 }
 
 func runCommand(t *testing.T, ctx context.Context, cmd *exec.Cmd, dir string) (stdout, stderr []byte, exit int) {

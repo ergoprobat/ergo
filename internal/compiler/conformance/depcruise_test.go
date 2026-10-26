@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -24,14 +23,11 @@ func TestDepcruise(t *testing.T) {
 	if _, err := os.Stat(cruiseScript); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := exec.LookPath("node"); err != nil {
-		t.Fatal(err)
-	}
 	script, err := filepath.Abs(cruiseScript)
 	if err != nil {
 		t.Fatal(err)
 	}
-	stdout, stderr, exit := commandOutput(t, 30*time.Second, "", "node", script, "--version")
+	stdout, stderr, exit := nodeOutput(t, 30*time.Second, "", script, "--version")
 	if exit != 0 {
 		t.Fatalf("dependency-cruiser --version exit %d\n%s\n%s", exit, stdout, stderr)
 	}
@@ -118,7 +114,7 @@ func cruise(t *testing.T, script string, config []byte, repo string) []cruiseHit
 	if err := os.WriteFile(configPath, config, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	stdout, stderr, exit := commandOutput(t, 60*time.Second, repo, "node", script, "--config", configPath, "--output-type", "json", "packages")
+	stdout, stderr, exit := nodeOutput(t, 60*time.Second, repo, script, "--config", configPath, "--output-type", "json", "packages")
 	if exit != 0 {
 		t.Fatalf("depcruise exit %d\n%s\n%s", exit, stdout, stderr)
 	}

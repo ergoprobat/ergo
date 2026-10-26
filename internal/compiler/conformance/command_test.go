@@ -13,14 +13,25 @@ import (
 	"time"
 )
 
-func commandOutput(t *testing.T, timeout time.Duration, dir, name string, args ...string) (stdout, stderr []byte, exit int) {
+func semgrepOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
 	t.Helper()
-	if _, err := exec.LookPath(name); err != nil {
-		t.Fatal(err)
-	}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	t.Cleanup(cancel)
-	cmd := exec.CommandContext(ctx, name, args...)
+	return runCommand(t, ctx, exec.CommandContext(ctx, "semgrep", args...), dir)
+}
+
+func nodeOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	t.Cleanup(cancel)
+	return runCommand(t, ctx, exec.CommandContext(ctx, "node", args...), dir)
+}
+
+func runCommand(t *testing.T, ctx context.Context, cmd *exec.Cmd, dir string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	if cmd.Err != nil {
+		t.Fatal(cmd.Err)
+	}
 	if dir != "" {
 		cmd.Dir = dir
 	}
@@ -30,7 +41,7 @@ func commandOutput(t *testing.T, timeout time.Duration, dir, name string, args .
 	cmd.Stderr = &errBuf
 	runErr := cmd.Run()
 	if runErr != nil && ctx.Err() != nil {
-		t.Fatalf("%s timed out\n%s", name, errBuf.String())
+		t.Fatalf("%s timed out\n%s", cmd.Path, errBuf.String())
 	}
 	if runErr == nil {
 		return out.Bytes(), errBuf.Bytes(), 0

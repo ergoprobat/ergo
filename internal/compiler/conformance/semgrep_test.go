@@ -16,7 +16,7 @@ import (
 )
 
 func TestSemgrep(t *testing.T) {
-	stdout, stderr, exit := commandOutput(t, 30*time.Second, "", "semgrep", "--version")
+	stdout, stderr, exit := semgrepOutput(t, 30*time.Second, "", "--version")
 	if exit != 0 {
 		t.Fatalf("semgrep --version exit %d\n%s\n%s", exit, stdout, stderr)
 	}
@@ -89,7 +89,7 @@ func scanSemgrep(t *testing.T, config []byte, fixture, ruleID string) map[int]st
 	if err := os.WriteFile(targetPath, body, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	stdout, stderr, exit := commandOutput(t, 60*time.Second, root, "semgrep", "scan", "--config", configPath, "--json", "--metrics=off", "--disable-version-check", targetPath)
+	stdout, stderr, exit := semgrepOutput(t, 60*time.Second, root, "scan", "--config", configPath, "--json", "--metrics=off", "--disable-version-check", targetPath)
 	if exit != 0 && exit != 1 {
 		t.Fatalf("semgrep scan exit %d\n%s\n%s", exit, stdout, stderr)
 	}

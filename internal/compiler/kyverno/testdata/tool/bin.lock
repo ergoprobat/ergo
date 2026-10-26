@@ -1,0 +1,3 @@
+# sha256 pins for the Kyverno CLI conformance uses. install.sh checks them.
+kyverno-1.19.2-linux-amd64 357eaf1df8bc24ddd5a73979fadeaae6a032e8710f11af264229756e4956bf4a https://github.com/kyverno/kyverno/releases/download/v1.19.2/kyverno-cli_v1.19.2_linux_x86_64.tar.gz
+kyverno-1.19.2-darwin-arm64 7915c03c613c22363a100adb3da8d06f2e2626d9d21a98b97f921795ffdc536f https://github.com/kyverno/kyverno/releases/download/v1.19.2/kyverno-cli_v1.19.2_darwin_arm64.tar.gz

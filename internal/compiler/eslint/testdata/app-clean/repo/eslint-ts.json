@@ -1,0 +1,6 @@
+{
+  "files": ["services/**/*.ts"],
+  "rules": {
+    "@typescript-eslint/no-floating-promises": "error"
+  }
+}

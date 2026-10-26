@@ -1,0 +1,32 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: requireowner
+spec:
+  crd:
+    spec:
+      names:
+        kind: RequireOwner
+      validation:
+        openAPIV3Schema:
+          type: object
+  targets:
+  - target: admission.k8s.gatekeeper.sh
+    code:
+    - engine: Rego
+      source:
+        version: v1
+        rego: "package requireowner\n\nviolation contains {\"msg\": msg} if {\n\t\
+          msg := external_data({\"provider\": \"p\"})\n}\n"
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: RequireOwner
+metadata:
+  name: owner
+spec:
+  match:
+    kinds:
+    - apiGroups:
+      - apps
+      kinds:
+      - Deployment

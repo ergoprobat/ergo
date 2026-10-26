@@ -1,0 +1,14 @@
+{
+  "files": [
+    "web/**/*.js"
+  ],
+  "ignores": [
+    "web/vendor/**"
+  ],
+  "rules": {
+    "eqeqeq": [
+      "error",
+      "always"
+    ]
+  }
+}

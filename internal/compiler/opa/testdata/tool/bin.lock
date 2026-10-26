@@ -1,0 +1,3 @@
+# sha256 pins for the gator CLI conformance uses. install.sh checks them.
+gator-3.23.1-linux-amd64 c268d7b809c9fe59a110ab0bf7c296ab00b0b6c894c209cd15e94194590291bb https://github.com/open-policy-agent/gatekeeper/releases/download/v3.23.1/gator-v3.23.1-linux-amd64.tar.gz
+gator-3.23.1-darwin-arm64 dc96df4a0bad0427b36d2b10473801528ca5bdb00f2addb34d17bb7d706ed99b https://github.com/open-policy-agent/gatekeeper/releases/download/v3.23.1/gator-v3.23.1-darwin-arm64.tar.gz

@@ -1,0 +1,4 @@
+name: &n app
+other: *n
+---
+name: other

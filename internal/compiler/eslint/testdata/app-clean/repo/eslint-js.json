@@ -1,0 +1,6 @@
+{
+  "files": ["web/**/*.js"],
+  "rules": {
+    "eqeqeq": "error"
+  }
+}

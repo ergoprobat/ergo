@@ -1,0 +1,39 @@
+# comment
+kind: ConstraintTemplate
+apiVersion: templates.gatekeeper.sh/v1
+metadata:
+  name: requireowner
+spec:
+  targets:
+    - code:
+        - source:
+            rego: |
+              package requireowner
+
+              violation contains {"msg": msg} if {
+              	not input.review.object.metadata.labels.owner
+              	msg := "missing owner label"
+              }
+            version: v1
+          engine: Rego
+      target: admission.k8s.gatekeeper.sh
+  crd:
+    spec:
+      validation:
+        openAPIV3Schema:
+          type: object
+      names:
+        kind: RequireOwner
+---
+kind: RequireOwner
+apiVersion: constraints.gatekeeper.sh/v1beta1
+metadata:
+  name: owner
+spec:
+  enforcementAction: warn
+  match:
+    kinds:
+      - kinds:
+          - Deployment
+        apiGroups:
+          - apps

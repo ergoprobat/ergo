@@ -42,6 +42,46 @@ func javaOutput(t *testing.T, timeout time.Duration, dir string, args ...string)
 	return runCommand(t, ctx, exec.CommandContext(ctx, "java", args...), dir)
 }
 
+func kyvernoOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	t.Cleanup(cancel)
+	cmd := exec.CommandContext(ctx, "kyverno", args...)
+	pinCommand(t, cmd, "../kyverno/testdata/tool/bin/kyverno")
+	return runCommand(t, ctx, cmd, dir)
+}
+
+func gatorOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	t.Cleanup(cancel)
+	cmd := exec.CommandContext(ctx, "gator", args...)
+	pinCommand(t, cmd, "../opa/testdata/tool/bin/gator")
+	return runCommand(t, ctx, cmd, dir)
+}
+
+func eslintOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	t.Cleanup(cancel)
+	cmd := exec.CommandContext(ctx, "eslint", args...)
+	pinCommand(t, cmd, "../eslint/testdata/tool/node_modules/.bin/eslint")
+	return runCommand(t, ctx, cmd, dir)
+}
+
+// pinCommand runs the pinned binary. The command name stays a literal so the
+// call is not a variable executable. LookPath may fail when that name is not
+// on PATH, so the absolute pin replaces it.
+func pinCommand(t *testing.T, cmd *exec.Cmd, bin string) {
+	t.Helper()
+	abs, err := filepath.Abs(bin)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cmd.Path = abs
+	cmd.Err = nil
+}
+
 func lintImportsOutput(t *testing.T, timeout time.Duration, dir string, args ...string) (stdout, stderr []byte, exit int) {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)

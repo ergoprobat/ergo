@@ -1,0 +1,33 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: requireowner
+spec:
+  crd:
+    spec:
+      names:
+        kind: RequireOwner
+      validation:
+        openAPIV3Schema:
+          type: object
+  targets:
+  - target: admission.k8s.gatekeeper.sh
+    code:
+    - engine: Rego
+      source:
+        version: v1
+        rego: "package requireowner\n\nimport rego.v1\n\nviolation contains {\"msg\"\
+          : msg} if {\n\tnot input.review.object.metadata.labels.owner\n\tmsg := \"\
+          missing owner label\"\n}\n"
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: RequireOwner
+metadata:
+  name: owner
+spec:
+  match:
+    kinds:
+    - apiGroups:
+      - apps
+      kinds:
+      - Deployment

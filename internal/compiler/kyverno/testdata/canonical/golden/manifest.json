@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "0FKGWC6G7KW25E7F13TXVWWPX6",
+      "slug": "canonical",
+      "check_index": 0,
+      "engine": "kyverno",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "kyverno",
+      "compiler_version": "1.19.2",
+      "artifacts": [
+        {
+          "name": "kyverno.yaml",
+          "sha256": "8d7eaeef35c4f3533dd8dbb89d49b49b497e14f2367648f672d27e5bc8cd7880"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "0JY7S1VR1RSBPJP0GAH16R49GF",
+      "slug": "javascript",
+      "check_index": 0,
+      "engine": "eslint",
+      "mode": "block",
+      "target": "javascript",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "eslint",
+      "compiler_version": "10.13.0",
+      "artifacts": [
+        {
+          "name": "eslint.config.mjs",
+          "sha256": "f17d7922f11485457742dc052166cc7b94f14a8a2fa775d6119b5b68010f1640"
+        }
+      ]
+    }
+  ]
+}

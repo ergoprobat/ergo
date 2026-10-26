@@ -1,0 +1,8 @@
+{
+  "files": [
+    "../secret.js"
+  ],
+  "rules": {
+    "eqeqeq": "error"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "0BT12CQ6QC53G7X2RA479HPW44",
+      "slug": "mode-warn",
+      "check_index": 0,
+      "engine": "kyverno",
+      "mode": "warn",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "kyverno",
+      "compiler_version": "1.19.2",
+      "artifacts": [
+        {
+          "name": "kyverno.yaml",
+          "sha256": "5f23e0e308a19dd9f79f5287c95c7fd4019c6d149583e4e52ea818b7f0c87814"
+        }
+      ]
+    }
+  ]
+}

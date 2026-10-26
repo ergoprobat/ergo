@@ -1,0 +1,10 @@
+{
+  "name": "ergo-eslint-tool",
+  "private": true,
+  "description": "Pinned ESLint used by the compiler conformance test. Not a published package.",
+  "dependencies": {
+    "eslint": "10.13.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1"
+  }
+}

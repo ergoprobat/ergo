@@ -1,0 +1,9 @@
+{
+  "rules": {
+    "yoda": "warn",
+    "eqeqeq": "error"
+  },
+  "files": [
+    "web/**/*.js"
+  ]
+}

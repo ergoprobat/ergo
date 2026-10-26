@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "02YDPAMGKSQ9BSSBNVHJSMDX34",
+      "slug": "cluster-violating",
+      "check_index": 0,
+      "engine": "kyverno",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "kyverno",
+      "compiler_version": "1.19.2",
+      "artifacts": [
+        {
+          "name": "kyverno.yaml",
+          "sha256": "dc3fbf64a5508e332372622df3f4c54c4628204c382fb525dfcf123af3df1644"
+        }
+      ]
+    }
+  ]
+}

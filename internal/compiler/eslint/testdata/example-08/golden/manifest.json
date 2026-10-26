@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "0G0XJK7M3ZSVVGVRK1A6QKJVN1",
+      "slug": "example-08",
+      "check_index": 0,
+      "engine": "eslint",
+      "mode": "warn",
+      "target": "typescript",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "eslint",
+      "compiler_version": "10.13.0",
+      "artifacts": [
+        {
+          "name": "eslint.config.mjs",
+          "sha256": "0a1ab2e54f0d59d74db98e62604fa0f0db7f7ebf699f8bd523535694bf97fa33"
+        }
+      ]
+    }
+  ]
+}

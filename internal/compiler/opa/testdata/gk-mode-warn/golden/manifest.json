@@ -1,0 +1,28 @@
+{
+  "entries": [
+    {
+      "decision_id": "0624KQY804PKR96RK4T2RE8TBW",
+      "slug": "gk-mode-warn",
+      "check_index": 0,
+      "engine": "opa",
+      "mode": "warn",
+      "target": "gatekeeper",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "opa",
+      "compiler_version": "1.21.4",
+      "artifacts": [
+        {
+          "name": "constraint-template.yaml",
+          "sha256": "1b034ad529b9df5c44f4e207b86cd01a55e659884cad318c8dd006ce2b30b447"
+        },
+        {
+          "name": "constraint.yaml",
+          "sha256": "350e569765cfc0e9f4d53cc41c1497ddf9cc51c2c3b0fda4f0c5f2ea4c3faccb"
+        }
+      ]
+    }
+  ]
+}

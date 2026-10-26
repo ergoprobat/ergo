@@ -1,0 +1,11 @@
+{
+  "packages": ["com.acme"],
+  "rules": [
+    {
+      "name": "warn-only",
+      "type": "forbidden",
+      "source_packages": ["com.acme.domain.."],
+      "forbidden_packages": ["com.acme.web.."]
+    }
+  ]
+}

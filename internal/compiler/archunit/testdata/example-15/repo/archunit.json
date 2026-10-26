@@ -1,0 +1,20 @@
+{
+  "packages": ["com.acme.billing"],
+  "rules": [
+    {
+      "name": "domain-not-to-adapters",
+      "type": "forbidden",
+      "source_packages": ["com.acme.billing.domain.."],
+      "forbidden_packages": ["com.acme.billing.web..", "com.acme.billing.persistence.."]
+    },
+    {
+      "name": "layers",
+      "type": "layers",
+      "layers": [
+        {"name": "web", "packages": ["com.acme.billing.web.."]},
+        {"name": "domain", "packages": ["com.acme.billing.domain.."]},
+        {"name": "persistence", "packages": ["com.acme.billing.persistence.."]}
+      ]
+    }
+  ]
+}

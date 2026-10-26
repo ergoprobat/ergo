@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5WVYED4WP805Q4XV2PAHS8B",
+      "slug": "canonical",
+      "check_index": 0,
+      "engine": "archunit",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "archunit",
+      "compiler_version": "1.5.1",
+      "artifacts": [
+        {
+          "name": "ArchitectureTest.java",
+          "sha256": "178c7fab1dbde8136b840f5303e6d27b06657e7d1ed6ee14d4c1a7b67666151b"
+        }
+      ]
+    }
+  ]
+}

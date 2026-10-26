@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5WVYECH20GSNT3MW1VM5CC5",
+      "slug": "shop",
+      "check_index": 0,
+      "engine": "importlinter",
+      "mode": "warn",
+      "target": "",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "importlinter",
+      "compiler_version": "2.15",
+      "artifacts": [
+        {
+          "name": "importlinter.ini",
+          "sha256": "1dae9757e928eaf4b6ce16456e821d68743ca4e8f07f3e9a832c0cd9b38d6da9"
+        }
+      ]
+    }
+  ]
+}

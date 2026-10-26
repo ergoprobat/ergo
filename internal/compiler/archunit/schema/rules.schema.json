@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ergoplatform.io/schema/archunit-rules.json",
+  "title": "ArchUnit rules compiled by ergo",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["packages", "rules"],
+  "properties": {
+    "packages": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/concretePackage" }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/forbidden" },
+          { "$ref": "#/$defs/layers" }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "concretePackage": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+    },
+    "packagePattern": {
+      "type": "string",
+      "pattern": "^(\\.\\.)?[A-Za-z_][A-Za-z0-9_]*(\\.{1,2}[A-Za-z_][A-Za-z0-9_]*)*(\\.\\.)?$"
+    },
+    "kebab": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+    },
+    "forbidden": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "source_packages", "forbidden_packages"],
+      "properties": {
+        "name": { "$ref": "#/$defs/kebab" },
+        "type": { "const": "forbidden" },
+        "source_packages": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/packagePattern" }
+        },
+        "forbidden_packages": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/packagePattern" }
+        }
+      }
+    },
+    "layers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "layers"],
+      "properties": {
+        "name": { "$ref": "#/$defs/kebab" },
+        "type": { "const": "layers" },
+        "layers": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/layer" }
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "packages"],
+      "properties": {
+        "name": { "$ref": "#/$defs/kebab" },
+        "packages": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/packagePattern" }
+        }
+      }
+    }
+  }
+}

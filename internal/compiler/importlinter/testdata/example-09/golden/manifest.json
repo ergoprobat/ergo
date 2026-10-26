@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5C5QEHSQ604ZVGMZEQ6RNRC",
+      "slug": "import-boundaries",
+      "check_index": 0,
+      "engine": "importlinter",
+      "mode": "warn",
+      "target": "",
+      "valid_from": "2026-05-01",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "importlinter",
+      "compiler_version": "2.15",
+      "artifacts": [
+        {
+          "name": "importlinter.ini",
+          "sha256": "798cfb31d7d777aba8d33d9a4389d25699431584bc2a8155c2b476b703bb32b7"
+        }
+      ]
+    }
+  ]
+}

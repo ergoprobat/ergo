@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5C5QEHYCBCDSMGYVGQGCRV7",
+      "slug": "archunit-layers",
+      "check_index": 0,
+      "engine": "archunit",
+      "mode": "block",
+      "target": "",
+      "valid_from": "2026-07-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "archunit",
+      "compiler_version": "1.5.1",
+      "artifacts": [
+        {
+          "name": "ArchitectureTest.java",
+          "sha256": "297c7fef590e18af97b9e63c8f38d426a86d4b8106058cf3c51a4efbb7bff3ea"
+        }
+      ]
+    }
+  ]
+}

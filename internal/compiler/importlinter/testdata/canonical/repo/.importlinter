@@ -1,0 +1,13 @@
+# session
+[importlinter]
+; another comment
+root_package: Shop
+include_external_packages: true
+exclude_type_checking_imports = FALSE
+
+[importlinter:contract:layers]
+type: layers
+name: Keep the layers
+layers =
+    shop.api
+    shop.domain

@@ -1,0 +1,6 @@
+[importlinter]
+root_packages = shop
+
+[importlinter:contract:one]
+name = One
+type = custom

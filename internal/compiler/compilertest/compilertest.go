@@ -2,6 +2,7 @@
 // A case is a directory under testdata/ that contains record.md, plus repo/ and either golden/ or expect.
 // Directories without record.md are ignored, so a conformance corpus can sit beside the cases.
 // A directory with golden/ or expect but no record.md fails, and so does a testdata with no case.
+// A .java artifact is stored as <name>.fixture so the repository does not track Java source.
 // Rewrite golden files with go test ./internal/compiler/compilertest -update.
 package compilertest
 
@@ -162,6 +163,13 @@ func sameCompiled(left, right []compiler.Compiled) bool {
 	return true
 }
 
+func goldenName(name string) string {
+	if strings.HasSuffix(name, ".java") {
+		return name + ".fixture"
+	}
+	return name
+}
+
 func compareGolden(t *testing.T, dir string, compiled []compiler.Compiled) {
 	t.Helper()
 	entries := make([]compiler.Entry, 0, len(compiled))
@@ -185,7 +193,7 @@ func compareGolden(t *testing.T, dir string, compiled []compiler.Compiled) {
 		}
 		for _, item := range compiled {
 			for _, artifact := range item.Artifacts {
-				path := filepath.Join(golden, strconv.Itoa(item.Entry.CheckIndex), filepath.FromSlash(artifact.Name))
+				path := filepath.Join(golden, strconv.Itoa(item.Entry.CheckIndex), filepath.FromSlash(goldenName(artifact.Name)))
 				if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 					t.Fatal(err)
 				}
@@ -206,7 +214,7 @@ func compareGolden(t *testing.T, dir string, compiled []compiler.Compiled) {
 	wantFiles := map[string][]byte{"manifest.json": manifest}
 	for _, item := range compiled {
 		for _, artifact := range item.Artifacts {
-			rel := filepath.ToSlash(filepath.Join(strconv.Itoa(item.Entry.CheckIndex), filepath.FromSlash(artifact.Name)))
+			rel := filepath.ToSlash(filepath.Join(strconv.Itoa(item.Entry.CheckIndex), filepath.FromSlash(goldenName(artifact.Name))))
 			wantFiles[rel] = artifact.Data
 		}
 	}

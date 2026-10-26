@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "decision_id": "01M5WVYED3WMYCRYT7ZA8SZC4G",
+      "slug": "mode-warn",
+      "check_index": 0,
+      "engine": "archunit",
+      "mode": "warn",
+      "target": "jvm",
+      "valid_from": "2026-01-15",
+      "valid_to": null,
+      "env": null,
+      "waivers": [],
+      "compiler": "archunit",
+      "compiler_version": "1.5.1",
+      "artifacts": [
+        {
+          "name": "ArchitectureTest.java",
+          "sha256": "63f201595f9ce7da506c0064f6ef3c7a04bc8698d874d2e98ed8b90bb9e28ba9"
+        }
+      ]
+    }
+  ]
+}

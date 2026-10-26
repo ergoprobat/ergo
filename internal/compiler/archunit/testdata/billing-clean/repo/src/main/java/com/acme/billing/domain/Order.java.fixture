@@ -1,0 +1,7 @@
+package com.acme.billing.domain;
+
+public class Order {
+    public String id() {
+        return "order";
+    }
+}

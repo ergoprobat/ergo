@@ -1,0 +1,33 @@
+package ergo.d01m5wvyed3vxegfszf4jpg5xd2.c0;
+
+import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
+
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+class ArchitectureTest {
+    private static JavaClasses classes;
+
+    @BeforeAll
+    static void importClasses() {
+        classes = new ClassFileImporter()
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
+                .importPackages("com.acme.orders");
+    }
+
+    @Test
+    void rule_orders_layers() {
+        layeredArchitecture()
+                .consideringOnlyDependenciesInLayers()
+                .layer("api").definedBy("com.acme.orders.api..")
+                .layer("domain").definedBy("com.acme.orders.domain..")
+                .whereLayer("api").mayNotBeAccessedByAnyLayer()
+                .whereLayer("domain").mayOnlyBeAccessedByLayers("api")
+                .as("orders-layers")
+                .check(classes);
+    }
+}

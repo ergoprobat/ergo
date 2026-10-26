@@ -1,0 +1,8 @@
+[importlinter]
+root_packages = shop
+verbose = true
+
+[importlinter:contract:one]
+name = One
+type = independence
+modules = shop

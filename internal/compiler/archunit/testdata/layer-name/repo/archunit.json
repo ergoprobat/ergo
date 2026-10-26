@@ -1,0 +1,13 @@
+{
+  "packages": ["com.acme"],
+  "rules": [
+    {
+      "name": "layers",
+      "type": "layers",
+      "layers": [
+        {"name": "web", "packages": ["com.acme.web.."]},
+        {"name": "web", "packages": ["com.acme.domain.."]}
+      ]
+    }
+  ]
+}

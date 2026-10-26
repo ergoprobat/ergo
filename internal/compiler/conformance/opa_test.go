@@ -6,6 +6,8 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -30,6 +32,11 @@ func TestOPA(t *testing.T) {
 				outcome := evaluateOPA(t, artifacts, filepath.Join(root, "fail", name), now)
 				if outcome.Err != nil || outcome.Waived || len(outcome.Violations) == 0 {
 					t.Errorf("fail %s err %v waived %v violations %d", name, outcome.Err, outcome.Waived, len(outcome.Violations))
+					continue
+				}
+				want := wantAddresses(t, filepath.Join(root, "fail", strings.TrimSuffix(name, ".json")+".want"))
+				if got := violationAddresses(outcome.Violations); strings.Join(got, "\n") != strings.Join(want, "\n") {
+					t.Errorf("fail %s addresses %v want %v", name, got, want)
 				}
 			}
 		})
@@ -77,6 +84,36 @@ func evaluateOPA(t *testing.T, artifacts map[string][]byte, path string, now tim
 		t.Fatal(err)
 	}
 	return opa.EvalCheck(compiler.Entry{}, artifacts, plan, now)
+}
+
+func wantAddresses(t *testing.T, path string) []string {
+	t.Helper()
+	body, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var lines []string
+	for _, line := range strings.Split(strings.TrimSpace(string(body)), "\n") {
+		if line != "" {
+			lines = append(lines, line)
+		}
+	}
+	sort.Strings(lines)
+	return lines
+}
+
+func violationAddresses(violations []compiler.Violation) []string {
+	seen := map[string]struct{}{}
+	var out []string
+	for _, violation := range violations {
+		if _, ok := seen[violation.Address]; ok {
+			continue
+		}
+		seen[violation.Address] = struct{}{}
+		out = append(out, violation.Address)
+	}
+	sort.Strings(out)
+	return out
 }
 
 // withFormatVersion lets ReadPlan accept a corpus document.

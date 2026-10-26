@@ -30,6 +30,12 @@ func TestSubjects(t *testing.T) {
 		if len(pass) == 0 || len(fail) == 0 {
 			t.Errorf("%s pass %d fail %d", id, len(pass), len(fail))
 		}
+		for _, name := range fail {
+			want := filepath.Join(opaCorpus, filepath.FromSlash(id), "fail", strings.TrimSuffix(name, ".json")+".want")
+			if _, err := os.Stat(want); err != nil {
+				t.Errorf("%s fail %s has no .want: %v", id, name, err)
+			}
+		}
 	}
 	corpus := templateIDs(t, opaCorpus, "", "")
 	if strings.Join(corpus, "\n") != strings.Join(opaIDs, "\n") {

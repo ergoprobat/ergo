@@ -36,7 +36,9 @@ func TestSemgrep(t *testing.T) {
 					t.Fatalf("%s has no subjects", file)
 				}
 				lines := scanSemgrep(t, config, file, ruleID)
+				expected := map[int]struct{}{}
 				for _, line := range negative {
+					expected[line] = struct{}{}
 					if _, ok := lines[line]; !ok {
 						t.Errorf("%s ruleid line %d was not a finding", filepath.Base(file), line)
 					}
@@ -44,6 +46,11 @@ func TestSemgrep(t *testing.T) {
 				for _, line := range positive {
 					if _, ok := lines[line]; ok {
 						t.Errorf("%s ok line %d was a finding", filepath.Base(file), line)
+					}
+				}
+				for line := range lines {
+					if _, ok := expected[line]; !ok {
+						t.Errorf("%s line %d was a finding without a ruleid mark", filepath.Base(file), line)
 					}
 				}
 			}

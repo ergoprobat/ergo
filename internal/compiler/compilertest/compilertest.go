@@ -1,6 +1,7 @@
 // Package compilertest runs golden fixtures for one compiler.
 // A case is a directory under testdata/ that contains record.md, plus repo/ and either golden/ or expect.
 // Directories without record.md are ignored, so a conformance corpus can sit beside the cases.
+// A directory with golden/ or expect but no record.md fails, and so does a testdata with no case.
 // Rewrite golden files with go test ./internal/compiler/compilertest -update.
 package compilertest
 
@@ -35,18 +36,35 @@ func Run(t *testing.T, c compiler.Compiler) {
 	if len(entries) == 0 {
 		t.Fatal("testdata has no cases")
 	}
+	cases := 0
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
 		}
 		dir := filepath.Join("testdata", entry.Name())
 		if _, err := os.Stat(filepath.Join(dir, "record.md")); err != nil {
+			if looksLikeCase(dir) {
+				t.Errorf("%s has golden/ or expect but no record.md", dir)
+			}
 			continue
 		}
+		cases++
 		t.Run(entry.Name(), func(t *testing.T) {
 			runCase(t, c, dir)
 		})
 	}
+	if cases == 0 {
+		t.Fatal("testdata has no cases with record.md")
+	}
+}
+
+func looksLikeCase(dir string) bool {
+	for _, name := range []string{"golden", "expect"} {
+		if _, err := os.Stat(filepath.Join(dir, name)); err == nil {
+			return true
+		}
+	}
+	return false
 }
 
 func runCase(t *testing.T, c compiler.Compiler, dir string) {

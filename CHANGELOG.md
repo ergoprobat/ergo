@@ -5,11 +5,11 @@
 
 ### ⚠ BREAKING CHANGES
 
-* rename the CLI and module from ergo to ipso ([#29](https://github.com/ipsofacto-io/ipso/issues/29))
+* rename the CLI and module to ipso ([#29](https://github.com/ipsofacto-io/ipso/issues/29))
 
 ### Features
 
-* **cli:** compile in-force checks into .ergo/build ([2816ed1](https://github.com/ipsofacto-io/ipso/commit/2816ed1ab4a6988bdfd83aaa1365808a29979f12))
+* **cli:** compile in-force checks into the local build directory ([2816ed1](https://github.com/ipsofacto-io/ipso/commit/2816ed1ab4a6988bdfd83aaa1365808a29979f12))
 * **cli:** evaluate ArchUnit checks ([#28](https://github.com/ipsofacto-io/ipso/issues/28)) ([ad3317d](https://github.com/ipsofacto-io/ipso/commit/ad3317d02658f0c6bad57d71a6c9ea1fc10cc43b))
 * **cli:** evaluate dependency-cruiser checks ([#26](https://github.com/ipsofacto-io/ipso/issues/26)) ([6cb03ba](https://github.com/ipsofacto-io/ipso/commit/6cb03ba5dd5d09fef59d2ce66211c3b833e17a9a))
 * **cli:** evaluate Semgrep checks ([231777d](https://github.com/ipsofacto-io/ipso/commit/231777dc0d58528b34aa5b4138fcbc6f112e3350))
@@ -21,12 +21,12 @@
 * **compiler:** compile OPA policies and Terraform templates ([#18](https://github.com/ipsofacto-io/ipso/issues/18)) ([2928259](https://github.com/ipsofacto-io/ipso/commit/2928259b435a707ab0ecc3d083599e959d9fc0f2))
 * **compiler:** compile Semgrep rules to canonical YAML ([#21](https://github.com/ipsofacto-io/ipso/issues/21)) ([9046a02](https://github.com/ipsofacto-io/ipso/commit/9046a02288f92c1e43e06a5e6687c685d1ede7e8))
 * **compiler:** evaluate CI jobs and Checkov ids offline ([#22](https://github.com/ipsofacto-io/ipso/issues/22)) ([b244b7e](https://github.com/ipsofacto-io/ipso/commit/b244b7e210cbacb0cd69a8f7a244b150c9f441ae))
-* rename the CLI and module from ergo to ipso ([#29](https://github.com/ipsofacto-io/ipso/issues/29)) ([db65f7a](https://github.com/ipsofacto-io/ipso/commit/db65f7a95a9feea71125099b006c1fa071c09905))
+* rename the CLI and module to ipso ([#29](https://github.com/ipsofacto-io/ipso/issues/29)) ([db65f7a](https://github.com/ipsofacto-io/ipso/commit/db65f7a95a9feea71125099b006c1fa071c09905))
 
 
 ### Bug Fixes
 
-* **cli:** cite ERGO-19 for the unimplemented import command ([89947b8](https://github.com/ipsofacto-io/ipso/commit/89947b81aec46ab3f5c96cff30a230e076074f01))
+* **cli:** cite IPSO-19 for the unimplemented import command ([89947b8](https://github.com/ipsofacto-io/ipso/commit/89947b81aec46ab3f5c96cff30a230e076074f01))
 
 ## 0.1.1 (2026-10-21)
 
@@ -38,4 +38,4 @@
 
 ### Features
 
-* **cli:** add offline init, check, and explain ([0737378](https://github.com/ergoprobat/ergo/commit/07373789f8176bb190c4a1a3fd0f032a78190c5d))
+* **cli:** add offline init, check, and explain ([0737378](https://github.com/ipsofacto-io/ipso/commit/07373789f8176bb190c4a1a3fd0f032a78190c5d))

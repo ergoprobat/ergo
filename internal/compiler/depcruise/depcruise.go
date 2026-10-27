@@ -29,6 +29,9 @@ const (
 	version      = "18.7.0"
 )
 
+// ArtifactName is the compiled dependency-cruiser config.
+const ArtifactName = artifactName
+
 // Compiler is the built-in dependency-cruiser engine.
 type Compiler struct{}
 

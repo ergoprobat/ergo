@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/ergoprobat/ergo/internal/edr"
 )
@@ -282,6 +283,19 @@ type CIReport struct {
 	Verdicts       []Verdict `json:"verdicts"`
 }
 
+// DepcruiseReport is the verdict report for ergo check depcruise.
+// It carries the paths that were cruised and the dependency-cruiser version, never module paths or rule names.
+type DepcruiseReport struct {
+	ReportVersion    int       `json:"report_version"`
+	ErgoVersion      string    `json:"ergo_version"`
+	EvaluatedAt      time.Time `json:"evaluated_at"`
+	Env              string    `json:"env"`
+	Paths            []string  `json:"paths"`
+	DepcruiseVersion string    `json:"depcruise_version"`
+	BuildSHA256      string    `json:"build_sha256"`
+	Verdicts         []Verdict `json:"verdicts"`
+}
+
 // CheckovReport is the verdict report for ergo check checkov.
 type CheckovReport struct {
 	ReportVersion  int       `json:"report_version"`
@@ -313,6 +327,28 @@ func MarshalCIReport(report CIReport) ([]byte, error) {
 func MarshalCheckovReport(report CheckovReport) ([]byte, error) {
 	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
 	return encodeReport(report)
+}
+
+// MarshalDepcruiseReport encodes a dependency-cruiser report as deterministic JSON.
+func MarshalDepcruiseReport(report DepcruiseReport) ([]byte, error) {
+	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
+	if report.Paths == nil {
+		report.Paths = []string{}
+	}
+	return encodeReport(report)
+}
+
+// EscapeControls replaces control characters so a violation line stays on one line.
+func EscapeControls(value string) string {
+	var buf strings.Builder
+	for _, r := range value {
+		if r < 0x20 || r == 0x7f || unicode.IsControl(r) {
+			fmt.Fprintf(&buf, "\\u%04x", r)
+			continue
+		}
+		buf.WriteRune(r)
+	}
+	return buf.String()
 }
 
 func finishReport(evaluated time.Time, verdicts []Verdict) (time.Time, []Verdict) {

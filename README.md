@@ -1,7 +1,7 @@
 # ipso
 
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/ipsofacto-io/ipso/badge)](https://scorecard.dev/viewer/?uri=github.com/ipsofacto-io/ipso)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15758/badge)](https://www.bestpractices.dev/projects/15758)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15758/badge)](https://www.bestpractices.dev/en/projects/15758)
 
 CLI, check compilers, agent hooks and local MCP server that turn engineering decisions into enforced checks.
 

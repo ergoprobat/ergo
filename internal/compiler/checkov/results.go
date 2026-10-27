@@ -7,9 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strings"
 	"time"
-	"unicode"
 
 	"github.com/ergoprobat/ergo/internal/compiler"
 )
@@ -196,19 +194,7 @@ func EvalCheck(entry compiler.Entry, artifacts map[string][]byte, results Result
 }
 
 func hitMessage(kind, id string, hit Hit) string {
-	return kind + " " + id + " " + escapeControls(hit.Resource) + " " + escapeControls(hit.FilePath)
-}
-
-func escapeControls(value string) string {
-	var buf strings.Builder
-	for _, r := range value {
-		if r < 0x20 || r == 0x7f || unicode.IsControl(r) {
-			fmt.Fprintf(&buf, "\\u%04x", r)
-			continue
-		}
-		buf.WriteRune(r)
-	}
-	return buf.String()
+	return kind + " " + id + " " + compiler.EscapeControls(hit.Resource) + " " + compiler.EscapeControls(hit.FilePath)
 }
 
 func bindingID(artifacts map[string][]byte) (string, error) {

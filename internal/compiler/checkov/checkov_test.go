@@ -62,7 +62,7 @@ func TestEval(t *testing.T) {
 }
 
 func TestControlCharacters(t *testing.T) {
-	got := escapeControls("a\nb")
+	got := compiler.EscapeControls("a\nb")
 	if got != "a\\u000ab" {
 		t.Fatalf("escaped %q", got)
 	}

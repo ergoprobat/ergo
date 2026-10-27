@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -14,6 +15,7 @@ import (
 	"github.com/ergoprobat/ergo/internal/compiler/builtin"
 	"github.com/ergoprobat/ergo/internal/compiler/checkov"
 	"github.com/ergoprobat/ergo/internal/compiler/cibinding"
+	"github.com/ergoprobat/ergo/internal/compiler/depcruise"
 	"github.com/ergoprobat/ergo/internal/compiler/opa"
 	"github.com/ergoprobat/ergo/internal/config"
 	"github.com/ergoprobat/ergo/internal/edr"
@@ -96,6 +98,7 @@ usage:
   ergo check plan <plan.json|-> [--env name] [--report file]
   ergo check ci <evidence.json|-> --sha <sha> [--env name] [--report file]
   ergo check checkov <results.json|-> [--env name] [--report file]
+  ergo check depcruise <path>... [--env name] [--report file]
   ergo explain <slug>
   ergo import [path...]
   ergo compile`
@@ -126,6 +129,8 @@ func checkCmd(root string, args []string, stdout, stderr io.Writer, d deps) int 
 		return ciCmd(root, args[1:], stdout, stderr, d)
 	case "checkov":
 		return checkovCmd(root, args[1:], stdout, stderr, d)
+	case "depcruise":
+		return depcruiseCmd(root, args[1:], stdout, stderr, d)
 	default:
 		fprintln(stderr, checkUsage)
 		return 2
@@ -173,10 +178,11 @@ func checkFiles(root string, stdout, stderr io.Writer) int {
 }
 
 const (
-	planUsage    = "usage: ergo check plan <plan.json|-> [--env name] [--report file]"
-	ciUsage      = "usage: ergo check ci <evidence.json|-> --sha <sha> [--env name] [--report file]"
-	checkovUsage = "usage: ergo check checkov <results.json|-> [--env name] [--report file]"
-	checkUsage   = planUsage + "\n" + ciUsage + "\n" + checkovUsage
+	planUsage      = "usage: ergo check plan <plan.json|-> [--env name] [--report file]"
+	ciUsage        = "usage: ergo check ci <evidence.json|-> --sha <sha> [--env name] [--report file]"
+	checkovUsage   = "usage: ergo check checkov <results.json|-> [--env name] [--report file]"
+	depcruiseUsage = "usage: ergo check depcruise <path>... [--env name] [--report file]"
+	checkUsage     = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage
 )
 
 func planCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
@@ -382,6 +388,86 @@ func checkovCmd(root string, args []string, stdout, stderr io.Writer, d deps) in
 	return 0
 }
 
+func depcruiseCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
+	opts, err := parseCruiseArgs(args)
+	if err != nil {
+		fprintln(stderr, err)
+		return 2
+	}
+	if d.now == nil {
+		d.now = time.Now
+	}
+	build, err := compiler.LoadBuild(root)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	now := d.now()
+	selectedCount := 0
+	for _, entry := range build.Entries {
+		if entry.Engine == "depcruise" && entry.Applies(opts.env, now) {
+			selectedCount++
+		}
+	}
+	var tool depcruise.Tool
+	var toolErr error
+	if selectedCount > 0 {
+		tool, toolErr = depcruise.FindTool(context.Background())
+	}
+	memo := depcruise.Memo{Tool: tool, Root: root, Paths: opts.paths}
+	verdicts, failed, selected, err := evaluateChecks(stdout, build, func(entry compiler.Entry) bool {
+		return entry.Engine == "depcruise" && entry.Applies(opts.env, now)
+	}, func(entry compiler.Entry, artifacts map[string][]byte) compiler.Outcome {
+		if toolErr != nil {
+			return compiler.Outcome{Err: toolErr}
+		}
+		if !depcruise.VersionFits(tool.Version, entry.CompilerVersion) {
+			return compiler.Outcome{Err: &compiler.Error{Code: depcruise.CodeVersion, Err: fmt.Errorf("depcruise %s does not satisfy ^%s", tool.Version, entry.CompilerVersion)}}
+		}
+		config, ok := artifacts[depcruise.ArtifactName]
+		if !ok {
+			return compiler.Outcome{Err: &compiler.Error{Code: compiler.CodeBuildManifest, Err: fmt.Errorf("missing %s", depcruise.ArtifactName)}}
+		}
+		raw, err := memo.Cruise(context.Background(), config)
+		if err != nil {
+			return compiler.Outcome{Err: err}
+		}
+		return depcruise.EvalCheck(entry, artifacts, tool.Version, raw, now)
+	})
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	if selected == 0 {
+		fprintln(stdout, "no checks selected")
+	}
+	report := compiler.DepcruiseReport{
+		ReportVersion:    compiler.ReportVersion,
+		ErgoVersion:      Version,
+		EvaluatedAt:      now.UTC(),
+		Env:              opts.env,
+		Paths:            opts.paths,
+		DepcruiseVersion: tool.Version,
+		BuildSHA256:      build.SHA256(),
+		Verdicts:         verdicts,
+	}
+	if opts.report != "" {
+		raw, err := compiler.MarshalDepcruiseReport(report)
+		if err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		if err := writeReport(opts.report, raw); err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+	}
+	if failed {
+		return 1
+	}
+	return 0
+}
+
 func openInput(path string) (io.ReadCloser, error) {
 	if path == "-" {
 		return io.NopCloser(os.Stdin), nil
@@ -420,6 +506,45 @@ func parsePlanArgs(args []string) (planOptions, error) {
 	}
 	if opts.path == "" {
 		return planOptions{}, fmt.Errorf("%s", planUsage)
+	}
+	return opts, nil
+}
+
+type cruiseOptions struct {
+	paths  []string
+	env    string
+	report string
+}
+
+func parseCruiseArgs(args []string) (cruiseOptions, error) {
+	var opts cruiseOptions
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case "--env":
+			if opts.env != "" || i+1 >= len(args) || strings.HasPrefix(args[i+1], "-") {
+				return cruiseOptions{}, fmt.Errorf("%s", depcruiseUsage)
+			}
+			i++
+			opts.env = args[i]
+		case "--report":
+			if opts.report != "" || i+1 >= len(args) || strings.HasPrefix(args[i+1], "-") {
+				return cruiseOptions{}, fmt.Errorf("%s", depcruiseUsage)
+			}
+			i++
+			opts.report = args[i]
+		default:
+			if strings.HasPrefix(args[i], "-") {
+				return cruiseOptions{}, fmt.Errorf("%s", depcruiseUsage)
+			}
+			cleaned, err := depcruise.NormalizePath(args[i])
+			if err != nil {
+				return cruiseOptions{}, fmt.Errorf("%s", depcruiseUsage)
+			}
+			opts.paths = append(opts.paths, cleaned)
+		}
+	}
+	if len(opts.paths) == 0 {
+		return cruiseOptions{}, fmt.Errorf("%s", depcruiseUsage)
 	}
 	return opts, nil
 }

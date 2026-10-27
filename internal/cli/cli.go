@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ergoprobat/ergo/internal/compiler/archunit"
 	"github.com/ergoprobat/ergo/internal/compiler/builtin"
 	"github.com/ergoprobat/ergo/internal/compiler/checkov"
 	"github.com/ergoprobat/ergo/internal/compiler/cibinding"
@@ -102,6 +103,7 @@ usage:
   ergo check checkov <results.json|-> [--env name] [--report file]
   ergo check depcruise <path>... [--env name] [--report file]
   ergo check semgrep <path>... [--env name] [--report file]
+  ergo check archunit <classes-dir>... --jars <dir> [--env name] [--report file]
   ergo explain <slug>
   ergo import [path...]
   ergo compile`
@@ -136,6 +138,8 @@ func checkCmd(root string, args []string, stdout, stderr io.Writer, d deps) int 
 		return depcruiseCmd(root, args[1:], stdout, stderr, d)
 	case "semgrep":
 		return semgrepCmd(root, args[1:], stdout, stderr, d)
+	case "archunit":
+		return archunitCmd(root, args[1:], stdout, stderr, d)
 	default:
 		fprintln(stderr, checkUsage)
 		return 2
@@ -188,7 +192,8 @@ const (
 	checkovUsage   = "usage: ergo check checkov <results.json|-> [--env name] [--report file]"
 	depcruiseUsage = "usage: ergo check depcruise <path>... [--env name] [--report file]"
 	semgrepUsage   = "usage: ergo check semgrep <path>... [--env name] [--report file]"
-	checkUsage     = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage + "\n" + semgrepUsage
+	archunitUsage  = "usage: ergo check archunit <classes-dir>... --jars <dir> [--env name] [--report file]"
+	checkUsage     = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage + "\n" + semgrepUsage + "\n" + archunitUsage
 )
 
 func planCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
@@ -395,7 +400,7 @@ func checkovCmd(root string, args []string, stdout, stderr io.Writer, d deps) in
 }
 
 func semgrepCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
-	opts, err := parsePathArgs(args, semgrepUsage)
+	opts, err := parsePathArgs(args, semgrepUsage, false)
 	if err != nil {
 		fprintln(stderr, err)
 		return 2
@@ -474,8 +479,81 @@ func semgrepCmd(root string, args []string, stdout, stderr io.Writer, d deps) in
 	return 0
 }
 
+func archunitCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
+	opts, err := parsePathArgs(args, archunitUsage, true)
+	if err != nil {
+		fprintln(stderr, err)
+		return 2
+	}
+	if d.now == nil {
+		d.now = time.Now
+	}
+	build, err := compiler.LoadBuild(root)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	now := d.now()
+	selectedCount := 0
+	for _, entry := range build.Entries {
+		if entry.Engine == "archunit" && entry.Applies(opts.env, now) {
+			selectedCount++
+		}
+	}
+	var env *archunit.Env
+	var envErr error
+	if selectedCount > 0 {
+		env, envErr = archunit.Setup(context.Background(), root, opts.jars, opts.paths)
+		if envErr == nil {
+			defer env.Close()
+		}
+	}
+	verdicts, failed, selected, err := evaluateChecks(stdout, build, func(entry compiler.Entry) bool {
+		return entry.Engine == "archunit" && entry.Applies(opts.env, now)
+	}, func(entry compiler.Entry, artifacts map[string][]byte) compiler.Outcome {
+		if envErr != nil {
+			return compiler.Outcome{Err: envErr}
+		}
+		return env.Evaluate(context.Background(), entry, artifacts, now)
+	})
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	if selected == 0 {
+		fprintln(stdout, "no checks selected")
+	}
+	report := compiler.ArchUnitReport{
+		ReportVersion: compiler.ReportVersion,
+		ErgoVersion:   Version,
+		EvaluatedAt:   now.UTC(),
+		Env:           opts.env,
+		Paths:         opts.paths,
+		BuildSHA256:   build.SHA256(),
+		Verdicts:      verdicts,
+	}
+	if envErr == nil && selectedCount > 0 {
+		report.ArchUnitVersion = env.Version()
+	}
+	if opts.report != "" {
+		raw, err := compiler.MarshalArchUnitReport(report)
+		if err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		if err := writeReport(opts.report, raw); err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+	}
+	if failed {
+		return 1
+	}
+	return 0
+}
+
 func depcruiseCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
-	opts, err := parsePathArgs(args, depcruiseUsage)
+	opts, err := parsePathArgs(args, depcruiseUsage, false)
 	if err != nil {
 		fprintln(stderr, err)
 		return 2
@@ -600,12 +678,21 @@ type cruiseOptions struct {
 	paths  []string
 	env    string
 	report string
+	jars   string
 }
 
-func parsePathArgs(args []string, usage string) (cruiseOptions, error) {
+// parsePathArgs reads the paths and options of a command that runs an engine over repository paths.
+// jars is true for the command that takes --jars, and then that option is required.
+func parsePathArgs(args []string, usage string, jars bool) (cruiseOptions, error) {
 	var opts cruiseOptions
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
+		case "--jars":
+			if !jars || opts.jars != "" || i+1 >= len(args) || strings.HasPrefix(args[i+1], "-") {
+				return cruiseOptions{}, fmt.Errorf("%s", usage)
+			}
+			i++
+			opts.jars = args[i]
 		case "--env":
 			if opts.env != "" || i+1 >= len(args) || strings.HasPrefix(args[i+1], "-") {
 				return cruiseOptions{}, fmt.Errorf("%s", usage)
@@ -629,7 +716,7 @@ func parsePathArgs(args []string, usage string) (cruiseOptions, error) {
 			opts.paths = append(opts.paths, cleaned)
 		}
 	}
-	if len(opts.paths) == 0 {
+	if len(opts.paths) == 0 || (jars && opts.jars == "") {
 		return cruiseOptions{}, fmt.Errorf("%s", usage)
 	}
 	return opts, nil

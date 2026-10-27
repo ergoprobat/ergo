@@ -42,3 +42,21 @@ A package pattern is identifiers joined by `.` or `..`, with an optional `..` at
 ## Running the test
 
 Add `.ergo/build` as a test source root and put ArchUnit 1.5.1 and JUnit Jupiter on the test classpath. The generated test does not use the ArchUnit JUnit engine. From the repository root, the compiled check for decision `<decision-id>` and check index `<index>` is `.ergo/build/<decision-id>/<index>/ArchitectureTest.java`.
+
+## Evaluate with ergo
+
+`ergo check archunit <classes-dir>... --jars <dir> [--env name] [--report file]` runs the compiled test for every in-force `archunit` check. Run `ergo compile` first, then build the project so the class directories exist.
+
+`<classes-dir>` is a compiled class directory relative to the repository root, such as `target/classes` or `build/classes/java/main`. ergo copies only the `.class` files below it. Resource files next to the classes, such as `archunit.properties` or `archunit_ignore_patterns.txt`, are not read. The directory layout is kept, so the `DO_NOT_INCLUDE_TESTS` option that the test sets matches the same locations as in a native run. ergo filters nothing itself, and a named `target/test-classes` or `build/classes/java/test` imports as nothing and fails as `archunit-empty`. A symlink anywhere below a named directory fails the check. Naming `.` copies every `.class` file in the repository and keeps its path from the root, so ArchUnit does not find the packages and the check fails as `archunit-empty`. Name the class output directory.
+
+`--jars` is a directory that holds the three jars in the table. ergo checks each sha256 and runs a copy of the verified bytes. The `install.sh` next to `jars.lock` under `internal/compiler/archunit/testdata/tool` downloads them from Maven Central into `lib/`.
+
+| Jar | sha256 |
+| --- | --- |
+| `archunit-1.5.1.jar` | `a4dbfc51c90005ad6ac9967672a7efb43aa6928287a57238b28e60e0a75c5c6f` |
+| `slf4j-api-2.0.19.jar` | `e91ff6d720609e7a194ffe758c3ed5c84e798617ae07b0a0f6a4fe229741b4bb` |
+| `junit-platform-console-standalone-6.1.3.jar` | `e62b96ac475dbcde8599ea905d088f65d90778f86e259b856a49fa5c4ea256ec` |
+
+`java` and `javac` come from `PATH` and must be JDK 17 or newer. The test is compiled with `--release 17`. Each check runs in its own JVM with 10 minutes for `javac` and the JVM together.
+
+A rule that fails prints one line per ArchUnit violation: `<slug>: checks[N] (mode): <rule-name> <message>`. A tree with no class file under the imported packages, a rule whose `that()` selection matches no class, or a layers rule in which every layer matches no class, is an error and is never waived. A layers rule in which only some layers are empty reports one violation for each empty layer. `--report` writes counts and hashes only, never rule names or class names.

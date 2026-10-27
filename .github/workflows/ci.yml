@@ -134,6 +134,28 @@ jobs:
         env:
           ERGO_SEMGREP: "1"
 
+  archunit:
+    name: ci / archunit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v6.1.0
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install ArchUnit
+        run: bash internal/compiler/archunit/testdata/tool/install.sh
+      - name: Evaluate the fixture subjects
+        run: go test ./internal/compiler/archunit ./internal/cli -count=1
+        env:
+          ERGO_ARCHUNIT: "1"
+
   conformance:
     name: ci / conformance
     runs-on: ubuntu-latest

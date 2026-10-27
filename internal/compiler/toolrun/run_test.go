@@ -54,7 +54,7 @@ exit "${FAKE_EXIT:-0}"
 	if err := os.WriteFile(filepath.Join(dir, "fake-tool"), []byte(script), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	bin := filepath.Join(dir, "fake-tool")
+	t.Setenv("PATH", dir)
 
 	t.Run("timeout", func(t *testing.T) {
 		t.Setenv("FAKE_SLEEP", "30")
@@ -63,7 +63,7 @@ exit "${FAKE_EXIT:-0}"
 		t.Setenv("FAKE_EXIT", "0")
 		ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 		defer cancel()
-		cmd := exec.CommandContext(ctx, bin)
+		cmd := exec.CommandContext(ctx, "fake-tool")
 		_, err := Run(ctx, cmd, Limits{Stdout: 64, Stderr: 64, Wait: 200 * time.Millisecond})
 		var timeout *TimeoutError
 		if !errors.As(err, &timeout) {
@@ -75,7 +75,7 @@ exit "${FAKE_EXIT:-0}"
 		t.Setenv("FAKE_SLEEP", "")
 		t.Setenv("FAKE_STDOUT", strings.Repeat("x", 64))
 		ctx := context.Background()
-		cmd := exec.CommandContext(ctx, bin)
+		cmd := exec.CommandContext(ctx, "fake-tool")
 		_, err := Run(ctx, cmd, Limits{Stdout: 16, Stderr: 64, Wait: time.Second})
 		var over *OutputError
 		if !errors.As(err, &over) || over.Max != 16 {
@@ -88,7 +88,7 @@ exit "${FAKE_EXIT:-0}"
 		t.Setenv("FAKE_STDERR", "boom")
 		t.Setenv("FAKE_EXIT", "2")
 		ctx := context.Background()
-		cmd := exec.CommandContext(ctx, bin)
+		cmd := exec.CommandContext(ctx, "fake-tool")
 		_, err := Run(ctx, cmd, Limits{Stdout: 64, Stderr: 64, Wait: time.Second})
 		var exit *ExitError
 		if !errors.As(err, &exit) || Excerpt(Stderr(err), "fallback") != "boom" {

@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.2.0](https://github.com/ipsofacto-io/ipso/compare/v0.1.1...v0.2.0) (2026-10-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename the CLI and module from ergo to ipso ([#29](https://github.com/ipsofacto-io/ipso/issues/29))
+
+### Features
+
+* **cli:** compile in-force checks into .ergo/build ([2816ed1](https://github.com/ipsofacto-io/ipso/commit/2816ed1ab4a6988bdfd83aaa1365808a29979f12))
+* **cli:** evaluate ArchUnit checks ([#28](https://github.com/ipsofacto-io/ipso/issues/28)) ([ad3317d](https://github.com/ipsofacto-io/ipso/commit/ad3317d02658f0c6bad57d71a6c9ea1fc10cc43b))
+* **cli:** evaluate dependency-cruiser checks ([#26](https://github.com/ipsofacto-io/ipso/issues/26)) ([6cb03ba](https://github.com/ipsofacto-io/ipso/commit/6cb03ba5dd5d09fef59d2ce66211c3b833e17a9a))
+* **cli:** evaluate Semgrep checks ([231777d](https://github.com/ipsofacto-io/ipso/commit/231777dc0d58528b34aa5b4138fcbc6f112e3350))
+* **cli:** evaluate Terraform and OpenTofu plans ([#19](https://github.com/ipsofacto-io/ipso/issues/19)) ([c6b78c1](https://github.com/ipsofacto-io/ipso/commit/c6b78c1d7b76123c7593500921b4c1745166aaf3))
+* **cli:** import MADR and Nygard ADRs as EDR files ([1f3118d](https://github.com/ipsofacto-io/ipso/commit/1f3118d9943eacba7a9a33b77cb52dc79731d268))
+* **compiler:** compile ArchUnit and import-linter architecture rules ([#24](https://github.com/ipsofacto-io/ipso/issues/24)) ([65b814a](https://github.com/ipsofacto-io/ipso/commit/65b814a6f3519605fbdf53c1b8769d6fbf3b55e9))
+* **compiler:** compile dependency-cruiser JSON rule files ([#20](https://github.com/ipsofacto-io/ipso/issues/20)) ([1a3e4ad](https://github.com/ipsofacto-io/ipso/commit/1a3e4ad83971767b987c5ccca075a36fd0b87cbe))
+* **compiler:** compile Kyverno, Gatekeeper, and ESLint checks ([#25](https://github.com/ipsofacto-io/ipso/issues/25)) ([5bfddf4](https://github.com/ipsofacto-io/ipso/commit/5bfddf4aba0792dfd803da82526bd2e85a71e928))
+* **compiler:** compile OPA policies and Terraform templates ([#18](https://github.com/ipsofacto-io/ipso/issues/18)) ([2928259](https://github.com/ipsofacto-io/ipso/commit/2928259b435a707ab0ecc3d083599e959d9fc0f2))
+* **compiler:** compile Semgrep rules to canonical YAML ([#21](https://github.com/ipsofacto-io/ipso/issues/21)) ([9046a02](https://github.com/ipsofacto-io/ipso/commit/9046a02288f92c1e43e06a5e6687c685d1ede7e8))
+* **compiler:** evaluate CI jobs and Checkov ids offline ([#22](https://github.com/ipsofacto-io/ipso/issues/22)) ([b244b7e](https://github.com/ipsofacto-io/ipso/commit/b244b7e210cbacb0cd69a8f7a244b150c9f441ae))
+* rename the CLI and module from ergo to ipso ([#29](https://github.com/ipsofacto-io/ipso/issues/29)) ([db65f7a](https://github.com/ipsofacto-io/ipso/commit/db65f7a95a9feea71125099b006c1fa071c09905))
+
+
+### Bug Fixes
+
+* **cli:** cite ERGO-19 for the unimplemented import command ([89947b8](https://github.com/ipsofacto-io/ipso/commit/89947b81aec46ab3f5c96cff30a230e076074f01))
+
 ## 0.1.1 (2026-10-21)
 
 ### Features

@@ -1,0 +1,10 @@
+rules:
+  - id: sample
+    languages:
+      - python
+    message: sample rule
+    options:
+      constant_propagation: false
+      symbolic_propagation: true
+    pattern: foo(...)
+    severity: WARNING

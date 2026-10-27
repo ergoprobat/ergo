@@ -10,37 +10,8 @@ import (
 	"time"
 
 	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ergoprobat/ergo/internal/compiler/toolrun"
 )
-
-func TestNormalizePath(t *testing.T) {
-	ok := []struct {
-		in, want string
-	}{
-		{".", "."},
-		{"packages", "packages"},
-		{"./packages", "packages"},
-		{"packages/ui", "packages/ui"},
-		{"foo/./bar", "foo/bar"},
-		{"src/foo-bar", "src/foo-bar"},
-		{"lib/@scope/pkg", "lib/@scope/pkg"},
-		{"a+b", "a+b"},
-	}
-	for _, tc := range ok {
-		got, err := NormalizePath(tc.in)
-		if err != nil || got != tc.want {
-			t.Fatalf("NormalizePath(%q) = %q, %v", tc.in, got, err)
-		}
-	}
-	bad := []string{"", "..", "../x", "/abs", `src\x`, "src/*", "foo//bar", "packages/", "--config", "foo/../../etc", "a b", "src/../x"}
-	for _, in := range bad {
-		if _, err := NormalizePath(in); err == nil {
-			t.Fatalf("NormalizePath(%q) accepted", in)
-		}
-	}
-	if _, err := NormalizePaths(nil); err == nil {
-		t.Fatal("empty path list accepted")
-	}
-}
 
 func TestFindToolMissing(t *testing.T) {
 	skipFakeCruise(t)
@@ -206,7 +177,7 @@ func TestCruiseRejectsEscapingSymlink(t *testing.T) {
 	if compiler.CodeOf(err) != CodePath {
 		t.Fatalf("escape %v", err)
 	}
-	if err := withinRoot(root, []string{"inside", "missing"}); err != nil {
+	if err := toolrun.WithinRoot(root, []string{"inside", "missing"}); err != nil {
 		t.Fatal(err)
 	}
 }

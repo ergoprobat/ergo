@@ -21,9 +21,11 @@ const (
 	// CodeKey means a rule sets a key or mode this compiler rejects.
 	CodeKey = "semgrep-key"
 
-	artifactName = "semgrep.yaml"
-	version      = "1.182.1"
+	version = "1.182.1"
 )
+
+// ArtifactName is the compiled Semgrep rule file.
+const ArtifactName = "semgrep.yaml"
 
 // Compiler is the built-in Semgrep engine.
 type Compiler struct{}
@@ -55,7 +57,7 @@ func (Compiler) Compile(in compiler.Input) ([]compiler.Artifact, error) {
 	if err != nil {
 		return nil, err
 	}
-	return []compiler.Artifact{{Name: artifactName, Data: out}}, nil
+	return []compiler.Artifact{{Name: ArtifactName, Data: out}}, nil
 }
 
 func source(in compiler.Input) ([]byte, error) {

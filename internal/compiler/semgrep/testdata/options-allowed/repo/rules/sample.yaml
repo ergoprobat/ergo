@@ -1,0 +1,9 @@
+rules:
+  - id: sample
+    message: sample rule
+    languages:
+      - python
+    pattern: foo(...)
+    options:
+      symbolic_propagation: true
+      constant_propagation: false

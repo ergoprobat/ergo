@@ -296,6 +296,19 @@ type DepcruiseReport struct {
 	Verdicts         []Verdict `json:"verdicts"`
 }
 
+// SemgrepReport is the verdict report for ergo check semgrep.
+// It carries the paths that were scanned and the Semgrep version, never rule ids or file paths.
+type SemgrepReport struct {
+	ReportVersion  int       `json:"report_version"`
+	ErgoVersion    string    `json:"ergo_version"`
+	EvaluatedAt    time.Time `json:"evaluated_at"`
+	Env            string    `json:"env"`
+	Paths          []string  `json:"paths"`
+	SemgrepVersion string    `json:"semgrep_version"`
+	BuildSHA256    string    `json:"build_sha256"`
+	Verdicts       []Verdict `json:"verdicts"`
+}
+
 // CheckovReport is the verdict report for ergo check checkov.
 type CheckovReport struct {
 	ReportVersion  int       `json:"report_version"`
@@ -331,6 +344,15 @@ func MarshalCheckovReport(report CheckovReport) ([]byte, error) {
 
 // MarshalDepcruiseReport encodes a dependency-cruiser report as deterministic JSON.
 func MarshalDepcruiseReport(report DepcruiseReport) ([]byte, error) {
+	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
+	if report.Paths == nil {
+		report.Paths = []string{}
+	}
+	return encodeReport(report)
+}
+
+// MarshalSemgrepReport encodes a Semgrep report as deterministic JSON.
+func MarshalSemgrepReport(report SemgrepReport) ([]byte, error) {
 	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
 	if report.Paths == nil {
 		report.Paths = []string{}

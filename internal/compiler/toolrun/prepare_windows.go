@@ -1,6 +1,6 @@
 //go:build windows
 
-package depcruise
+package toolrun
 
 import (
 	"context"
@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-// prepareCommand kills the process and the children it spawned when the context ends.
-// A Windows depcruise shim starts Node as a child. Killing only the shim would leave that child running.
-func prepareCommand(cmd *exec.Cmd) {
+// prepare kills the process and the children it spawned when the context ends.
+// A Windows engine shim starts the real process as a child. Killing only the shim would leave that child running.
+func prepare(cmd *exec.Cmd) {
 	cmd.Cancel = func() error {
 		if cmd.Process == nil {
 			return os.ErrProcessDone

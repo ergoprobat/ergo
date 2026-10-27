@@ -1,0 +1,8 @@
+rules:
+  - id: sample
+    message: sample rule
+    languages:
+      - python
+    pattern: foo(...)
+    options:
+      interfile: false

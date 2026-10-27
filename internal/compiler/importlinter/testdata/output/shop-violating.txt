@@ -1,0 +1,43 @@
+
+---------
+Contracts
+---------
+
+Analyzed 6 files, 4 dependencies.
+---------------------------------
+
+Layers BROKEN
+Independence BROKEN
+Forbidden BROKEN
+
+Contracts: 0 kept, 3 broken.
+
+
+----------------
+Broken contracts
+----------------
+
+Layers
+------
+
+shop.domain is not allowed to import shop.api:
+
+- shop.domain -> shop.api (l.1)
+
+
+Independence
+------------
+
+shop.billing is not allowed to import shop.shipping:
+
+- shop.billing -> shop.shipping (l.1)
+
+
+Forbidden
+---------
+
+shop.domain is not allowed to import shop.infra:
+
+-   shop.domain -> shop.infra (l.2)
+
+

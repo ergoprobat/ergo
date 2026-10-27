@@ -323,6 +323,20 @@ type ArchUnitReport struct {
 	Verdicts        []Verdict `json:"verdicts"`
 }
 
+// ImportLinterReport is the verdict report for ipso check importlinter.
+// It carries the source directories that were checked and the import-linter version, never contract names or module names.
+// ImportLinterVersion is empty when python was not run.
+type ImportLinterReport struct {
+	ReportVersion       int       `json:"report_version"`
+	IpsoVersion         string    `json:"ipso_version"`
+	EvaluatedAt         time.Time `json:"evaluated_at"`
+	Env                 string    `json:"env"`
+	Paths               []string  `json:"paths"`
+	ImportLinterVersion string    `json:"importlinter_version"`
+	BuildSHA256         string    `json:"build_sha256"`
+	Verdicts            []Verdict `json:"verdicts"`
+}
+
 // CheckovReport is the verdict report for ipso check checkov.
 type CheckovReport struct {
 	ReportVersion  int       `json:"report_version"`
@@ -376,6 +390,15 @@ func MarshalSemgrepReport(report SemgrepReport) ([]byte, error) {
 
 // MarshalArchUnitReport encodes an ArchUnit report as deterministic JSON.
 func MarshalArchUnitReport(report ArchUnitReport) ([]byte, error) {
+	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
+	if report.Paths == nil {
+		report.Paths = []string{}
+	}
+	return encodeReport(report)
+}
+
+// MarshalImportLinterReport encodes an import-linter report as deterministic JSON.
+func MarshalImportLinterReport(report ImportLinterReport) ([]byte, error) {
 	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
 	if report.Paths == nil {
 		report.Paths = []string{}

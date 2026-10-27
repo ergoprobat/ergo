@@ -1,0 +1,71 @@
+
+---------
+Contracts
+---------
+
+Analyzed 16 files, 10 dependencies.
+-----------------------------------
+
+Forbidden BROKEN
+Layers BROKEN
+Independence BROKEN
+Protected BROKEN
+Siblings BROKEN
+
+Contracts: 0 kept, 5 broken.
+
+
+----------------
+Broken contracts
+----------------
+
+Forbidden
+---------
+
+shop.domain is not allowed to import shop.infra:
+
+-   shop.domain.models -> shop.infra.db (l.1)
+
+-   shop.domain.models -> shop.services.helper (l.2)
+    shop.services.helper -> shop.infra.db (l.1)
+
+
+Layers
+------
+
+shop.domain is not allowed to import shop.api:
+
+- shop.domain.models -> shop.api.views (l.3)
+
+
+Independence
+------------
+
+shop.shipping is not allowed to import shop.billing:
+
+- shop.shipping.label -> shop.billing.core (l.1)
+
+
+shop.billing is not allowed to import shop.shipping:
+
+- shop.billing.core -> shop.shipping.label (l.1)
+
+
+Protected
+---------
+
+Illegal imports of protected package shop.domain:
+
+- shop.infra.db -> shop.domain.models (l.1)
+
+
+Siblings
+--------
+
+No cycles are allowed in shop.
+It could be made acyclic by removing 3 dependencies:
+
+- .api -> .domain (1 import)
+- .infra -> .domain (1 import)
+- .shipping -> .billing (1 import)
+

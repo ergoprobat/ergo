@@ -49,7 +49,10 @@ func (e *OutputError) Error() string {
 }
 
 // ExitError means the command finished with a non-zero status.
+// Stdout is what the command wrote inside its cap. A tool that reports findings through its
+// exit status, such as import-linter, writes them there.
 type ExitError struct {
+	Stdout []byte
 	Stderr []byte
 	Err    error
 }
@@ -127,7 +130,7 @@ func Run(ctx context.Context, cmd *exec.Cmd, limits Limits) (Result, error) {
 		return Result{}, &OutputError{Max: limits.Stdout, Stderr: stderr.Bytes()}
 	}
 	if runErr != nil {
-		return Result{}, &ExitError{Stderr: stderr.Bytes(), Err: runErr}
+		return Result{}, &ExitError{Stdout: stdout.Bytes(), Stderr: stderr.Bytes(), Err: runErr}
 	}
 	return Result{Stdout: stdout.Bytes()}, nil
 }

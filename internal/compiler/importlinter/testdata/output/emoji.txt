@@ -1,0 +1,11 @@
+
+---------
+Contracts
+---------
+
+Analyzed 16 files, 10 dependencies.
+-----------------------------------
+
+Keep :warning: and :brick: out KEPT
+
+Contracts: 1 kept, 0 broken.

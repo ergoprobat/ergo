@@ -95,6 +95,19 @@ exit "${FAKE_EXIT:-0}"
 			t.Fatalf("err %v", err)
 		}
 	})
+
+	t.Run("exit keeps stdout", func(t *testing.T) {
+		t.Setenv("FAKE_STDOUT", "findings")
+		t.Setenv("FAKE_STDERR", "")
+		t.Setenv("FAKE_EXIT", "1")
+		ctx := context.Background()
+		cmd := exec.CommandContext(ctx, "fake-tool")
+		_, err := Run(ctx, cmd, Limits{Stdout: 64, Stderr: 64, Wait: time.Second})
+		var exit *ExitError
+		if !errors.As(err, &exit) || string(exit.Stdout) != "findings" {
+			t.Fatalf("err %v", err)
+		}
+	})
 }
 
 func TestMemoReuses(t *testing.T) {

@@ -17,6 +17,7 @@ import (
 	"github.com/ipsofacto-io/ipso/internal/compiler/checkov"
 	"github.com/ipsofacto-io/ipso/internal/compiler/cibinding"
 	"github.com/ipsofacto-io/ipso/internal/compiler/depcruise"
+	"github.com/ipsofacto-io/ipso/internal/compiler/importlinter"
 	"github.com/ipsofacto-io/ipso/internal/compiler/opa"
 	"github.com/ipsofacto-io/ipso/internal/compiler/semgrep"
 	"github.com/ipsofacto-io/ipso/internal/compiler/toolrun"
@@ -104,6 +105,7 @@ usage:
   ipso check depcruise <path>... [--env name] [--report file]
   ipso check semgrep <path>... [--env name] [--report file]
   ipso check archunit <classes-dir>... --jars <dir> [--env name] [--report file]
+  ipso check importlinter <source-dir>... [--env name] [--report file]
   ipso explain <slug>
   ipso import [path...]
   ipso compile`
@@ -140,6 +142,8 @@ func checkCmd(root string, args []string, stdout, stderr io.Writer, d deps) int 
 		return semgrepCmd(root, args[1:], stdout, stderr, d)
 	case "archunit":
 		return archunitCmd(root, args[1:], stdout, stderr, d)
+	case "importlinter":
+		return importlinterCmd(root, args[1:], stdout, stderr, d)
 	default:
 		fprintln(stderr, checkUsage)
 		return 2
@@ -187,13 +191,14 @@ func checkFiles(root string, stdout, stderr io.Writer) int {
 }
 
 const (
-	planUsage      = "usage: ipso check plan <plan.json|-> [--env name] [--report file]"
-	ciUsage        = "usage: ipso check ci <evidence.json|-> --sha <sha> [--env name] [--report file]"
-	checkovUsage   = "usage: ipso check checkov <results.json|-> [--env name] [--report file]"
-	depcruiseUsage = "usage: ipso check depcruise <path>... [--env name] [--report file]"
-	semgrepUsage   = "usage: ipso check semgrep <path>... [--env name] [--report file]"
-	archunitUsage  = "usage: ipso check archunit <classes-dir>... --jars <dir> [--env name] [--report file]"
-	checkUsage     = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage + "\n" + semgrepUsage + "\n" + archunitUsage
+	planUsage         = "usage: ipso check plan <plan.json|-> [--env name] [--report file]"
+	ciUsage           = "usage: ipso check ci <evidence.json|-> --sha <sha> [--env name] [--report file]"
+	checkovUsage      = "usage: ipso check checkov <results.json|-> [--env name] [--report file]"
+	depcruiseUsage    = "usage: ipso check depcruise <path>... [--env name] [--report file]"
+	semgrepUsage      = "usage: ipso check semgrep <path>... [--env name] [--report file]"
+	archunitUsage     = "usage: ipso check archunit <classes-dir>... --jars <dir> [--env name] [--report file]"
+	importlinterUsage = "usage: ipso check importlinter <source-dir>... [--env name] [--report file]"
+	checkUsage        = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage + "\n" + semgrepUsage + "\n" + archunitUsage + "\n" + importlinterUsage
 )
 
 func planCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
@@ -537,6 +542,79 @@ func archunitCmd(root string, args []string, stdout, stderr io.Writer, d deps) i
 	}
 	if opts.report != "" {
 		raw, err := compiler.MarshalArchUnitReport(report)
+		if err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		if err := writeReport(opts.report, raw); err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+	}
+	if failed {
+		return 1
+	}
+	return 0
+}
+
+func importlinterCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
+	opts, err := parsePathArgs(args, importlinterUsage, false)
+	if err != nil {
+		fprintln(stderr, err)
+		return 2
+	}
+	if d.now == nil {
+		d.now = time.Now
+	}
+	build, err := compiler.LoadBuild(root)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	now := d.now()
+	selectedCount := 0
+	for _, entry := range build.Entries {
+		if entry.Engine == "importlinter" && entry.Applies(opts.env, now) {
+			selectedCount++
+		}
+	}
+	var env *importlinter.Env
+	var envErr error
+	if selectedCount > 0 {
+		env, envErr = importlinter.Setup(context.Background(), root, opts.paths)
+		if envErr == nil {
+			defer env.Close()
+		}
+	}
+	verdicts, failed, selected, err := evaluateChecks(stdout, build, func(entry compiler.Entry) bool {
+		return entry.Engine == "importlinter" && entry.Applies(opts.env, now)
+	}, func(entry compiler.Entry, artifacts map[string][]byte) compiler.Outcome {
+		if envErr != nil {
+			return compiler.Outcome{Err: envErr}
+		}
+		return env.Evaluate(context.Background(), entry, artifacts, now)
+	})
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	if selected == 0 {
+		fprintln(stdout, "no checks selected")
+	}
+	report := compiler.ImportLinterReport{
+		ReportVersion: compiler.ReportVersion,
+		IpsoVersion:   Version,
+		EvaluatedAt:   now.UTC(),
+		Env:           opts.env,
+		Paths:         opts.paths,
+		BuildSHA256:   build.SHA256(),
+		Verdicts:      verdicts,
+	}
+	if envErr == nil && selectedCount > 0 {
+		report.ImportLinterVersion = env.Version()
+	}
+	if opts.report != "" {
+		raw, err := compiler.MarshalImportLinterReport(report)
 		if err != nil {
 			fprintln(stderr, err)
 			return 1

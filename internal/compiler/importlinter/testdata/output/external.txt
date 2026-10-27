@@ -1,0 +1,25 @@
+
+---------
+Contracts
+---------
+
+Analyzed 17 files, 11 dependencies.
+-----------------------------------
+
+Forbidden BROKEN
+
+Contracts: 0 kept, 1 broken.
+
+
+----------------
+Broken contracts
+----------------
+
+Forbidden
+---------
+
+shop.util is not allowed to import os:
+
+-   shop.util.tools -> os (l.1)
+
+

@@ -83,7 +83,7 @@ func TestCheckArchunitUsage(t *testing.T) {
 // --jars belongs to ipso check archunit alone.
 func TestCheckPathCommandsRefuseJars(t *testing.T) {
 	now := time.Date(2026, 2, 1, 12, 0, 0, 0, time.UTC)
-	for _, engine := range []string{"semgrep", "depcruise"} {
+	for _, engine := range []string{"semgrep", "depcruise", "importlinter"} {
 		var stdout, stderr strings.Builder
 		code := run([]string{"check", engine, "src", "--jars", "lib"}, &stdout, &stderr, deps{now: func() time.Time { return now }, registry: builtin.Registry()})
 		if code != 2 {

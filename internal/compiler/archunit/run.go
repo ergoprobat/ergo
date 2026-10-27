@@ -83,34 +83,45 @@ func (e *Env) libDir() string { return filepath.Join(e.dir, "lib") }
 
 func (e *Env) jar(name string) string { return filepath.Join(e.libDir(), name) }
 
+// jdkTool is one tool the JDK check runs. Each command name is a literal at its call site, so Go resolves it
+// with LookPath and nothing from the repository or the environment can pick the binary.
+type jdkTool struct {
+	name    string
+	command func(ctx context.Context) *exec.Cmd
+}
+
 // checkJDK reads the version of java and javac. Both must be 17 or newer.
 // The tools run in dir, never in the repository.
 func checkJDK(ctx context.Context, dir string) error {
-	for _, name := range []string{"java", "javac"} {
-		if _, err := exec.LookPath(name); err != nil {
-			return &compiler.Error{Code: CodeMissing, Err: fmt.Errorf("%s is not on PATH", name)}
+	tools := []jdkTool{
+		{"java", func(ctx context.Context) *exec.Cmd { return exec.CommandContext(ctx, "java", "--version") }},
+		{"javac", func(ctx context.Context) *exec.Cmd { return exec.CommandContext(ctx, "javac", "--version") }},
+	}
+	for _, tool := range tools {
+		if _, err := exec.LookPath(tool.name); err != nil {
+			return &compiler.Error{Code: CodeMissing, Err: fmt.Errorf("%s is not on PATH", tool.name)}
 		}
-		out, err := runVersion(ctx, dir, name)
+		out, err := runVersion(ctx, dir, tool)
 		if err != nil {
 			return err
 		}
 		major, ok := jdkMajor(out)
 		if !ok || major < minJava {
-			return &compiler.Error{Code: CodeVersion, Err: fmt.Errorf("%s needs JDK %d or newer", name, minJava)}
+			return &compiler.Error{Code: CodeVersion, Err: fmt.Errorf("%s needs JDK %d or newer", tool.name, minJava)}
 		}
 	}
 	return nil
 }
 
-func runVersion(ctx context.Context, dir, name string) (string, error) {
+func runVersion(ctx context.Context, dir string, tool jdkTool) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, versionTimeout)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, name, "--version")
+	cmd := tool.command(ctx)
 	cmd.Dir = dir
 	cmd.Env = jvmEnv()
 	out, err := toolrun.Run(ctx, cmd, toolrun.Limits{Stdout: versionLimit, Stderr: stderrLimit, Wait: commandWait})
 	if err != nil {
-		return "", &compiler.Error{Code: CodeMissing, Err: fmt.Errorf("%s --version: %s", name, toolrun.Excerpt(toolrun.Stderr(err), "failed"))}
+		return "", &compiler.Error{Code: CodeMissing, Err: fmt.Errorf("%s --version: %s", tool.name, toolrun.Excerpt(toolrun.Stderr(err), "failed"))}
 	}
 	return string(out.Stdout), nil
 }

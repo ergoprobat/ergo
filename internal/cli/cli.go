@@ -18,6 +18,7 @@ import (
 	"github.com/ipsofacto-io/ipso/internal/compiler/cibinding"
 	"github.com/ipsofacto-io/ipso/internal/compiler/depcruise"
 	"github.com/ipsofacto-io/ipso/internal/compiler/importlinter"
+	"github.com/ipsofacto-io/ipso/internal/compiler/kyverno"
 	"github.com/ipsofacto-io/ipso/internal/compiler/opa"
 	"github.com/ipsofacto-io/ipso/internal/compiler/semgrep"
 	"github.com/ipsofacto-io/ipso/internal/compiler/toolrun"
@@ -106,6 +107,7 @@ usage:
   ipso check semgrep <path>... [--env name] [--report file]
   ipso check archunit <classes-dir>... --jars <dir> [--env name] [--report file]
   ipso check importlinter <source-dir>... [--env name] [--report file]
+  ipso check kyverno <path>... [--env name] [--report file]
   ipso explain <slug>
   ipso import [path...]
   ipso compile`
@@ -144,6 +146,8 @@ func checkCmd(root string, args []string, stdout, stderr io.Writer, d deps) int 
 		return archunitCmd(root, args[1:], stdout, stderr, d)
 	case "importlinter":
 		return importlinterCmd(root, args[1:], stdout, stderr, d)
+	case "kyverno":
+		return kyvernoCmd(root, args[1:], stdout, stderr, d)
 	default:
 		fprintln(stderr, checkUsage)
 		return 2
@@ -198,7 +202,8 @@ const (
 	semgrepUsage      = "usage: ipso check semgrep <path>... [--env name] [--report file]"
 	archunitUsage     = "usage: ipso check archunit <classes-dir>... --jars <dir> [--env name] [--report file]"
 	importlinterUsage = "usage: ipso check importlinter <source-dir>... [--env name] [--report file]"
-	checkUsage        = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage + "\n" + semgrepUsage + "\n" + archunitUsage + "\n" + importlinterUsage
+	kyvernoUsage      = "usage: ipso check kyverno <path>... [--env name] [--report file]"
+	checkUsage        = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage + "\n" + semgrepUsage + "\n" + archunitUsage + "\n" + importlinterUsage + "\n" + kyvernoUsage
 )
 
 func planCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
@@ -615,6 +620,79 @@ func importlinterCmd(root string, args []string, stdout, stderr io.Writer, d dep
 	}
 	if opts.report != "" {
 		raw, err := compiler.MarshalImportLinterReport(report)
+		if err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		if err := writeReport(opts.report, raw); err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+	}
+	if failed {
+		return 1
+	}
+	return 0
+}
+
+func kyvernoCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
+	opts, err := parsePathArgs(args, kyvernoUsage, false)
+	if err != nil {
+		fprintln(stderr, err)
+		return 2
+	}
+	if d.now == nil {
+		d.now = time.Now
+	}
+	build, err := compiler.LoadBuild(root)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	now := d.now()
+	selectedCount := 0
+	for _, entry := range build.Entries {
+		if entry.Engine == "kyverno" && entry.Applies(opts.env, now) {
+			selectedCount++
+		}
+	}
+	var env *kyverno.Env
+	var envErr error
+	if selectedCount > 0 {
+		env, envErr = kyverno.Setup(context.Background(), root, opts.paths)
+		if envErr == nil {
+			defer env.Close()
+		}
+	}
+	verdicts, failed, selected, err := evaluateChecks(stdout, build, func(entry compiler.Entry) bool {
+		return entry.Engine == "kyverno" && entry.Applies(opts.env, now)
+	}, func(entry compiler.Entry, artifacts map[string][]byte) compiler.Outcome {
+		if envErr != nil {
+			return compiler.Outcome{Err: envErr}
+		}
+		return env.Evaluate(context.Background(), entry, artifacts, now)
+	})
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	if selected == 0 {
+		fprintln(stdout, "no checks selected")
+	}
+	report := compiler.KyvernoReport{
+		ReportVersion: compiler.ReportVersion,
+		IpsoVersion:   Version,
+		EvaluatedAt:   now.UTC(),
+		Env:           opts.env,
+		Paths:         opts.paths,
+		BuildSHA256:   build.SHA256(),
+		Verdicts:      verdicts,
+	}
+	if envErr == nil && selectedCount > 0 {
+		report.KyvernoVersion = env.Version()
+	}
+	if opts.report != "" {
+		raw, err := compiler.MarshalKyvernoReport(report)
 		if err != nil {
 			fprintln(stderr, err)
 			return 1

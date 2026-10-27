@@ -337,6 +337,20 @@ type ImportLinterReport struct {
 	Verdicts            []Verdict `json:"verdicts"`
 }
 
+// KyvernoReport is the verdict report for ipso check kyverno.
+// It carries the paths that were checked and the Kyverno version, never policy names, resource names, or messages.
+// KyvernoVersion is empty when the binary was not run.
+type KyvernoReport struct {
+	ReportVersion  int       `json:"report_version"`
+	IpsoVersion    string    `json:"ipso_version"`
+	EvaluatedAt    time.Time `json:"evaluated_at"`
+	Env            string    `json:"env"`
+	Paths          []string  `json:"paths"`
+	KyvernoVersion string    `json:"kyverno_version"`
+	BuildSHA256    string    `json:"build_sha256"`
+	Verdicts       []Verdict `json:"verdicts"`
+}
+
 // CheckovReport is the verdict report for ipso check checkov.
 type CheckovReport struct {
 	ReportVersion  int       `json:"report_version"`
@@ -399,6 +413,15 @@ func MarshalArchUnitReport(report ArchUnitReport) ([]byte, error) {
 
 // MarshalImportLinterReport encodes an import-linter report as deterministic JSON.
 func MarshalImportLinterReport(report ImportLinterReport) ([]byte, error) {
+	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
+	if report.Paths == nil {
+		report.Paths = []string{}
+	}
+	return encodeReport(report)
+}
+
+// MarshalKyvernoReport encodes a Kyverno report as deterministic JSON.
+func MarshalKyvernoReport(report KyvernoReport) ([]byte, error) {
 	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
 	if report.Paths == nil {
 		report.Paths = []string{}

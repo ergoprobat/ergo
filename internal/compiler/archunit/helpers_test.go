@@ -60,7 +60,7 @@ if [ -n "$FAKE_JAVA_ENV" ]; then
     printf '_java=%s\n' "$_JAVA_OPTIONS"
     printf 'javac=%s\n' "$JDK_JAVAC_OPTIONS"
     printf 'classpath=%s\n' "$CLASSPATH"
-    printf 'keep=%s\n' "$ERGO_TEST_KEEP"
+    printf 'keep=%s\n' "$IPSO_TEST_KEEP"
   } > "$FAKE_JAVA_ENV"
 fi
 if [ -n "$FAKE_JAVA_PWD" ]; then

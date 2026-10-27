@@ -5,9 +5,9 @@
 #   provider: aws
 #   resources:
 #     - aws_lb_listener
-package ergo.templates.aws.lb_http_redirects_to_https
+package ipso.templates.aws.lb_http_redirects_to_https
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(rc, msg) if {
 	some rc in tf.resources("aws_lb_listener")

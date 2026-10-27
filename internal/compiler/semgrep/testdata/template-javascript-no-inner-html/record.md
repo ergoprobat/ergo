@@ -14,7 +14,7 @@ supersedes: []
 criticality: blocking
 checks:
   - engine: semgrep
-    ref: ergo:javascript/no-inner-html
+    ref: ipso:javascript/no-inner-html
     mode: block
 waivers: []
 sources:

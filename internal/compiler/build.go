@@ -11,14 +11,14 @@ import (
 )
 
 const (
-	buildDir  = ".ergo/build"
+	buildDir  = ".ipso/build"
 	stageName = "build.stage"
 	prevName  = "build.prev"
 	gitIgnore = "*\n"
 )
 
-// WriteBuild replaces .ergo/build with the compiled artifacts and a manifest.
-// On error the previous build is left in place. A symlink at .ergo/build is refused.
+// WriteBuild replaces .ipso/build with the compiled artifacts and a manifest.
+// On error the previous build is left in place. A symlink at .ipso/build is refused.
 // ids lists every in-force record, including records that compiled nothing.
 func WriteBuild(root string, ids []DecisionRef, compiled []Compiled) error {
 	if err := rejectDuplicateIDs(ids); err != nil {
@@ -28,11 +28,11 @@ func WriteBuild(root string, ids []DecisionRef, compiled []Compiled) error {
 	if err := refuseSymlink(dest); err != nil {
 		return err
 	}
-	ergoDir := filepath.Dir(dest)
-	if err := os.MkdirAll(ergoDir, 0o755); err != nil {
+	ipsoDir := filepath.Dir(dest)
+	if err := os.MkdirAll(ipsoDir, 0o755); err != nil {
 		return err
 	}
-	stage := filepath.Join(ergoDir, stageName)
+	stage := filepath.Join(ipsoDir, stageName)
 	if err := os.RemoveAll(stage); err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func refuseSymlink(path string) error {
 		return err
 	}
 	if info.Mode()&os.ModeSymlink != 0 {
-		return fmt.Errorf(".ergo/build is a symlink")
+		return fmt.Errorf(".ipso/build is a symlink")
 	}
 	return nil
 }

@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/depcruise"
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/depcruise"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 const cruiseScript = "../depcruise/testdata/tool/node_modules/dependency-cruiser/bin/dependency-cruiser.mjs"

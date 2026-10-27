@@ -6,7 +6,7 @@ import (
 )
 
 // generate writes one JUnit Jupiter test. The package name carries the decision
-// id, so every check can share .ergo/build as a test source root. Only strings
+// id, so every check can share .ipso/build as a test source root. Only strings
 // that matched the rule schema are embedded, so the file cannot carry free text.
 func generate(decisionID string, index int, packages []string, rules []archRule) ([]byte, error) {
 	var b strings.Builder
@@ -53,7 +53,7 @@ func generate(decisionID string, index int, packages []string, rules []archRule)
 
 // packageName is the Java package of one check's test. Evaluation selects the class by this name.
 func packageName(decisionID string, index int) string {
-	return fmt.Sprintf("ergo.d%s.c%d", strings.ToLower(decisionID), index)
+	return fmt.Sprintf("ipso.d%s.c%d", strings.ToLower(decisionID), index)
 }
 
 func writeRule(b *strings.Builder, rule archRule) error {

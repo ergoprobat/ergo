@@ -16,8 +16,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 var update = flag.Bool("update", false, "rewrite golden compiler fixtures")

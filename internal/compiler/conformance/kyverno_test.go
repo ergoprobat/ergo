@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler/kyverno"
+	"github.com/ipsofacto-io/ipso/internal/compiler/kyverno"
 )
 
 func TestKyverno(t *testing.T) {

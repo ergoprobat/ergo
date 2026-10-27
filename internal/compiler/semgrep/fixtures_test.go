@@ -11,13 +11,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 func TestSemgrepFixtures(t *testing.T) {
-	if os.Getenv("ERGO_SEMGREP") == "" {
-		t.Skip("ERGO_SEMGREP is not set")
+	if os.Getenv("IPSO_SEMGREP") == "" {
+		t.Skip("IPSO_SEMGREP is not set")
 	}
 	if _, err := exec.LookPath("semgrep"); err != nil {
 		t.Fatal(err)
@@ -142,7 +142,7 @@ func compileTemplate(t *testing.T, id string) []byte {
 	t.Helper()
 	artifacts, err := New().Compile(compiler.Input{
 		Record: edr.Record{Criticality: "blocking"},
-		Check:  edr.Check{Engine: "semgrep", Ref: "ergo:" + id, Mode: "block"},
+		Check:  edr.Check{Engine: "semgrep", Ref: "ipso:" + id, Mode: "block"},
 	})
 	if err != nil {
 		t.Fatal(err)

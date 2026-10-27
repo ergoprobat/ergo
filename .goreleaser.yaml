@@ -1,11 +1,11 @@
 version: 2
 
-project_name: ergo
+project_name: ipso
 
 builds:
-  - id: ergo
-    main: ./cmd/ergo
-    binary: ergo
+  - id: ipso
+    main: ./cmd/ipso
+    binary: ipso
     env:
       - CGO_ENABLED=0
     flags:
@@ -22,12 +22,12 @@ builds:
         goarch: arm64
     ldflags:
       - -s -w
-      - -X github.com/ergoprobat/ergo/internal/cli.Version={{ .Version }}
-      - -X github.com/ergoprobat/ergo/internal/cli.Commit={{ .Commit }}
-      - -X github.com/ergoprobat/ergo/internal/cli.Date={{ .Date }}
+      - -X github.com/ipsofacto-io/ipso/internal/cli.Version={{ .Version }}
+      - -X github.com/ipsofacto-io/ipso/internal/cli.Commit={{ .Commit }}
+      - -X github.com/ipsofacto-io/ipso/internal/cli.Date={{ .Date }}
 
 archives:
-  - id: ergo
+  - id: ipso
     formats: [tar.gz]
     format_overrides:
       - goos: windows
@@ -43,18 +43,18 @@ changelog:
 release:
   mode: append
   github:
-    owner: ergoprobat
-    name: ergo
+    owner: ipsofacto-io
+    name: ipso
 
 brews:
-  - name: ergo
+  - name: ipso
     repository:
-      owner: ergoprobat
+      owner: ipsofacto-io
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     skip_upload: "{{ .Env.SKIP_HOMEBREW }}"
     directory: Formula
-    homepage: https://ergoplatform.io
+    homepage: https://ipsoplatform.io
     description: CLI that validates engineering decision records
     license: Apache-2.0
     commit_author:
@@ -63,10 +63,10 @@ brews:
 
 dockers_v2:
   - ids:
-      - ergo
+      - ipso
     dockerfile: Dockerfile
     images:
-      - ghcr.io/ergoprobat/ergo
+      - ghcr.io/ipsofacto-io/ipso
     tags:
       - "{{ .Version }}"
       - latest
@@ -76,4 +76,4 @@ dockers_v2:
     sbom: "false"
     labels:
       org.opencontainers.image.licenses: Apache-2.0
-      org.opencontainers.image.source: https://github.com/ergoprobat/ergo
+      org.opencontainers.image.source: https://github.com/ipsofacto-io/ipso

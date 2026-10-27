@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 // semverPattern is MAJOR.MINOR.PATCH with no leading zeros and no prerelease.

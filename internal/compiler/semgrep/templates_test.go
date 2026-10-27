@@ -10,7 +10,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/ergoprobat/ergo/internal/compiler/compilertest"
+	"github.com/ipsofacto-io/ipso/internal/compiler/compilertest"
 )
 
 // Fixtures end in .fixture so CodeQL and the org Semgrep scan do not treat the deliberate violations as source.
@@ -124,7 +124,7 @@ func checkDoc(t *testing.T, rows []docRow) {
 func renderDoc(rows []docRow) string {
 	var b strings.Builder
 	b.WriteString("# Semgrep templates\n\n")
-	b.WriteString("A check with `engine: semgrep` and `ref: ergo:<id>` compiles one of these templates. Severity follows the check mode. Each template is one Semgrep rule.\n\n")
+	b.WriteString("A check with `engine: semgrep` and `ref: ipso:<id>` compiles one of these templates. Severity follows the check mode. Each template is one Semgrep rule.\n\n")
 	b.WriteString("| id | title | languages |\n")
 	b.WriteString("| --- | --- | --- |\n")
 	for _, row := range rows {

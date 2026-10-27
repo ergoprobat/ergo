@@ -5,9 +5,9 @@
 #   provider: azure
 #   resources:
 #     - azurerm_mssql_server
-package ergo.templates.azure.sql_no_public_network
+package ipso.templates.azure.sql_no_public_network
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(rc, msg) if {
 	some rc in tf.resources("azurerm_mssql_server")

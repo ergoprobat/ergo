@@ -5,9 +5,9 @@ The JSON files in `captured/` are real `checkov` 3.2.495 output. The Terraform a
 `checkov -o json --quiet` omits `passed_checks`. These captures do not use `--quiet`.
 
 ```bash
-python3 -m venv /tmp/ergo-checkov
-/tmp/ergo-checkov/bin/pip install 'checkov==3.2.495'
-chk=/tmp/ergo-checkov/bin/checkov
+python3 -m venv /tmp/ipso-checkov
+/tmp/ipso-checkov/bin/pip install 'checkov==3.2.495'
+chk=/tmp/ipso-checkov/bin/checkov
 work=$(mktemp -d)
 cp fixtures/pass.tf.fixture "$work/pass.tf"
 cp fixtures/fail.tf.fixture "$work/fail.tf"

@@ -7,11 +7,11 @@ import (
 
 	"github.com/open-policy-agent/opa/v1/version"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 const (
-	// CodeTemplateTarget means an ergo: template check does not target a Terraform plan.
+	// CodeTemplateTarget means an ipso: template check does not target a Terraform plan.
 	CodeTemplateTarget = "template-target"
 	// CodeRegoParse means the Rego module could not be parsed as Rego v1.
 	CodeRegoParse = "rego-parse"
@@ -41,7 +41,7 @@ func (Compiler) Engine() string { return "opa" }
 func (Compiler) Version() string { return version.Version }
 
 // Compile writes policy.rego for one Rego module.
-// A ref that starts with ergo: selects a built-in template and also writes terraform.rego.
+// A ref that starts with ipso: selects a built-in template and also writes terraform.rego.
 // target gatekeeper reads one YAML file of a ConstraintTemplate and a Constraint.
 // Any other ref is one repository Rego file.
 func (Compiler) Compile(in compiler.Input) ([]compiler.Artifact, error) {

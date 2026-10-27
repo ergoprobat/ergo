@@ -1,4 +1,4 @@
-// Package checkov compiles a Checkov check id into a binding ergo evaluates offline.
+// Package checkov compiles a Checkov check id into a binding ipso evaluates offline.
 package checkov
 
 import (
@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 const (
 	// CodeID means ref is not a Checkov check id.
 	CodeID = "checkov-id"
-	// CodeFormat means the Checkov JSON is not a report ergo can read.
+	// CodeFormat means the Checkov JSON is not a report ipso can read.
 	CodeFormat = "checkov-format"
 	// CodeTooLarge means the Checkov JSON is larger than MaxReportBytes.
 	CodeTooLarge = "checkov-too-large"

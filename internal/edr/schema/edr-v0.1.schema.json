@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ergoplatform.io/schema/edr/v0.1.json",
+  "$id": "https://ipsoplatform.io/schema/edr/v0.1.json",
   "title": "EDR v0.1 frontmatter",
   "type": "object",
   "additionalProperties": false,

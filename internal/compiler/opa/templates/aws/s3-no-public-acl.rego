@@ -6,9 +6,9 @@
 #   resources:
 #     - aws_s3_bucket
 #     - aws_s3_bucket_acl
-package ergo.templates.aws.s3_no_public_acl
+package ipso.templates.aws.s3_no_public_acl
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(bucket, msg) if {
 	some bucket in tf.resources("aws_s3_bucket")

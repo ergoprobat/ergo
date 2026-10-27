@@ -6,7 +6,7 @@ import (
 
 	"github.com/open-policy-agent/opa/v1/ast"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 // gatorDenied are host and network builtins. gator does not disable http.send,

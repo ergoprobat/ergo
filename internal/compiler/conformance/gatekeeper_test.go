@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler/opa"
+	"github.com/ipsofacto-io/ipso/internal/compiler/opa"
 )
 
 func TestGatekeeper(t *testing.T) {

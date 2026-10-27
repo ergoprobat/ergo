@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 //go:embed templates/*/*.yaml

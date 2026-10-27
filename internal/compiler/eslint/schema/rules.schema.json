@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ergoplatform.io/schema/eslint-rules.json",
-  "title": "ESLint rules compiled by ergo",
+  "$id": "https://ipsoplatform.io/schema/eslint-rules.json",
+  "title": "ESLint rules compiled by ipso",
   "type": "object",
   "additionalProperties": false,
   "required": ["files", "rules"],

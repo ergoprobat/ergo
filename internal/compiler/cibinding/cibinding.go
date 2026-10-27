@@ -1,4 +1,4 @@
-// Package cibinding compiles a ci-binding check into the job name ergo verifies.
+// Package cibinding compiles a ci-binding check into the job name ipso verifies.
 package cibinding
 
 import (
@@ -9,7 +9,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 const (

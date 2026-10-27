@@ -14,7 +14,7 @@ supersedes: []
 criticality: blocking
 checks:
   - engine: semgrep
-    ref: ergo:python/requests-timeout
+    ref: ipso:python/requests-timeout
     mode: block
 waivers: []
 sources:

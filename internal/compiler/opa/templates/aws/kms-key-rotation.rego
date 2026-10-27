@@ -5,9 +5,9 @@
 #   provider: aws
 #   resources:
 #     - aws_kms_key
-package ergo.templates.aws.kms_key_rotation
+package ipso.templates.aws.kms_key_rotation
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 asymmetric_specs := {
 	"RSA_2048", "RSA_3072", "RSA_4096",

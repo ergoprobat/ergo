@@ -3,11 +3,11 @@ package compiler
 import "strings"
 
 const (
-	// CodeTemplateUnknown means ref names an ergo: template that is not built in.
+	// CodeTemplateUnknown means ref names an ipso: template that is not built in.
 	CodeTemplateUnknown = "template-unknown"
 
 	// TemplatePrefix marks a ref that selects a built-in template.
-	TemplatePrefix = "ergo:"
+	TemplatePrefix = "ipso:"
 )
 
 // ValidTemplateID reports whether id is one provider token, a slash, and one name token.

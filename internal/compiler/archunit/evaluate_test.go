@@ -8,16 +8,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
-// The tests below run the pinned jars. They need ERGO_ARCHUNIT=1, a JDK 17 or newer on PATH,
+// The tests below run the pinned jars. They need IPSO_ARCHUNIT=1, a JDK 17 or newer on PATH,
 // and the jars from testdata/tool/install.sh.
 
 func realJars(t *testing.T) string {
 	t.Helper()
-	if os.Getenv("ERGO_ARCHUNIT") == "" {
-		t.Skip("ERGO_ARCHUNIT is not set")
+	if os.Getenv("IPSO_ARCHUNIT") == "" {
+		t.Skip("IPSO_ARCHUNIT is not set")
 	}
 	dir, err := filepath.Abs(filepath.Join("testdata", "tool", "lib"))
 	if err != nil {
@@ -172,7 +172,7 @@ func addFiles(t *testing.T, dir string, files map[string]string) {
 	}
 }
 
-// ArchUnit's DO_NOT_INCLUDE_TESTS option skips a location that looks like test output. ergo keeps the named
+// ArchUnit's DO_NOT_INCLUDE_TESTS option skips a location that looks like test output. ipso keeps the named
 // path below the copy, so naming such a directory checks nothing, exactly as a native run would.
 // That is an error for a forbidden rule and for a layers rule alike, never a set of violations.
 func TestEvaluateRealSkipsANamedTestOutputDirectory(t *testing.T) {

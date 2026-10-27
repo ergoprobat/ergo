@@ -18,9 +18,9 @@
 #     - azurerm_cosmosdb_account
 #     - azurerm_redis_cache
 #     - azurerm_postgresql_flexible_server
-package ergo.templates.terraform.postgres_only
+package ipso.templates.terraform.postgres_only
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 other_engines := {
 	"aws_dynamodb_table": "DynamoDB",

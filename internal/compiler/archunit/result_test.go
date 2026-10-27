@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
-const billingClass = "ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest"
+const billingClass = "ipso.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest"
 
 var billingTest = Canonical{
 	Class:    billingClass,
@@ -98,7 +98,7 @@ func TestParseReportReasonCodes(t *testing.T) {
 		"a missing rule":              {junitSuite(passed), 0, CodeOutput},
 		"a rule listed twice":         {junitSuite(passed, passed, junitCase(domainMethod, passCase)), 0, CodeOutput},
 		"an extra test":               {junitSuite(passed, junitCase(domainMethod, passCase), junitCase("rule_other", passCase)), 0, CodeOutput},
-		"another class":               {[]byte(strings.ReplaceAll(string(junitFixture(t, "pass")), billingClass, "ergo.dother.c0.ArchitectureTest")), 0, CodeOutput},
+		"another class":               {[]byte(strings.ReplaceAll(string(junitFixture(t, "pass")), billingClass, "ipso.dother.c0.ArchitectureTest")), 0, CodeOutput},
 		"no report":                   {nil, 0, CodeOutput},
 		"not xml":                     {[]byte("not xml"), 0, CodeOutput},
 		"another root":                {[]byte(`<testsuites/>`), 0, CodeOutput},

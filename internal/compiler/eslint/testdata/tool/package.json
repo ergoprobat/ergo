@@ -1,5 +1,5 @@
 {
-  "name": "ergo-eslint-tool",
+  "name": "ipso-eslint-tool",
   "private": true,
   "description": "Pinned ESLint used by the compiler conformance test. Not a published package.",
   "dependencies": {

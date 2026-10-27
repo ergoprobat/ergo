@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuite name="JUnit Jupiter" tests="2" skipped="0" failures="2" errors="0" time="0.001" hostname="localhost" timestamp="2026-10-27T00:00:00">
-<testcase name="rule_layers()" classname="ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest" time="0.001">
+<testcase name="rule_layers()" classname="ipso.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest" time="0.001">
 <failure message="Architecture Violation [Priority: MEDIUM] - Rule 'layers' was violated (3 times):&#10;Layer 'domain' is empty&#10;Layer 'persistence' is empty&#10;Layer 'web' is empty" type="java.lang.AssertionError"><![CDATA[java.lang.AssertionError: Architecture Violation [Priority: MEDIUM] - Rule 'layers' was violated (3 times):
 Layer 'domain' is empty
 Layer 'persistence' is empty
@@ -8,23 +8,23 @@ Layer 'web' is empty
 	at com.tngtech.archunit.lang.ArchRule$Assertions.assertNoViolation(ArchRule.java:94)
 	at com.tngtech.archunit.lang.ArchRule$Assertions.check(ArchRule.java:86)
 	at com.tngtech.archunit.library.Architectures$LayeredArchitecture.check(Architectures.java:347)
-	at ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest.rule_layers(ArchitectureTest.java:43)
+	at ipso.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest.rule_layers(ArchitectureTest.java:43)
 ]]></failure>
 <system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest]/[method:rule_layers()]
+unique-id: [engine:junit-jupiter]/[class:ipso.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest]/[method:rule_layers()]
 display-name: JUnit Jupiter > ArchitectureTest > rule_layers()
 ]]></system-out>
 </testcase>
-<testcase name="rule_domain_not_to_adapters()" classname="ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest" time="0.001">
+<testcase name="rule_domain_not_to_adapters()" classname="ipso.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest" time="0.001">
 <failure message="Rule 'domain-not-to-adapters' failed to check any classes. This means either that no classes have been passed to the rule at all, or that no classes passed to the rule matched the `that()` clause. To allow rules being evaluated without checking any classes you can either use `ArchRule.allowEmptyShould(true)` on a single rule or set the configuration property `archRule.failOnEmptyShould = false` to change the behavior globally." type="java.lang.AssertionError"><![CDATA[java.lang.AssertionError: Rule 'domain-not-to-adapters' failed to check any classes. This means either that no classes have been passed to the rule at all, or that no classes passed to the rule matched the `that()` clause. To allow rules being evaluated without checking any classes you can either use `ArchRule.allowEmptyShould(true)` on a single rule or set the configuration property `archRule.failOnEmptyShould = false` to change the behavior globally.
 	at com.tngtech.archunit.lang.ArchRule$Factory$SimpleArchRule.verifyNoEmptyShouldIfEnabled(ArchRule.java:201)
 	at com.tngtech.archunit.lang.ArchRule$Factory$SimpleArchRule.evaluate(ArchRule.java:181)
 	at com.tngtech.archunit.lang.ArchRule$Assertions.check(ArchRule.java:84)
 	at com.tngtech.archunit.lang.ArchRule$Factory$SimpleArchRule.check(ArchRule.java:165)
-	at ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest.rule_domain_not_to_adapters(ArchitectureTest.java:29)
+	at ipso.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest.rule_domain_not_to_adapters(ArchitectureTest.java:29)
 ]]></failure>
 <system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest]/[method:rule_domain_not_to_adapters()]
+unique-id: [engine:junit-jupiter]/[class:ipso.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest]/[method:rule_domain_not_to_adapters()]
 display-name: JUnit Jupiter > ArchitectureTest > rule_domain_not_to_adapters()
 ]]></system-out>
 </testcase>

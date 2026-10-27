@@ -5,9 +5,9 @@
 #   provider: azure
 #   resources:
 #     - azurerm_key_vault
-package ergo.templates.azure.keyvault_purge_protection
+package ipso.templates.azure.keyvault_purge_protection
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(rc, msg) if {
 	some rc in tf.resources("azurerm_key_vault")

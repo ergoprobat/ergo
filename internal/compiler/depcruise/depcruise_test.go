@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/compilertest"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/compilertest"
 )
 
 func TestCompile(t *testing.T) {

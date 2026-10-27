@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 const (
@@ -29,7 +29,7 @@ const (
 	CodeEmpty = "archunit-empty"
 	// CodeRun means javac or the JVM did not finish, or a rule raised an exception.
 	CodeRun = "archunit-run"
-	// CodeOutput means the run produced output ergo cannot trust: no report, a report that does not
+	// CodeOutput means the run produced output ipso cannot trust: no report, a report that does not
 	// match the test, or output over the cap.
 	CodeOutput = "archunit-output"
 )
@@ -68,7 +68,7 @@ type detail struct {
 // The check runs the canonical test regenerated from the verified artifact, never a repository file.
 func (e *Env) Evaluate(ctx context.Context, entry compiler.Entry, artifacts map[string][]byte, now time.Time) compiler.Outcome {
 	if entry.CompilerVersion != version {
-		return compiler.Outcome{Err: &compiler.Error{Code: CodeVersion, Err: fmt.Errorf("check compiled for archunit %s, ergo runs %s", entry.CompilerVersion, version)}}
+		return compiler.Outcome{Err: &compiler.Error{Code: CodeVersion, Err: fmt.Errorf("check compiled for archunit %s, ipso runs %s", entry.CompilerVersion, version)}}
 	}
 	source, ok := artifacts[artifactName]
 	if !ok {
@@ -154,7 +154,7 @@ func ruleFindings(rule string, layers int, item testCase) ([]Finding, error) {
 	case len(item.Failures) == 0:
 		return nil, nil
 	case len(item.Failures) > 1 || item.Failures[0].Type != assertionError:
-		return nil, outputError("rule " + rule + " failed in a way ergo does not read")
+		return nil, outputError("rule " + rule + " failed in a way ipso does not read")
 	}
 	message := strings.ReplaceAll(item.Failures[0].Message, "\r\n", "\n")
 	if strings.HasPrefix(message, "Rule '"+rule+"' failed to check any classes. ") {
@@ -163,7 +163,7 @@ func ruleFindings(rule string, layers int, item testCase) ([]Finding, error) {
 	head, rest, hasLines := strings.Cut(message, "\n")
 	match := violated.FindStringSubmatch(head)
 	if match == nil || match[1] != rule || !hasLines {
-		return nil, outputError("rule " + rule + " failed in a way ergo does not read")
+		return nil, outputError("rule " + rule + " failed in a way ipso does not read")
 	}
 	count, err := strconv.Atoi(match[2])
 	lines := strings.Split(rest, "\n")

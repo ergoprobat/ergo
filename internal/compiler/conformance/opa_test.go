@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/opa"
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/opa"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 func TestOPA(t *testing.T) {
@@ -54,7 +54,7 @@ func compileOPA(t *testing.T, id string) map[string][]byte {
 			Criticality: "blocking",
 			ValidFrom:   time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		},
-		Check: edr.Check{Engine: "opa", Target: "terraform-plan", Ref: "ergo:" + id, Mode: "block"},
+		Check: edr.Check{Engine: "opa", Target: "terraform-plan", Ref: "ipso:" + id, Mode: "block"},
 	}
 	artifacts, err := engine.Compile(in)
 	if err != nil {

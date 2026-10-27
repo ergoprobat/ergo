@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/toolrun"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/toolrun"
 )
 
 const (
@@ -47,7 +47,7 @@ func (*Env) Version() string { return version }
 // It verifies the pinned jars found in jarsDir, finds java and javac on PATH, and copies the class
 // files below paths. paths are repository-relative, slash-separated, and already normalized.
 func Setup(ctx context.Context, root, jarsDir string, paths []string) (*Env, error) {
-	dir, err := os.MkdirTemp("", "ergo-archunit-")
+	dir, err := os.MkdirTemp("", "ipso-archunit-")
 	if err != nil {
 		return nil, &compiler.Error{Code: CodeRun, Err: err}
 	}
@@ -128,7 +128,7 @@ func runVersion(ctx context.Context, dir string, tool jdkTool) (string, error) {
 
 // jdkMajor reads the major version from the first line of java --version or javac --version,
 // such as "openjdk 21.0.4 2024-07-16 LTS" or "javac 21.0.4". The quoted form
-// `openjdk version "21.0.4"` is what java -version prints, which ergo does not run, so it is unreadable here.
+// `openjdk version "21.0.4"` is what java -version prints, which ipso does not run, so it is unreadable here.
 func jdkMajor(output string) (int, bool) {
 	line, _, _ := strings.Cut(strings.TrimSpace(output), "\n")
 	fields := strings.Fields(line)

@@ -21,8 +21,8 @@ The generated config sets `noInlineConfig`, so an `eslint-disable` comment canno
 
 ## Running ESLint
 
-Run from the repository root, with `typescript-eslint` installed where the config file can import it. The compiled check for decision `<decision-id>` and check index `<index>` is `.ergo/build/<decision-id>/<index>/eslint.config.mjs`. Pass `--suppressions-location` pointing at an empty file so a repository `eslint-suppressions.json` is not applied.
+Run from the repository root, with `typescript-eslint` installed where the config file can import it. The compiled check for decision `<decision-id>` and check index `<index>` is `.ipso/build/<decision-id>/<index>/eslint.config.mjs`. Pass `--suppressions-location` pointing at an empty file so a repository `eslint-suppressions.json` is not applied.
 
 ```text
-eslint --config .ergo/build/<decision-id>/<index>/eslint.config.mjs --suppressions-location <empty.json>
+eslint --config .ipso/build/<decision-id>/<index>/eslint.config.mjs --suppressions-location <empty.json>
 ```

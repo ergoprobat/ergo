@@ -7,13 +7,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 func TestEvaluateFixtures(t *testing.T) {
-	bin := os.Getenv("ERGO_DEPCRUISE")
+	bin := os.Getenv("IPSO_DEPCRUISE")
 	if bin == "" {
-		t.Skip("ERGO_DEPCRUISE is not set")
+		t.Skip("IPSO_DEPCRUISE is not set")
 	}
 	binDir := filepath.Dir(bin)
 	if _, err := os.Stat(filepath.Join(binDir, "depcruise")); err != nil {

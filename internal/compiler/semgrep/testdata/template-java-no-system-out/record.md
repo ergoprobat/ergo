@@ -14,7 +14,7 @@ supersedes: []
 criticality: blocking
 checks:
   - engine: semgrep
-    ref: ergo:java/no-system-out
+    ref: ipso:java/no-system-out
     mode: block
 waivers: []
 sources:

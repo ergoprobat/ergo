@@ -6,9 +6,9 @@
 #   resources:
 #     - aws_db_instance
 #     - aws_rds_cluster
-package ergo.templates.aws.rds_storage_encrypted
+package ipso.templates.aws.rds_storage_encrypted
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(rc, msg) if {
 	some rc in tf.resources("aws_db_instance")

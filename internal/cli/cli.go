@@ -11,17 +11,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/archunit"
-	"github.com/ergoprobat/ergo/internal/compiler/builtin"
-	"github.com/ergoprobat/ergo/internal/compiler/checkov"
-	"github.com/ergoprobat/ergo/internal/compiler/cibinding"
-	"github.com/ergoprobat/ergo/internal/compiler/depcruise"
-	"github.com/ergoprobat/ergo/internal/compiler/opa"
-	"github.com/ergoprobat/ergo/internal/compiler/semgrep"
-	"github.com/ergoprobat/ergo/internal/compiler/toolrun"
-	"github.com/ergoprobat/ergo/internal/config"
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/archunit"
+	"github.com/ipsofacto-io/ipso/internal/compiler/builtin"
+	"github.com/ipsofacto-io/ipso/internal/compiler/checkov"
+	"github.com/ipsofacto-io/ipso/internal/compiler/cibinding"
+	"github.com/ipsofacto-io/ipso/internal/compiler/depcruise"
+	"github.com/ipsofacto-io/ipso/internal/compiler/opa"
+	"github.com/ipsofacto-io/ipso/internal/compiler/semgrep"
+	"github.com/ipsofacto-io/ipso/internal/compiler/toolrun"
+	"github.com/ipsofacto-io/ipso/internal/config"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 // deps is the clock and compiler registry for one invocation.
@@ -49,7 +49,7 @@ func run(args []string, stdout, stderr io.Writer, d deps) int {
 	switch args[0] {
 	case "init":
 		if len(args) != 1 {
-			fprintln(stderr, "usage: ergo init")
+			fprintln(stderr, "usage: ipso init")
 			return 2
 		}
 		return initCmd(root, stdout, stderr)
@@ -57,19 +57,19 @@ func run(args []string, stdout, stderr io.Writer, d deps) int {
 		return checkCmd(root, args[1:], stdout, stderr, d)
 	case "explain":
 		if len(args) != 2 || args[1] == "" {
-			fprintln(stderr, "usage: ergo explain <slug>")
+			fprintln(stderr, "usage: ipso explain <slug>")
 			return 2
 		}
 		return explainCmd(root, args[1], stdout, stderr)
 	case "import":
 		if len(args) > 1 && args[1] == "" {
-			fprintln(stderr, "usage: ergo import [path...]")
+			fprintln(stderr, "usage: ipso import [path...]")
 			return 2
 		}
 		return importCmd(root, args[1:], stdout, stderr)
 	case "compile":
 		if len(args) != 1 {
-			fprintln(stderr, "usage: ergo compile")
+			fprintln(stderr, "usage: ipso compile")
 			return 2
 		}
 		return compileCmd(root, stdout, stderr, d)
@@ -90,23 +90,23 @@ var (
 )
 
 func helpText() string {
-	return fmt.Sprintf("ergo %s (%s, %s)\n\n%s", Version, Commit, Date, usage)
+	return fmt.Sprintf("ipso %s (%s, %s)\n\n%s", Version, Commit, Date, usage)
 }
 
-const usage = `ergo reads and compiles engineering decision records in a repository.
+const usage = `ipso reads and compiles engineering decision records in a repository.
 
 usage:
-  ergo init
-  ergo check
-  ergo check plan <plan.json|-> [--env name] [--report file]
-  ergo check ci <evidence.json|-> --sha <sha> [--env name] [--report file]
-  ergo check checkov <results.json|-> [--env name] [--report file]
-  ergo check depcruise <path>... [--env name] [--report file]
-  ergo check semgrep <path>... [--env name] [--report file]
-  ergo check archunit <classes-dir>... --jars <dir> [--env name] [--report file]
-  ergo explain <slug>
-  ergo import [path...]
-  ergo compile`
+  ipso init
+  ipso check
+  ipso check plan <plan.json|-> [--env name] [--report file]
+  ipso check ci <evidence.json|-> --sha <sha> [--env name] [--report file]
+  ipso check checkov <results.json|-> [--env name] [--report file]
+  ipso check depcruise <path>... [--env name] [--report file]
+  ipso check semgrep <path>... [--env name] [--report file]
+  ipso check archunit <classes-dir>... --jars <dir> [--env name] [--report file]
+  ipso explain <slug>
+  ipso import [path...]
+  ipso compile`
 
 func initCmd(root string, stdout, stderr io.Writer) int {
 	created, err := config.Init(root)
@@ -187,12 +187,12 @@ func checkFiles(root string, stdout, stderr io.Writer) int {
 }
 
 const (
-	planUsage      = "usage: ergo check plan <plan.json|-> [--env name] [--report file]"
-	ciUsage        = "usage: ergo check ci <evidence.json|-> --sha <sha> [--env name] [--report file]"
-	checkovUsage   = "usage: ergo check checkov <results.json|-> [--env name] [--report file]"
-	depcruiseUsage = "usage: ergo check depcruise <path>... [--env name] [--report file]"
-	semgrepUsage   = "usage: ergo check semgrep <path>... [--env name] [--report file]"
-	archunitUsage  = "usage: ergo check archunit <classes-dir>... --jars <dir> [--env name] [--report file]"
+	planUsage      = "usage: ipso check plan <plan.json|-> [--env name] [--report file]"
+	ciUsage        = "usage: ipso check ci <evidence.json|-> --sha <sha> [--env name] [--report file]"
+	checkovUsage   = "usage: ipso check checkov <results.json|-> [--env name] [--report file]"
+	depcruiseUsage = "usage: ipso check depcruise <path>... [--env name] [--report file]"
+	semgrepUsage   = "usage: ipso check semgrep <path>... [--env name] [--report file]"
+	archunitUsage  = "usage: ipso check archunit <classes-dir>... --jars <dir> [--env name] [--report file]"
 	checkUsage     = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage + "\n" + semgrepUsage + "\n" + archunitUsage
 )
 
@@ -230,7 +230,7 @@ func planCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
 	now := d.now()
 	report := compiler.PlanReport{
 		ReportVersion: compiler.ReportVersion,
-		ErgoVersion:   Version,
+		IpsoVersion:   Version,
 		EvaluatedAt:   now.UTC(),
 		Env:           opts.env,
 		PlanSHA256:    plan.SHA256(),
@@ -310,7 +310,7 @@ func ciCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
 	}
 	report := compiler.CIReport{
 		ReportVersion:  compiler.ReportVersion,
-		ErgoVersion:    Version,
+		IpsoVersion:    Version,
 		EvaluatedAt:    now.UTC(),
 		Env:            opts.env,
 		CommitSHA:      opts.sha,
@@ -375,7 +375,7 @@ func checkovCmd(root string, args []string, stdout, stderr io.Writer, d deps) in
 	}
 	report := compiler.CheckovReport{
 		ReportVersion:  compiler.ReportVersion,
-		ErgoVersion:    Version,
+		IpsoVersion:    Version,
 		EvaluatedAt:    now.UTC(),
 		Env:            opts.env,
 		EvidenceSHA256: results.SHA256(),
@@ -454,7 +454,7 @@ func semgrepCmd(root string, args []string, stdout, stderr io.Writer, d deps) in
 	}
 	report := compiler.SemgrepReport{
 		ReportVersion:  compiler.ReportVersion,
-		ErgoVersion:    Version,
+		IpsoVersion:    Version,
 		EvaluatedAt:    now.UTC(),
 		Env:            opts.env,
 		Paths:          opts.paths,
@@ -525,7 +525,7 @@ func archunitCmd(root string, args []string, stdout, stderr io.Writer, d deps) i
 	}
 	report := compiler.ArchUnitReport{
 		ReportVersion: compiler.ReportVersion,
-		ErgoVersion:   Version,
+		IpsoVersion:   Version,
 		EvaluatedAt:   now.UTC(),
 		Env:           opts.env,
 		Paths:         opts.paths,
@@ -607,7 +607,7 @@ func depcruiseCmd(root string, args []string, stdout, stderr io.Writer, d deps) 
 	}
 	report := compiler.DepcruiseReport{
 		ReportVersion:    compiler.ReportVersion,
-		ErgoVersion:      Version,
+		IpsoVersion:      Version,
 		EvaluatedAt:      now.UTC(),
 		Env:              opts.env,
 		Paths:            opts.paths,
@@ -1090,7 +1090,7 @@ func importTargets(root string, args []string) ([]string, error) {
 	var found []string
 	for _, arg := range args {
 		if arg == "" {
-			return nil, fmt.Errorf("usage: ergo import [path...]")
+			return nil, fmt.Errorf("usage: ipso import [path...]")
 		}
 		path := arg
 		if !filepath.IsAbs(path) {

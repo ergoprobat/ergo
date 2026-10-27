@@ -14,7 +14,7 @@ supersedes: []
 criticality: blocking
 checks:
   - engine: semgrep
-    ref: ergo:python/no-pickle
+    ref: ipso:python/no-pickle
     mode: block
 waivers: []
 sources:

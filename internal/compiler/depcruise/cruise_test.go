@@ -13,15 +13,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 // The json reporter exits 0 and records the build result in summary.advisedExitCode.
 // The err reporter exits with that number. This test reads the json report.
 func TestCruise(t *testing.T) {
-	if os.Getenv("ERGO_DEPCRUISE") == "" {
-		t.Skip("ERGO_DEPCRUISE is not set")
+	if os.Getenv("IPSO_DEPCRUISE") == "" {
+		t.Skip("IPSO_DEPCRUISE is not set")
 	}
 	if _, err := os.Stat(cruiseScript); err != nil {
 		t.Fatal(err)

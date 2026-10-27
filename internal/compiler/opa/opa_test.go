@@ -3,7 +3,7 @@ package opa
 import (
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/compiler/compilertest"
+	"github.com/ipsofacto-io/ipso/internal/compiler/compilertest"
 )
 
 func TestCompile(t *testing.T) {

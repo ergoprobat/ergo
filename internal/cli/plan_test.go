@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/builtin"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/builtin"
 )
 
 const planBody = `{"format_version":"1.2","resource_changes":[{"address":"aws_ebs_volume.data","mode":"managed","type":"aws_ebs_volume","change":{"actions":["create"],"after":{"encrypted":false},"after_unknown":{}}}]}`
@@ -19,7 +19,7 @@ func TestCheckPlan(t *testing.T) {
 	now := time.Date(2026, 2, 1, 12, 0, 0, 0, time.UTC)
 	root := t.TempDir()
 	withDir(t, root)
-	record := compileRecord(idA, "ebs-encrypted", "accepted", "blocking", "2026-01-01", "", "  - engine: opa\n    target: terraform-plan\n    ref: ergo:aws/ebs-encrypted\n")
+	record := compileRecord(idA, "ebs-encrypted", "accepted", "blocking", "2026-01-01", "", "  - engine: opa\n    target: terraform-plan\n    ref: ipso:aws/ebs-encrypted\n")
 	writeRepoFile(t, root, "docs/decisions/ebs.md", record)
 	writeRepoFile(t, root, "plan.json", planBody)
 	if _, stderr, code := compileAt(t, now, builtin.Registry()); code != 0 {
@@ -65,7 +65,7 @@ func TestCheckPlanPass(t *testing.T) {
 	now := time.Date(2026, 2, 1, 12, 0, 0, 0, time.UTC)
 	root := t.TempDir()
 	withDir(t, root)
-	record := compileRecord(idA, "ebs-encrypted", "accepted", "blocking", "2026-01-01", "", "  - engine: opa\n    target: terraform-plan\n    ref: ergo:aws/ebs-encrypted\n")
+	record := compileRecord(idA, "ebs-encrypted", "accepted", "blocking", "2026-01-01", "", "  - engine: opa\n    target: terraform-plan\n    ref: ipso:aws/ebs-encrypted\n")
 	writeRepoFile(t, root, "docs/decisions/ebs.md", record)
 	passing := strings.Replace(planBody, `"encrypted":false`, `"encrypted":true`, 1)
 	writeRepoFile(t, root, "plan.json", passing)
@@ -86,7 +86,7 @@ func TestCheckPlanNoBuild(t *testing.T) {
 	withDir(t, root)
 	writeRepoFile(t, root, "plan.json", planBody)
 	_, stderr, code := planAt(t, time.Now(), []string{"plan.json"})
-	if code != 1 || !strings.Contains(stderr, "run ergo compile first") {
+	if code != 1 || !strings.Contains(stderr, "run ipso compile first") {
 		t.Fatalf("code %d stderr %s", code, stderr)
 	}
 }
@@ -95,7 +95,7 @@ func TestCheckPlanNoneSelected(t *testing.T) {
 	now := time.Date(2026, 2, 1, 12, 0, 0, 0, time.UTC)
 	root := t.TempDir()
 	withDir(t, root)
-	record := compileRecord(idA, "ebs-encrypted", "accepted", "blocking", "2026-01-01", "", "  - engine: opa\n    target: terraform-plan\n    ref: ergo:aws/ebs-encrypted\n")
+	record := compileRecord(idA, "ebs-encrypted", "accepted", "blocking", "2026-01-01", "", "  - engine: opa\n    target: terraform-plan\n    ref: ipso:aws/ebs-encrypted\n")
 	record = strings.Replace(record, "  - org: acme", "  - org: acme\n    env: [prod]", 1)
 	writeRepoFile(t, root, "docs/decisions/ebs.md", record)
 	writeRepoFile(t, root, "plan.json", planBody)
@@ -132,7 +132,7 @@ func TestCheckPlanPrivacy(t *testing.T) {
 	now := time.Date(2026, 2, 1, 12, 0, 0, 0, time.UTC)
 	root := t.TempDir()
 	withDir(t, root)
-	record := compileRecord(idA, "ebs-encrypted", "accepted", "blocking", "2026-01-01", "", "  - engine: opa\n    target: terraform-plan\n    ref: ergo:aws/ebs-encrypted\n")
+	record := compileRecord(idA, "ebs-encrypted", "accepted", "blocking", "2026-01-01", "", "  - engine: opa\n    target: terraform-plan\n    ref: ipso:aws/ebs-encrypted\n")
 	writeRepoFile(t, root, "docs/decisions/ebs.md", record)
 	marker := "secret-bucket-name-9f3a"
 	body := strings.Replace(planBody, `"after_unknown":{}`, `"after_unknown":{},"bucket":"`+marker+`"`, 1)

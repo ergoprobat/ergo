@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 func TestWriteBuildReplacesAndRefusesSymlink(t *testing.T) {
@@ -28,7 +28,7 @@ func TestWriteBuildReplacesAndRefusesSymlink(t *testing.T) {
 	if err := WriteBuild(root, ids, compiled); err != nil {
 		t.Fatal(err)
 	}
-	build := filepath.Join(root, ".ergo", "build")
+	build := filepath.Join(root, ".ipso", "build")
 	ignore, err := os.ReadFile(filepath.Join(build, ".gitignore"))
 	if err != nil {
 		t.Fatal(err)
@@ -97,7 +97,7 @@ func TestWriteBuildDuplicateID(t *testing.T) {
 	if CodeOf(err) != CodeDuplicateID {
 		t.Fatalf("code %q err %v", CodeOf(err), err)
 	}
-	if _, statErr := os.Stat(filepath.Join(root, ".ergo", "build")); !os.IsNotExist(statErr) {
+	if _, statErr := os.Stat(filepath.Join(root, ".ipso", "build")); !os.IsNotExist(statErr) {
 		t.Fatal("duplicate id wrote a build")
 	}
 }

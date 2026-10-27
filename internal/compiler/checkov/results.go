@@ -9,7 +9,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 // Hit is one Checkov result for a check id.
@@ -18,7 +18,7 @@ type Hit struct {
 	FilePath string
 }
 
-// Results is a Checkov JSON report reduced to the fields ergo reads.
+// Results is a Checkov JSON report reduced to the fields ipso reads.
 type Results struct {
 	Version    string
 	Passed     map[string][]Hit

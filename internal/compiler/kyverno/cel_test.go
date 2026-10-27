@@ -3,7 +3,7 @@ package kyverno
 import (
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 func TestCELAllowsStringLiteral(t *testing.T) {

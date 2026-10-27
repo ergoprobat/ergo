@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const fileName = ".ergo/config.yaml"
+const fileName = ".ipso/config.yaml"
 
 // DefaultDecisions is the glob init writes and check uses when no config exists.
 var DefaultDecisions = []string{"docs/decisions/**/*.md"}

@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler/eslint"
+	"github.com/ipsofacto-io/ipso/internal/compiler/eslint"
 )
 
 const eslintTool = "../eslint/testdata/tool"

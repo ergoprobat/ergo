@@ -43,7 +43,7 @@ func TestSelected(t *testing.T) {
 func TestLoadBuildDigest(t *testing.T) {
 	root := t.TempDir()
 	id := "01M5C5QEHHNXJ3D7X2ZCMGXQT7"
-	dir := filepath.Join(root, ".ergo", "build", id, "0")
+	dir := filepath.Join(root, ".ipso", "build", id, "0")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestLoadBuildDigest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, ".ergo", "build", "manifest.json"), raw, 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, ".ipso", "build", "manifest.json"), raw, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	build, err := LoadBuild(root)
@@ -101,7 +101,7 @@ func TestLoadBuildRejectsTraversal(t *testing.T) {
 	if err := os.WriteFile(secret, []byte("package outside\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.MkdirAll(filepath.Join(root, ".ergo", "build"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(root, ".ipso", "build"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	raw, err := MarshalManifest([]Entry{{
@@ -112,7 +112,7 @@ func TestLoadBuildRejectsTraversal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, ".ergo", "build", "manifest.json"), raw, 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, ".ipso", "build", "manifest.json"), raw, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	_, err = LoadBuild(root)
@@ -124,10 +124,10 @@ func TestLoadBuildRejectsTraversal(t *testing.T) {
 func TestLoadBuildRejectsSymlink(t *testing.T) {
 	root := t.TempDir()
 	elsewhere := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(root, ".ergo"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(root, ".ipso"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Symlink(elsewhere, filepath.Join(root, ".ergo", "build")); err != nil {
+	if err := os.Symlink(elsewhere, filepath.Join(root, ".ipso", "build")); err != nil {
 		t.Fatal(err)
 	}
 	_, err := LoadBuild(root)
@@ -144,7 +144,7 @@ func TestLoadBuildRejectsArtifactSymlink(t *testing.T) {
 		t.Fatal(err)
 	}
 	id := "01M5C5QEHHNXJ3D7X2ZCMGXQT7"
-	dir := filepath.Join(root, ".ergo", "build", id, "0")
+	dir := filepath.Join(root, ".ipso", "build", id, "0")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -160,7 +160,7 @@ func TestLoadBuildRejectsArtifactSymlink(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, ".ergo", "build", "manifest.json"), raw, 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, ".ipso", "build", "manifest.json"), raw, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	_, err = LoadBuild(root)
@@ -171,7 +171,7 @@ func TestLoadBuildRejectsArtifactSymlink(t *testing.T) {
 
 func TestLoadBuildRejectsBadDate(t *testing.T) {
 	root := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(root, ".ergo", "build"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(root, ".ipso", "build"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	raw, err := MarshalManifest([]Entry{{
@@ -183,7 +183,7 @@ func TestLoadBuildRejectsBadDate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, ".ergo", "build", "manifest.json"), raw, 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, ".ipso", "build", "manifest.json"), raw, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	_, err = LoadBuild(root)

@@ -15,7 +15,7 @@ criticality: blocking
 checks:
   - engine: opa
     target: terraform-plan
-    ref: ergo:aws/ebs-encrypted
+    ref: ipso:aws/ebs-encrypted
 waivers: []
 sources:
   - type: pr

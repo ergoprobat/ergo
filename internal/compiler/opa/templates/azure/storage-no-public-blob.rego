@@ -5,9 +5,9 @@
 #   provider: azure
 #   resources:
 #     - azurerm_storage_account
-package ergo.templates.azure.storage_no_public_blob
+package ipso.templates.azure.storage_no_public_blob
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(rc, msg) if {
 	some rc in tf.resources("azurerm_storage_account")

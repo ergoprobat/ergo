@@ -7,9 +7,9 @@
 #     - aws_security_group
 #     - aws_security_group_rule
 #     - aws_vpc_security_group_ingress_rule
-package ergo.templates.aws.sg_no_ssh_from_internet
+package ipso.templates.aws.sg_no_ssh_from_internet
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(rc, msg) if {
 	some rc in tf.resources("aws_security_group")

@@ -6,7 +6,7 @@ import (
 
 	"github.com/open-policy-agent/opa/v1/ast"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 const (
@@ -26,7 +26,7 @@ var deniedBuiltins = map[string]struct{}{
 // terraformLib is the data document of the shared helper module.
 var terraformLib = ast.Ref{
 	ast.DefaultRootDocument,
-	ast.StringTerm("ergo"),
+	ast.StringTerm("ipso"),
 	ast.StringTerm("lib"),
 	ast.StringTerm("terraform"),
 }

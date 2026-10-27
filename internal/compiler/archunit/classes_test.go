@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 func relativeFiles(t *testing.T, dir string) []string {

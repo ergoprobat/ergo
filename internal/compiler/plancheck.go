@@ -14,11 +14,11 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 const (
-	// CodeBuildMissing means .ergo/build is absent or has no manifest.
+	// CodeBuildMissing means .ipso/build is absent or has no manifest.
 	CodeBuildMissing = "build-missing"
 	// CodeBuildDigest means an artifact does not match the digest in the manifest.
 	CodeBuildDigest = "build-digest"
@@ -29,7 +29,7 @@ const (
 	opaEngine  = "opa"
 )
 
-// Build is one compiled .ergo/build directory.
+// Build is one compiled .ipso/build directory.
 // Files holds the artifact bytes verified against the manifest, keyed by decision id and check index.
 type Build struct {
 	Root     string
@@ -44,8 +44,8 @@ func (b Build) SHA256() string {
 	return hex.EncodeToString(sum[:])
 }
 
-// LoadBuild reads .ergo/build and checks every artifact against its manifest digest.
-// A symlink at .ergo/build is refused, and every manifest path must stay inside the build.
+// LoadBuild reads .ipso/build and checks every artifact against its manifest digest.
+// A symlink at .ipso/build is refused, and every manifest path must stay inside the build.
 func LoadBuild(root string) (Build, error) {
 	dir := filepath.Join(root, filepath.FromSlash(buildDir))
 	if err := refuseSymlink(dir); err != nil {
@@ -53,7 +53,7 @@ func LoadBuild(root string) (Build, error) {
 	}
 	buildRoot, err := os.OpenRoot(dir)
 	if errors.Is(err, fs.ErrNotExist) {
-		return Build{}, &Error{Code: CodeBuildMissing, Err: fmt.Errorf("run ergo compile first")}
+		return Build{}, &Error{Code: CodeBuildMissing, Err: fmt.Errorf("run ipso compile first")}
 	}
 	if err != nil {
 		return Build{}, err
@@ -61,7 +61,7 @@ func LoadBuild(root string) (Build, error) {
 	defer func() { _ = buildRoot.Close() }()
 	raw, err := fs.ReadFile(buildRoot.FS(), "manifest.json")
 	if errors.Is(err, fs.ErrNotExist) {
-		return Build{}, &Error{Code: CodeBuildMissing, Err: fmt.Errorf("run ergo compile first")}
+		return Build{}, &Error{Code: CodeBuildMissing, Err: fmt.Errorf("run ipso compile first")}
 	}
 	if err != nil {
 		return Build{}, err
@@ -263,7 +263,7 @@ type Verdict struct {
 // PlanReport is the local verdict report. It carries counts and hashes, never plan contents.
 type PlanReport struct {
 	ReportVersion int       `json:"report_version"`
-	ErgoVersion   string    `json:"ergo_version"`
+	IpsoVersion   string    `json:"ipso_version"`
 	EvaluatedAt   time.Time `json:"evaluated_at"`
 	Env           string    `json:"env"`
 	PlanSHA256    string    `json:"plan_sha256"`
@@ -271,10 +271,10 @@ type PlanReport struct {
 	Verdicts      []Verdict `json:"verdicts"`
 }
 
-// CIReport is the verdict report for ergo check ci.
+// CIReport is the verdict report for ipso check ci.
 type CIReport struct {
 	ReportVersion  int       `json:"report_version"`
-	ErgoVersion    string    `json:"ergo_version"`
+	IpsoVersion    string    `json:"ipso_version"`
 	EvaluatedAt    time.Time `json:"evaluated_at"`
 	Env            string    `json:"env"`
 	CommitSHA      string    `json:"commit_sha"`
@@ -283,11 +283,11 @@ type CIReport struct {
 	Verdicts       []Verdict `json:"verdicts"`
 }
 
-// DepcruiseReport is the verdict report for ergo check depcruise.
+// DepcruiseReport is the verdict report for ipso check depcruise.
 // It carries the paths that were cruised and the dependency-cruiser version, never module paths or rule names.
 type DepcruiseReport struct {
 	ReportVersion    int       `json:"report_version"`
-	ErgoVersion      string    `json:"ergo_version"`
+	IpsoVersion      string    `json:"ipso_version"`
 	EvaluatedAt      time.Time `json:"evaluated_at"`
 	Env              string    `json:"env"`
 	Paths            []string  `json:"paths"`
@@ -296,11 +296,11 @@ type DepcruiseReport struct {
 	Verdicts         []Verdict `json:"verdicts"`
 }
 
-// SemgrepReport is the verdict report for ergo check semgrep.
+// SemgrepReport is the verdict report for ipso check semgrep.
 // It carries the paths that were scanned and the Semgrep version, never rule ids or file paths.
 type SemgrepReport struct {
 	ReportVersion  int       `json:"report_version"`
-	ErgoVersion    string    `json:"ergo_version"`
+	IpsoVersion    string    `json:"ipso_version"`
 	EvaluatedAt    time.Time `json:"evaluated_at"`
 	Env            string    `json:"env"`
 	Paths          []string  `json:"paths"`
@@ -309,12 +309,12 @@ type SemgrepReport struct {
 	Verdicts       []Verdict `json:"verdicts"`
 }
 
-// ArchUnitReport is the verdict report for ergo check archunit.
+// ArchUnitReport is the verdict report for ipso check archunit.
 // It carries the class directories that were checked and the ArchUnit version, never rule names or class names.
 // ArchUnitVersion is empty when the jars were not run.
 type ArchUnitReport struct {
 	ReportVersion   int       `json:"report_version"`
-	ErgoVersion     string    `json:"ergo_version"`
+	IpsoVersion     string    `json:"ipso_version"`
 	EvaluatedAt     time.Time `json:"evaluated_at"`
 	Env             string    `json:"env"`
 	Paths           []string  `json:"paths"`
@@ -323,10 +323,10 @@ type ArchUnitReport struct {
 	Verdicts        []Verdict `json:"verdicts"`
 }
 
-// CheckovReport is the verdict report for ergo check checkov.
+// CheckovReport is the verdict report for ipso check checkov.
 type CheckovReport struct {
 	ReportVersion  int       `json:"report_version"`
-	ErgoVersion    string    `json:"ergo_version"`
+	IpsoVersion    string    `json:"ipso_version"`
 	EvaluatedAt    time.Time `json:"evaluated_at"`
 	Env            string    `json:"env"`
 	EvidenceSHA256 string    `json:"evidence_sha256"`

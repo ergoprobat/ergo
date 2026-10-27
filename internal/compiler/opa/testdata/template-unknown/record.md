@@ -15,7 +15,7 @@ criticality: blocking
 checks:
   - engine: opa
     target: terraform-plan
-    ref: ergo:aws/no-such
+    ref: ipso:aws/no-such
 waivers: []
 sources:
   - type: pr

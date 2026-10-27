@@ -80,7 +80,7 @@ jobs:
       packages: write
       id-token: write
       attestations: write
-    uses: ipsofacto-io/.github/.github/workflows/release-cli.yml@c982f324efb4fabedc7f44acb7ef452cfa204bfe
+    uses: ipsofacto-io/.github/.github/workflows/release-cli.yml@32c374491dac1c7ea02b8158609244f2519c4296
     with:
       ref: ${{ github.event_name == 'workflow_dispatch' && inputs.sign-tag || github.ref }}
       tag: ${{ github.event_name == 'workflow_dispatch' && inputs.sign-tag || github.ref_name }}

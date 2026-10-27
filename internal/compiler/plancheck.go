@@ -365,6 +365,20 @@ type GatekeeperReport struct {
 	Verdicts      []Verdict `json:"verdicts"`
 }
 
+// ESLintReport is the verdict report for ipso check eslint.
+// It carries the paths that were linted and the ESLint version, never rule ids, file paths, or messages.
+// ESLintVersion is empty when eslint was not run.
+type ESLintReport struct {
+	ReportVersion int       `json:"report_version"`
+	IpsoVersion   string    `json:"ipso_version"`
+	EvaluatedAt   time.Time `json:"evaluated_at"`
+	Env           string    `json:"env"`
+	Paths         []string  `json:"paths"`
+	ESLintVersion string    `json:"eslint_version"`
+	BuildSHA256   string    `json:"build_sha256"`
+	Verdicts      []Verdict `json:"verdicts"`
+}
+
 // CheckovReport is the verdict report for ipso check checkov.
 type CheckovReport struct {
 	ReportVersion  int       `json:"report_version"`
@@ -445,6 +459,15 @@ func MarshalKyvernoReport(report KyvernoReport) ([]byte, error) {
 
 // MarshalGatekeeperReport encodes a Gatekeeper report as deterministic JSON.
 func MarshalGatekeeperReport(report GatekeeperReport) ([]byte, error) {
+	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
+	if report.Paths == nil {
+		report.Paths = []string{}
+	}
+	return encodeReport(report)
+}
+
+// MarshalESLintReport encodes an ESLint report as deterministic JSON.
+func MarshalESLintReport(report ESLintReport) ([]byte, error) {
 	report.EvaluatedAt, report.Verdicts = finishReport(report.EvaluatedAt, report.Verdicts)
 	if report.Paths == nil {
 		report.Paths = []string{}

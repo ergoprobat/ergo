@@ -1,0 +1,21 @@
+[
+  {
+    "filePath": "/repo/other.ts",
+    "messages": [
+      {
+        "ruleId": null,
+        "fatal": true,
+        "severity": 2,
+        "message": "Parsing error: Unable to parse the specified 'tsconfig' file. Ensure it's correct and has valid syntax.\n\nerror TS18003: No inputs were found in config file '/repo/tsconfig.json'. Specified 'include' paths were '[\"services/**/*.ts\"]' and 'exclude' paths were '[]'."
+      }
+    ],
+    "suppressedMessages": [],
+    "errorCount": 1,
+    "fatalErrorCount": 1,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "source": "export const a = 1;\n",
+    "usedDeprecatedRules": []
+  }
+]

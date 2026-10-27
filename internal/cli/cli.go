@@ -17,6 +17,7 @@ import (
 	"github.com/ipsofacto-io/ipso/internal/compiler/checkov"
 	"github.com/ipsofacto-io/ipso/internal/compiler/cibinding"
 	"github.com/ipsofacto-io/ipso/internal/compiler/depcruise"
+	"github.com/ipsofacto-io/ipso/internal/compiler/eslint"
 	"github.com/ipsofacto-io/ipso/internal/compiler/gatekeeper"
 	"github.com/ipsofacto-io/ipso/internal/compiler/importlinter"
 	"github.com/ipsofacto-io/ipso/internal/compiler/kyverno"
@@ -110,6 +111,7 @@ usage:
   ipso check importlinter <source-dir>... [--env name] [--report file]
   ipso check kyverno <path>... [--env name] [--report file]
   ipso check gatekeeper <path>... [--env name] [--report file]
+  ipso check eslint <path>... [--env name] [--report file]
   ipso explain <slug>
   ipso import [path...]
   ipso compile`
@@ -152,6 +154,8 @@ func checkCmd(root string, args []string, stdout, stderr io.Writer, d deps) int 
 		return kyvernoCmd(root, args[1:], stdout, stderr, d)
 	case "gatekeeper":
 		return gatekeeperCmd(root, args[1:], stdout, stderr, d)
+	case "eslint":
+		return eslintCmd(root, args[1:], stdout, stderr, d)
 	default:
 		fprintln(stderr, checkUsage)
 		return 2
@@ -208,7 +212,8 @@ const (
 	importlinterUsage = "usage: ipso check importlinter <source-dir>... [--env name] [--report file]"
 	kyvernoUsage      = "usage: ipso check kyverno <path>... [--env name] [--report file]"
 	gatekeeperUsage   = "usage: ipso check gatekeeper <path>... [--env name] [--report file]"
-	checkUsage        = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage + "\n" + semgrepUsage + "\n" + archunitUsage + "\n" + importlinterUsage + "\n" + kyvernoUsage + "\n" + gatekeeperUsage
+	eslintUsage       = "usage: ipso check eslint <path>... [--env name] [--report file]"
+	checkUsage        = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage + "\n" + semgrepUsage + "\n" + archunitUsage + "\n" + importlinterUsage + "\n" + kyvernoUsage + "\n" + gatekeeperUsage + "\n" + eslintUsage
 )
 
 func planCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
@@ -776,6 +781,79 @@ func gatekeeperCmd(root string, args []string, stdout, stderr io.Writer, d deps)
 	}
 	if opts.report != "" {
 		raw, err := compiler.MarshalGatekeeperReport(report)
+		if err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		if err := writeReport(opts.report, raw); err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+	}
+	if failed {
+		return 1
+	}
+	return 0
+}
+
+func eslintCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
+	opts, err := parsePathArgs(args, eslintUsage, false)
+	if err != nil {
+		fprintln(stderr, err)
+		return 2
+	}
+	if d.now == nil {
+		d.now = time.Now
+	}
+	build, err := compiler.LoadBuild(root)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	now := d.now()
+	selectedCount := 0
+	for _, entry := range build.Entries {
+		if entry.Engine == "eslint" && entry.Applies(opts.env, now) {
+			selectedCount++
+		}
+	}
+	var env *eslint.Env
+	var envErr error
+	if selectedCount > 0 {
+		env, envErr = eslint.Setup(context.Background(), root, opts.paths)
+		if envErr == nil {
+			defer env.Close()
+		}
+	}
+	verdicts, failed, selected, err := evaluateChecks(stdout, build, func(entry compiler.Entry) bool {
+		return entry.Engine == "eslint" && entry.Applies(opts.env, now)
+	}, func(entry compiler.Entry, artifacts map[string][]byte) compiler.Outcome {
+		if envErr != nil {
+			return compiler.Outcome{Err: envErr}
+		}
+		return env.Evaluate(context.Background(), entry, artifacts, now)
+	})
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	if selected == 0 {
+		fprintln(stdout, "no checks selected")
+	}
+	report := compiler.ESLintReport{
+		ReportVersion: compiler.ReportVersion,
+		IpsoVersion:   Version,
+		EvaluatedAt:   now.UTC(),
+		Env:           opts.env,
+		Paths:         opts.paths,
+		BuildSHA256:   build.SHA256(),
+		Verdicts:      verdicts,
+	}
+	if envErr == nil && selectedCount > 0 {
+		report.ESLintVersion = env.Version()
+	}
+	if opts.report != "" {
+		raw, err := compiler.MarshalESLintReport(report)
 		if err != nil {
 			fprintln(stderr, err)
 			return 1

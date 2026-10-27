@@ -10,7 +10,7 @@ import (
 // that matched the rule schema are embedded, so the file cannot carry free text.
 func generate(decisionID string, index int, packages []string, rules []archRule) ([]byte, error) {
 	var b strings.Builder
-	fmt.Fprintf(&b, "package ergo.d%s.c%d;\n\n", strings.ToLower(decisionID), index)
+	fmt.Fprintf(&b, "package %s;\n\n", packageName(decisionID, index))
 	forbidden, layers := false, false
 	for _, rule := range rules {
 		switch rule.kind {
@@ -49,6 +49,11 @@ func generate(decisionID string, index int, packages []string, rules []archRule)
 	}
 	b.WriteString("}\n")
 	return []byte(b.String()), nil
+}
+
+// packageName is the Java package of one check's test. Evaluation selects the class by this name.
+func packageName(decisionID string, index int) string {
+	return fmt.Sprintf("ergo.d%s.c%d", strings.ToLower(decisionID), index)
 }
 
 func writeRule(b *strings.Builder, rule archRule) error {

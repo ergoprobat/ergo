@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="JUnit Jupiter" tests="2" skipped="0" failures="0" errors="2" time="0.001" hostname="localhost" timestamp="2026-10-27T00:00:00">
+<testcase name="rule_layers()" classname="ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest" time="0.001">
+<error message="org/slf4j/LoggerFactory" type="java.lang.NoClassDefFoundError"><![CDATA[java.lang.NoClassDefFoundError: org/slf4j/LoggerFactory
+	at com.tngtech.archunit.core.importer.ClassFileImporter.<clinit>(ClassFileImporter.java:83)
+	at ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest.importClasses(ArchitectureTest.java:17)
+Caused by: java.lang.ClassNotFoundException: org.slf4j.LoggerFactory
+	at java.base/java.net.URLClassLoader.findClass(URLClassLoader.java:445)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:593)
+	at java.base/java.net.FactoryURLClassLoader.loadClass(URLClassLoader.java:872)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:526)
+	... 2 more
+]]></error>
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest]/[method:rule_layers()]
+display-name: JUnit Jupiter > ArchitectureTest > rule_layers()
+]]></system-out>
+</testcase>
+<testcase name="rule_domain_not_to_adapters()" classname="ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest" time="0.001">
+<error message="org/slf4j/LoggerFactory" type="java.lang.NoClassDefFoundError"><![CDATA[java.lang.NoClassDefFoundError: org/slf4j/LoggerFactory
+	at com.tngtech.archunit.core.importer.ClassFileImporter.<clinit>(ClassFileImporter.java:83)
+	at ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest.importClasses(ArchitectureTest.java:17)
+Caused by: java.lang.ClassNotFoundException: org.slf4j.LoggerFactory
+	at java.base/java.net.URLClassLoader.findClass(URLClassLoader.java:445)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:593)
+	at java.base/java.net.FactoryURLClassLoader.loadClass(URLClassLoader.java:872)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:526)
+	... 2 more
+]]></error>
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]/[class:ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest]/[method:rule_domain_not_to_adapters()]
+display-name: JUnit Jupiter > ArchitectureTest > rule_domain_not_to_adapters()
+]]></system-out>
+</testcase>
+<system-out><![CDATA[
+unique-id: [engine:junit-jupiter]
+display-name: JUnit Jupiter
+]]></system-out>
+</testsuite>

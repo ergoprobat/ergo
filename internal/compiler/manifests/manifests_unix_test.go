@@ -1,6 +1,6 @@
 //go:build unix
 
-package kyverno
+package manifests
 
 import (
 	"context"
@@ -35,7 +35,7 @@ func TestStageRefusesSymlinks(t *testing.T) {
 				t.Skipf("no symlinks: %v", err)
 			}
 			_, _, err := stage(t, context.Background(), root, "k8s")
-			requireCode(t, err, CodePath)
+			requirePath(t, err)
 		})
 	}
 }
@@ -80,9 +80,9 @@ func TestStageRefusesAFileThatIsNotRegular(t *testing.T) {
 		t.Skipf("no fifo: %v", err)
 	}
 	_, _, err := stage(t, context.Background(), root, "k8s")
-	requireCode(t, err, CodePath)
+	requirePath(t, err)
 	_, _, err = stage(t, context.Background(), root, "k8s/pipe.yaml")
-	requireCode(t, err, CodePath)
+	requirePath(t, err)
 
 	// A file that is not a manifest is never opened, so it cannot block the copy.
 	other := t.TempDir()

@@ -204,6 +204,27 @@ jobs:
         env:
           IPSO_KYVERNO: "1"
 
+  gatekeeper:
+    name: ci / gatekeeper
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Install gator
+        run: |
+          set -euo pipefail
+          bash internal/compiler/opa/testdata/tool/install.sh
+          echo "${GITHUB_WORKSPACE}/internal/compiler/opa/testdata/tool/bin" >> "$GITHUB_PATH"
+      - name: Evaluate the fixture subjects
+        run: go test ./internal/compiler/gatekeeper ./internal/cli -count=1
+        env:
+          IPSO_GATEKEEPER: "1"
+
   conformance:
     name: ci / conformance
     runs-on: ubuntu-latest

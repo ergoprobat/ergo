@@ -17,6 +17,7 @@ import (
 	"github.com/ipsofacto-io/ipso/internal/compiler/checkov"
 	"github.com/ipsofacto-io/ipso/internal/compiler/cibinding"
 	"github.com/ipsofacto-io/ipso/internal/compiler/depcruise"
+	"github.com/ipsofacto-io/ipso/internal/compiler/gatekeeper"
 	"github.com/ipsofacto-io/ipso/internal/compiler/importlinter"
 	"github.com/ipsofacto-io/ipso/internal/compiler/kyverno"
 	"github.com/ipsofacto-io/ipso/internal/compiler/opa"
@@ -108,6 +109,7 @@ usage:
   ipso check archunit <classes-dir>... --jars <dir> [--env name] [--report file]
   ipso check importlinter <source-dir>... [--env name] [--report file]
   ipso check kyverno <path>... [--env name] [--report file]
+  ipso check gatekeeper <path>... [--env name] [--report file]
   ipso explain <slug>
   ipso import [path...]
   ipso compile`
@@ -148,6 +150,8 @@ func checkCmd(root string, args []string, stdout, stderr io.Writer, d deps) int 
 		return importlinterCmd(root, args[1:], stdout, stderr, d)
 	case "kyverno":
 		return kyvernoCmd(root, args[1:], stdout, stderr, d)
+	case "gatekeeper":
+		return gatekeeperCmd(root, args[1:], stdout, stderr, d)
 	default:
 		fprintln(stderr, checkUsage)
 		return 2
@@ -203,7 +207,8 @@ const (
 	archunitUsage     = "usage: ipso check archunit <classes-dir>... --jars <dir> [--env name] [--report file]"
 	importlinterUsage = "usage: ipso check importlinter <source-dir>... [--env name] [--report file]"
 	kyvernoUsage      = "usage: ipso check kyverno <path>... [--env name] [--report file]"
-	checkUsage        = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage + "\n" + semgrepUsage + "\n" + archunitUsage + "\n" + importlinterUsage + "\n" + kyvernoUsage
+	gatekeeperUsage   = "usage: ipso check gatekeeper <path>... [--env name] [--report file]"
+	checkUsage        = planUsage + "\n" + ciUsage + "\n" + checkovUsage + "\n" + depcruiseUsage + "\n" + semgrepUsage + "\n" + archunitUsage + "\n" + importlinterUsage + "\n" + kyvernoUsage + "\n" + gatekeeperUsage
 )
 
 func planCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
@@ -693,6 +698,84 @@ func kyvernoCmd(root string, args []string, stdout, stderr io.Writer, d deps) in
 	}
 	if opts.report != "" {
 		raw, err := compiler.MarshalKyvernoReport(report)
+		if err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+		if err := writeReport(opts.report, raw); err != nil {
+			fprintln(stderr, err)
+			return 1
+		}
+	}
+	if failed {
+		return 1
+	}
+	return 0
+}
+
+// isGatekeeperCheck reports whether the entry is a compiled Gatekeeper template and constraint.
+func isGatekeeperCheck(entry compiler.Entry) bool {
+	return entry.Engine == "opa" && entry.Target == "gatekeeper"
+}
+
+func gatekeeperCmd(root string, args []string, stdout, stderr io.Writer, d deps) int {
+	opts, err := parsePathArgs(args, gatekeeperUsage, false)
+	if err != nil {
+		fprintln(stderr, err)
+		return 2
+	}
+	if d.now == nil {
+		d.now = time.Now
+	}
+	build, err := compiler.LoadBuild(root)
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	now := d.now()
+	selectedCount := 0
+	for _, entry := range build.Entries {
+		if isGatekeeperCheck(entry) && entry.Applies(opts.env, now) {
+			selectedCount++
+		}
+	}
+	var env *gatekeeper.Env
+	var envErr error
+	if selectedCount > 0 {
+		env, envErr = gatekeeper.Setup(context.Background(), root, opts.paths)
+		if envErr == nil {
+			defer env.Close()
+		}
+	}
+	verdicts, failed, selected, err := evaluateChecks(stdout, build, func(entry compiler.Entry) bool {
+		return isGatekeeperCheck(entry) && entry.Applies(opts.env, now)
+	}, func(entry compiler.Entry, artifacts map[string][]byte) compiler.Outcome {
+		if envErr != nil {
+			return compiler.Outcome{Err: envErr}
+		}
+		return env.Evaluate(context.Background(), entry, artifacts, now)
+	})
+	if err != nil {
+		fprintln(stderr, err)
+		return 1
+	}
+	if selected == 0 {
+		fprintln(stdout, "no checks selected")
+	}
+	report := compiler.GatekeeperReport{
+		ReportVersion: compiler.ReportVersion,
+		IpsoVersion:   Version,
+		EvaluatedAt:   now.UTC(),
+		Env:           opts.env,
+		Paths:         opts.paths,
+		BuildSHA256:   build.SHA256(),
+		Verdicts:      verdicts,
+	}
+	if envErr == nil && selectedCount > 0 {
+		report.GatorVersion = env.Version()
+	}
+	if opts.report != "" {
+		raw, err := compiler.MarshalGatekeeperReport(report)
 		if err != nil {
 			fprintln(stderr, err)
 			return 1

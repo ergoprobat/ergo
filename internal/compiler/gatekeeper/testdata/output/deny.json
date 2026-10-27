@@ -1,0 +1,43 @@
+[
+    {
+        "target": "admission.k8s.gatekeeper.sh",
+        "msg": "missing owner label",
+        "metadata": {
+            "details": {}
+        },
+        "constraint": {
+            "apiVersion": "constraints.gatekeeper.sh/v1beta1",
+            "kind": "RequireOwner",
+            "metadata": {
+                "name": "owner"
+            },
+            "spec": {
+                "enforcementAction": "deny",
+                "match": {
+                    "kinds": [
+                        {
+                            "apiGroups": [
+                                "apps"
+                            ],
+                            "kinds": [
+                                "Deployment"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "enforcementAction": "deny",
+        "violatingObject": {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "name": "web"
+            },
+            "spec": {
+                "replicas": 1
+            }
+        },
+        "trace": null
+    }
+]

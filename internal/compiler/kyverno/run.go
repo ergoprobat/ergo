@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/manifests"
 	"github.com/ipsofacto-io/ipso/internal/compiler/toolrun"
 )
 
@@ -48,7 +49,7 @@ func (e *Env) Version() string { return e.version }
 // manifests. A named path that is missing, leaves the repository, or holds a symlink, and a tree that
 // holds no manifest, fail the run before any check starts.
 func Setup(ctx context.Context, root string, paths []string) (*Env, error) {
-	named := distinct(paths)
+	named := manifests.Distinct(paths)
 	if err := toolrun.WithinRoot(root, named); err != nil {
 		return nil, &compiler.Error{Code: CodePath, Err: err}
 	}
@@ -76,19 +77,6 @@ func Setup(ctx context.Context, root string, paths []string) (*Env, error) {
 // Close removes the temporary directory.
 func (e *Env) Close() {
 	_ = os.RemoveAll(e.dir)
-}
-
-func distinct(paths []string) []string {
-	seen := map[string]struct{}{}
-	var out []string
-	for _, path := range paths {
-		if _, ok := seen[path]; ok {
-			continue
-		}
-		seen[path] = struct{}{}
-		out = append(out, path)
-	}
-	return out
 }
 
 // probe runs `kyverno version` once. The command name is a literal, so Go resolves it with LookPath and

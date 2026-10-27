@@ -74,30 +74,60 @@ func compileGatekeeper(in compiler.Input) ([]compiler.Artifact, error) {
 	if err != nil {
 		return nil, err
 	}
-	regoSrc, libs, kind, err := checkTemplate(docs[0])
-	if err != nil {
-		return nil, err
-	}
-	if err := checkConstraint(docs[1], kind); err != nil {
-		return nil, err
-	}
-	if err := vetGatekeeper(regoSrc, libs); err != nil {
-		return nil, err
-	}
-	if err := setEnforcement(gkChild(docs[1], "spec"), mode); err != nil {
-		return nil, err
-	}
-	template, err := strictyaml.Canonical(docs[0])
-	if err != nil {
-		return nil, err
-	}
-	constraint, err := strictyaml.Canonical(docs[1])
+	built, err := buildGatekeeper(docs[0], docs[1], mode)
 	if err != nil {
 		return nil, err
 	}
 	return []compiler.Artifact{
-		{Name: templateArtifact, Data: template},
-		{Name: constraintArtifact, Data: constraint},
+		{Name: templateArtifact, Data: built.template},
+		{Name: constraintArtifact, Data: built.constraint},
+	}, nil
+}
+
+// gatekeeperBuild is what compile writes for one template and constraint, and the names the
+// evaluation reader needs to recognize the constraint in gator's output.
+type gatekeeperBuild struct {
+	template   []byte
+	constraint []byte
+	kind       string
+	name       string
+	action     string
+}
+
+// buildGatekeeper checks the two documents, rewrites enforcementAction from mode, and encodes both
+// canonically. The nodes are changed in place.
+func buildGatekeeper(templateRoot, constraintRoot *yaml.Node, mode string) (gatekeeperBuild, error) {
+	regoSrc, libs, kind, err := checkTemplate(templateRoot)
+	if err != nil {
+		return gatekeeperBuild{}, err
+	}
+	if err := checkConstraint(constraintRoot, kind); err != nil {
+		return gatekeeperBuild{}, err
+	}
+	if err := vetGatekeeper(regoSrc, libs); err != nil {
+		return gatekeeperBuild{}, err
+	}
+	if err := setEnforcement(gkChild(constraintRoot, "spec"), mode); err != nil {
+		return gatekeeperBuild{}, err
+	}
+	template, err := strictyaml.Canonical(templateRoot)
+	if err != nil {
+		return gatekeeperBuild{}, err
+	}
+	constraint, err := strictyaml.Canonical(constraintRoot)
+	if err != nil {
+		return gatekeeperBuild{}, err
+	}
+	action, err := enforcementFor(mode)
+	if err != nil {
+		return gatekeeperBuild{}, err
+	}
+	return gatekeeperBuild{
+		template:   template,
+		constraint: constraint,
+		kind:       kind,
+		name:       gkChild(gkChild(constraintRoot, "metadata"), "name").Value,
+		action:     action,
 	}, nil
 }
 

@@ -1,0 +1,118 @@
+[
+    {
+        "target": "admission.k8s.gatekeeper.sh",
+        "msg": "missing owner label",
+        "metadata": {
+            "details": {}
+        },
+        "constraint": {
+            "apiVersion": "constraints.gatekeeper.sh/v1beta1",
+            "kind": "RequireOwner",
+            "metadata": {
+                "name": "owner"
+            },
+            "spec": {
+                "enforcementAction": "deny",
+                "match": {}
+            }
+        },
+        "enforcementAction": "deny",
+        "violatingObject": {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "name": "web"
+            },
+            "spec": {
+                "replicas": 1
+            }
+        },
+        "trace": null
+    },
+    {
+        "target": "admission.k8s.gatekeeper.sh",
+        "msg": "missing owner label",
+        "metadata": {
+            "details": {}
+        },
+        "constraint": {
+            "apiVersion": "constraints.gatekeeper.sh/v1beta1",
+            "kind": "RequireOwner",
+            "metadata": {
+                "name": "owner"
+            },
+            "spec": {
+                "enforcementAction": "deny",
+                "match": {}
+            }
+        },
+        "enforcementAction": "deny",
+        "violatingObject": {
+            "apiVersion": "templates.gatekeeper.sh/v1",
+            "kind": "ConstraintTemplate",
+            "metadata": {
+                "name": "requireowner"
+            },
+            "spec": {
+                "crd": {
+                    "spec": {
+                        "names": {
+                            "kind": "RequireOwner"
+                        },
+                        "validation": {
+                            "openAPIV3Schema": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "targets": [
+                    {
+                        "code": [
+                            {
+                                "engine": "Rego",
+                                "source": {
+                                    "rego": "package requireowner\n\nviolation contains {\"msg\": msg} if {\n\tnot input.review.object.metadata.labels.owner\n\tmsg := \"missing owner label\"\n}\n",
+                                    "version": "v1"
+                                }
+                            }
+                        ],
+                        "target": "admission.k8s.gatekeeper.sh"
+                    }
+                ]
+            }
+        },
+        "trace": null
+    },
+    {
+        "target": "admission.k8s.gatekeeper.sh",
+        "msg": "missing owner label",
+        "metadata": {
+            "details": {}
+        },
+        "constraint": {
+            "apiVersion": "constraints.gatekeeper.sh/v1beta1",
+            "kind": "RequireOwner",
+            "metadata": {
+                "name": "owner"
+            },
+            "spec": {
+                "enforcementAction": "deny",
+                "match": {}
+            }
+        },
+        "enforcementAction": "deny",
+        "violatingObject": {
+            "apiVersion": "constraints.gatekeeper.sh/v1beta1",
+            "kind": "RequireOwner",
+            "metadata": {
+                "name": "owner"
+            },
+            "spec": {
+                "enforcementAction": "deny",
+                "match": {}
+            }
+        },
+        "trace": null
+    }
+]

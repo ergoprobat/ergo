@@ -1,0 +1,27 @@
+
+---------
+Contracts
+---------
+
+Analyzed 26 files, 13 dependencies.
+-----------------------------------
+
+Siblings BROKEN
+
+Contracts: 0 kept, 1 broken.
+
+
+----------------
+Broken contracts
+----------------
+
+Siblings
+--------
+
+No cycles are allowed in cyc.
+It could be made acyclic by removing 3 dependencies:
+
+- .b -> .a (2 imports)
+- .d -> .c (1 import)
+- .e -> .d (1 import)
+

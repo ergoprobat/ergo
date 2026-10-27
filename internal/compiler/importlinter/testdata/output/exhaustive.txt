@@ -1,0 +1,35 @@
+
+---------
+Contracts
+---------
+
+Analyzed 16 files, 10 dependencies.
+-----------------------------------
+
+Layers BROKEN
+
+Contracts: 0 kept, 1 broken.
+
+
+----------------
+Broken contracts
+----------------
+
+Layers
+------
+
+shop.domain is not allowed to import shop.api:
+
+- shop.domain.models -> shop.api.views (l.3)
+
+
+The following modules are not listed as layers:
+
+- shop.billing
+- shop.infra
+- shop.services
+- shop.shipping
+- shop.util
+
+(Since this contract is marked as 'exhaustive', every child of every container must be declared as a layer.)
+

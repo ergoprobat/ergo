@@ -1,0 +1,11 @@
+
+---------
+Contracts
+---------
+
+Analyzed 16 files, 10 dependencies.
+-----------------------------------
+
+Forbidden KEPT (2 ignored imports)
+
+Contracts: 1 kept, 0 broken.

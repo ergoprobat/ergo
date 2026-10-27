@@ -1,0 +1,28 @@
+
+---------
+Contracts
+---------
+
+Analyzed 16 files, 10 dependencies.
+-----------------------------------
+
+Ends\\ BROKEN
+
+Contracts: 0 kept, 1 broken.
+
+
+----------------
+Broken contracts
+----------------
+
+Ends\
+------
+
+shop.domain is not allowed to import shop.infra:
+
+-   shop.domain.models -> shop.infra.db (l.1)
+
+-   shop.domain.models -> shop.services.helper (l.2)
+    shop.services.helper -> shop.infra.db (l.1)
+
+

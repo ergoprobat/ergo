@@ -1,0 +1,2 @@
+
+Invalid container 'elsewhere': a container must either be a subpackage of shop, or shop itself.

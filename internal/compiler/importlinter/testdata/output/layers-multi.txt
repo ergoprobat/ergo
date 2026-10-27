@@ -1,0 +1,90 @@
+
+---------
+Contracts
+---------
+
+Analyzed 26 files, 13 dependencies.
+-----------------------------------
+
+Layers BROKEN
+Independence BROKEN
+Protected BROKEN
+
+Contracts: 0 kept, 3 broken.
+
+
+----------------
+Broken contracts
+----------------
+
+Layers
+------
+
+cyc.b is not allowed to import cyc.a:
+
+- cyc.b.m -> cyc.a.x (l.1)
+
+- cyc.b.inner.y -> cyc.a.inner.y (l.1)
+
+
+cyc.d is not allowed to import cyc.c:
+
+- cyc.d.m -> cyc.c.x (l.1)
+
+
+cyc.a is not allowed to import cyc.b:
+
+- cyc.a.inner.y -> cyc.b.inner.y (l.1)
+
+
+cyc.f is not allowed to import cyc.e:
+
+- cyc.f.m -> cyc.e.x (l.1)
+
+
+cyc.c is not allowed to import cyc.b:
+
+- cyc.c.m -> cyc.b.x (l.1)
+
+
+Independence
+------------
+
+cyc.c is not allowed to import cyc.b:
+
+- cyc.c.m -> cyc.b.x (l.1)
+
+
+cyc.a is not allowed to import cyc.b:
+
+- cyc.a.inner.y -> cyc.b.inner.y (l.1)
+
+
+cyc.b is not allowed to import cyc.a:
+
+- cyc.b.m -> cyc.a.x (l.1)
+
+- cyc.b.inner.y -> cyc.a.inner.y (l.1)
+
+
+cyc.a is not allowed to import cyc.c:
+
+- cyc.a.m -> cyc.c.x (l.2)
+
+
+Protected
+---------
+
+Illegal imports of protected package cyc.a:
+
+- cyc.b.inner.y -> cyc.a.inner.y (l.1)
+
+- cyc.b.m -> cyc.a.x (l.1)
+
+Illegal imports of protected package cyc.b:
+
+- cyc.a.inner.y -> cyc.b.inner.y (l.1)
+
+- cyc.c.m -> cyc.b.x (l.1)
+
+

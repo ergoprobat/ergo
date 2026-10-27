@@ -20,7 +20,7 @@ func TestPinnedVersion(t *testing.T) {
 	if manifest.Dependencies["eslint"] != version {
 		t.Fatalf("package.json eslint %q, compiler %s", manifest.Dependencies["eslint"], version)
 	}
-	if manifest.Dependencies["typescript-eslint"] != "8.72.1" || manifest.Dependencies["typescript"] != "6.0.3" {
+	if manifest.Dependencies["typescript-eslint"] != typescriptESLintVersion || manifest.Dependencies["typescript"] != typescriptVersion {
 		t.Fatalf("package.json typescript pins %#v", manifest.Dependencies)
 	}
 
@@ -38,8 +38,8 @@ func TestPinnedVersion(t *testing.T) {
 	}
 	pins := map[string]string{
 		"node_modules/eslint":            version,
-		"node_modules/typescript-eslint": "8.72.1",
-		"node_modules/typescript":        "6.0.3",
+		"node_modules/typescript-eslint": typescriptESLintVersion,
+		"node_modules/typescript":        typescriptVersion,
 	}
 	for name, want := range pins {
 		if lock.Packages[name].Version != want {

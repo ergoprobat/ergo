@@ -1,0 +1,48 @@
+[
+  {
+    "filePath": "/repo/web/eq.js",
+    "messages": [],
+    "suppressedMessages": [
+      {
+        "ruleId": "eqeqeq",
+        "severity": 2,
+        "message": "Expected '===' and instead saw '=='.",
+        "line": 2,
+        "column": 15,
+        "messageId": "unexpected",
+        "endLine": 2,
+        "endColumn": 17,
+        "suggestions": [
+          {
+            "messageId": "replaceOperator",
+            "data": {
+              "expectedOperator": "===",
+              "actualOperator": "=="
+            },
+            "fix": {
+              "range": [
+                50,
+                52
+              ],
+              "text": "==="
+            },
+            "desc": "Use '===' instead of '=='."
+          }
+        ],
+        "suppressions": [
+          {
+            "kind": "file",
+            "justification": ""
+          }
+        ]
+      }
+    ],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "source": "export function same(left, right) {\n  return left == right;\n}\n",
+    "usedDeprecatedRules": []
+  }
+]

@@ -18,13 +18,18 @@ const (
 	CodeTarget = "eslint-target"
 	// CodeRule means a rule id is unknown, deprecated, or turned off.
 	CodeRule = "eslint-rule"
-	// CodePath means a files or ignores pattern leaves the repository.
+	// CodePath means a files or ignores pattern leaves the repository at compile time. At evaluation
+	// it means a named path is missing, or leaves the repository through a symlink.
 	CodePath = "eslint-path"
 
-	artifactName     = "eslint.config.mjs"
-	version          = "10.13.0"
-	targetJavaScript = "javascript"
-	targetTypeScript = "typescript"
+	artifactName = "eslint.config.mjs"
+	version      = "10.13.0"
+	// typescriptESLintVersion and typescriptVersion are the releases a typescript check runs against.
+	// testdata/tool/package.json pins both, and version_test.go keeps these equal to it.
+	typescriptESLintVersion = "8.72.1"
+	typescriptVersion       = "6.0.3"
+	targetJavaScript        = "javascript"
+	targetTypeScript        = "typescript"
 )
 
 // Compiler is the built-in ESLint engine.

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/builtin"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/builtin"
 )
 
 const archunitCheck = "  - engine: archunit\n    ref: archunit.json\n    mode: block\n"
@@ -74,13 +74,13 @@ func TestCheckArchunitUsage(t *testing.T) {
 		{"target/classes", "--jars", "lib", "--bogus"},
 	} {
 		stdout, stderr, code := archunitAt(t, now, args)
-		if code != 2 || stdout != "" || !strings.Contains(stderr, "usage: ergo check archunit") {
+		if code != 2 || stdout != "" || !strings.Contains(stderr, "usage: ipso check archunit") {
 			t.Fatalf("args %q code %d stdout %q stderr %q", args, code, stdout, stderr)
 		}
 	}
 }
 
-// --jars belongs to ergo check archunit alone.
+// --jars belongs to ipso check archunit alone.
 func TestCheckPathCommandsRefuseJars(t *testing.T) {
 	now := time.Date(2026, 2, 1, 12, 0, 0, 0, time.UTC)
 	for _, engine := range []string{"semgrep", "depcruise"} {
@@ -152,12 +152,12 @@ func TestCheckArchunitJarFailureIsAnErrorEvenWithAWaiver(t *testing.T) {
 	}
 }
 
-// The tests below run the pinned jars. They need ERGO_ARCHUNIT=1, a JDK on PATH, and the jars from install.sh.
+// The tests below run the pinned jars. They need IPSO_ARCHUNIT=1, a JDK on PATH, and the jars from install.sh.
 
 func realArchUnitJars(t *testing.T) string {
 	t.Helper()
-	if os.Getenv("ERGO_ARCHUNIT") == "" {
-		t.Skip("ERGO_ARCHUNIT is not set")
+	if os.Getenv("IPSO_ARCHUNIT") == "" {
+		t.Skip("IPSO_ARCHUNIT is not set")
 	}
 	if _, err := exec.LookPath("javac"); err != nil {
 		t.Fatal("javac is not on PATH")

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 // capturedPlans are terraform show -json and tofu show -json output for testdata/plans/main.tf.

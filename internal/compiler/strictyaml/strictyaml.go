@@ -11,7 +11,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 const (

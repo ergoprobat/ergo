@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/toolrun"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/toolrun"
 )
 
 const (
@@ -17,7 +17,7 @@ const (
 	CodeVersion = "depcruise-version"
 	// CodeRun means the cruise did not finish.
 	CodeRun = "depcruise-run"
-	// CodeOutput means the cruise output is not a report ergo can read, or it is larger than the cap.
+	// CodeOutput means the cruise output is not a report ipso can read, or it is larger than the cap.
 	CodeOutput = "depcruise-output"
 	// CodeEnvironment means dependency-cruiser reported an environment issue, so sources may have been skipped.
 	CodeEnvironment = "depcruise-environment"
@@ -33,7 +33,7 @@ type Violation struct {
 	Severity string
 }
 
-// Result is the part of a cruise report ergo evaluates.
+// Result is the part of a cruise report ipso evaluates.
 type Result struct {
 	Version    string
 	Cruised    int

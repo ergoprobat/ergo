@@ -14,7 +14,7 @@ supersedes: []
 criticality: blocking
 checks:
   - engine: opa
-    ref: ergo:aws/ebs-encrypted
+    ref: ipso:aws/ebs-encrypted
 waivers: []
 sources:
   - type: pr

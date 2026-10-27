@@ -1,4 +1,4 @@
-module github.com/ergoprobat/ergo
+module github.com/ipsofacto-io/ipso
 
 go 1.27.1
 

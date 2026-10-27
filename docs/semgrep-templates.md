@@ -1,6 +1,6 @@
 # Semgrep templates
 
-A check with `engine: semgrep` and `ref: ergo:<id>` compiles one of these templates. Severity follows the check mode. Each template is one Semgrep rule.
+A check with `engine: semgrep` and `ref: ipso:<id>` compiles one of these templates. Severity follows the check mode. Each template is one Semgrep rule.
 
 | id | title | languages |
 | --- | --- | --- |

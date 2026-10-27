@@ -1,5 +1,5 @@
 {
-  "name": "ergo-depcruise-tool",
+  "name": "ipso-depcruise-tool",
   "private": true,
   "description": "Pinned dependency-cruiser used by the compiler cruise test. Not a published package.",
   "dependencies": {

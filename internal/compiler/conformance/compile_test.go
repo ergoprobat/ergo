@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/builtin"
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/builtin"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 // compiledChecks returns the artifacts of every check for engine, in check order.

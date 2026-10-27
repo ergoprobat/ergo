@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 func TestParseCaptured(t *testing.T) {

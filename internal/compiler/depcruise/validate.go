@@ -10,7 +10,7 @@ import (
 
 	"github.com/santhosh-tekuri/jsonschema/v6"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 // rejectedOptions are dependency-cruiser options this compiler refuses.
@@ -20,7 +20,7 @@ import (
 // load code or select another compiler. detectJSDocImports and
 // detectImportsInAmbientModules force parser tsc. preserveSymlinks lets a later
 // cruise follow a symlink that the path checks never opened. knownViolations,
-// baseline, and ignoreKnown grandfather violations outside ergo. focus, reaches,
+// baseline, and ignoreKnown grandfather violations outside ipso. focus, reaches,
 // highlight, collapse, affected, prefix, suffix, progress, and reporterOptions
 // only shape a report. doNotFollow, exclude, and includeOnly are regular
 // expressions, not repository paths, so compile does not resolve them.

@@ -6,9 +6,9 @@
 #   resources:
 #     - aws_instance
 #     - aws_launch_template
-package ergo.templates.aws.ec2_imdsv2_required
+package ipso.templates.aws.ec2_imdsv2_required
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 kinds := {"aws_instance", "aws_launch_template"}
 

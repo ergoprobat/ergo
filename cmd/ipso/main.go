@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/ergoprobat/ergo/internal/cli"
+	"github.com/ipsofacto-io/ipso/internal/cli"
 )
 
 func main() {

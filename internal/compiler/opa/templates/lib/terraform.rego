@@ -1,7 +1,7 @@
 # Shared helpers for built-in Terraform plan templates.
 # Repository policies cannot import this module.
 # Schemas: hashicorp/aws 6.x and hashicorp/azurerm 5.x.
-package ergo.lib.terraform
+package ipso.lib.terraform
 
 # resources keeps managed changes that still have an after state.
 # Delete-only changes have a null after state and are omitted.

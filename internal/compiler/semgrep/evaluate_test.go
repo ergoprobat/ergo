@@ -8,12 +8,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 func TestEvaluateFixtures(t *testing.T) {
-	if os.Getenv("ERGO_SEMGREP") == "" {
-		t.Skip("ERGO_SEMGREP is not set")
+	if os.Getenv("IPSO_SEMGREP") == "" {
+		t.Skip("IPSO_SEMGREP is not set")
 	}
 	ctx := context.Background()
 	tool, err := FindTool(ctx)

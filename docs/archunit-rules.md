@@ -2,7 +2,7 @@
 
 `engine: archunit` reads one JSON file named by `ref` and writes `ArchitectureTest.java`. Compile does not run a JVM. The check mode is stamped on the manifest and does not change the test. `target` is ignored the same way.
 
-The generated class is `ergo.d<decision-id>.c<check-index>.ArchitectureTest`, with the decision id in lowercase. Every check can share `.ergo/build` as one test source root. The class imports the packages named in the file, skipping tests and jars, and runs one JUnit Jupiter test per rule.
+The generated class is `ipso.d<decision-id>.c<check-index>.ArchitectureTest`, with the decision id in lowercase. Every check can share `.ipso/build` as one test source root. The class imports the packages named in the file, skipping tests and jars, and runs one JUnit Jupiter test per rule.
 
 ## File
 
@@ -41,15 +41,15 @@ A package pattern is identifiers joined by `.` or `..`, with an optional `..` at
 
 ## Running the test
 
-Add `.ergo/build` as a test source root and put ArchUnit 1.5.1 and JUnit Jupiter on the test classpath. The generated test does not use the ArchUnit JUnit engine. From the repository root, the compiled check for decision `<decision-id>` and check index `<index>` is `.ergo/build/<decision-id>/<index>/ArchitectureTest.java`.
+Add `.ipso/build` as a test source root and put ArchUnit 1.5.1 and JUnit Jupiter on the test classpath. The generated test does not use the ArchUnit JUnit engine. From the repository root, the compiled check for decision `<decision-id>` and check index `<index>` is `.ipso/build/<decision-id>/<index>/ArchitectureTest.java`.
 
-## Evaluate with ergo
+## Evaluate with ipso
 
-`ergo check archunit <classes-dir>... --jars <dir> [--env name] [--report file]` runs the compiled test for every in-force `archunit` check. Run `ergo compile` first, then build the project so the class directories exist.
+`ipso check archunit <classes-dir>... --jars <dir> [--env name] [--report file]` runs the compiled test for every in-force `archunit` check. Run `ipso compile` first, then build the project so the class directories exist.
 
-`<classes-dir>` is a compiled class directory relative to the repository root, such as `target/classes` or `build/classes/java/main`. ergo copies only the `.class` files below it. Resource files next to the classes, such as `archunit.properties` or `archunit_ignore_patterns.txt`, are not read. The directory layout is kept, so the `DO_NOT_INCLUDE_TESTS` option that the test sets matches the same locations as in a native run. ergo filters nothing itself, and a named `target/test-classes` or `build/classes/java/test` imports as nothing and fails as `archunit-empty`. A symlink anywhere below a named directory fails the check. Naming `.` copies every `.class` file in the repository and keeps its path from the root, so ArchUnit does not find the packages and the check fails as `archunit-empty`. Name the class output directory.
+`<classes-dir>` is a compiled class directory relative to the repository root, such as `target/classes` or `build/classes/java/main`. ipso copies only the `.class` files below it. Resource files next to the classes, such as `archunit.properties` or `archunit_ignore_patterns.txt`, are not read. The directory layout is kept, so the `DO_NOT_INCLUDE_TESTS` option that the test sets matches the same locations as in a native run. ipso filters nothing itself, and a named `target/test-classes` or `build/classes/java/test` imports as nothing and fails as `archunit-empty`. A symlink anywhere below a named directory fails the check. Naming `.` copies every `.class` file in the repository and keeps its path from the root, so ArchUnit does not find the packages and the check fails as `archunit-empty`. Name the class output directory.
 
-`--jars` is a directory that holds the three jars in the table. ergo checks each sha256 and runs a copy of the verified bytes. The `install.sh` next to `jars.lock` under `internal/compiler/archunit/testdata/tool` downloads them from Maven Central into `lib/`.
+`--jars` is a directory that holds the three jars in the table. ipso checks each sha256 and runs a copy of the verified bytes. The `install.sh` next to `jars.lock` under `internal/compiler/archunit/testdata/tool` downloads them from Maven Central into `lib/`.
 
 | Jar | sha256 |
 | --- | --- |

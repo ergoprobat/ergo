@@ -5,9 +5,9 @@
 #   provider: aws
 #   resources:
 #     - aws_db_instance
-package ergo.templates.aws.rds_not_public
+package ipso.templates.aws.rds_not_public
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(rc, msg) if {
 	some rc in tf.resources("aws_db_instance")

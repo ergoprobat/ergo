@@ -3,7 +3,7 @@ package eslint
 import (
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 func TestNestedProtoKey(t *testing.T) {

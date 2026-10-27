@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 //go:embed templates
@@ -61,5 +61,5 @@ func templateIDs() []string {
 
 func packagePath(id string) string {
 	dotted := strings.ReplaceAll(strings.ReplaceAll(id, "-", "_"), "/", ".")
-	return "data.ergo.templates." + dotted
+	return "data.ipso.templates." + dotted
 }

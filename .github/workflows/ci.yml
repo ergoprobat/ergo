@@ -54,7 +54,7 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go install github.com/google/go-licenses/v2@v2.0.1
-      - run: go-licenses check ./cmd/ergo --allowed_licenses=Apache-2.0,MIT,BSD-2-Clause,BSD-3-Clause,ISC
+      - run: go-licenses check ./cmd/ipso --allowed_licenses=Apache-2.0,MIT,BSD-2-Clause,BSD-3-Clause,ISC
 
   release:
     name: ci / release
@@ -77,7 +77,7 @@ jobs:
           set -e
           # Exit 2 means the config is valid and uses the formula publisher.
           # GoReleaser 2.18 deprecates formulas in favor of casks. The tap
-          # install is `brew install ergoprobat/tap/ergo`, which is a formula.
+          # install is `brew install ipsofacto-io/tap/ipso`, which is a formula.
           if [ "$code" -eq 2 ]; then
             exit 0
           fi
@@ -105,7 +105,7 @@ jobs:
       - name: Cruise the fixture monorepo
         run: go test ./internal/compiler/depcruise -count=1
         env:
-          ERGO_DEPCRUISE: ${{ github.workspace }}/internal/compiler/depcruise/testdata/tool/node_modules/.bin/dependency-cruiser
+          IPSO_DEPCRUISE: ${{ github.workspace }}/internal/compiler/depcruise/testdata/tool/node_modules/.bin/dependency-cruiser
 
   semgrep-fixtures:
     name: ci / semgrep-fixtures
@@ -132,7 +132,7 @@ jobs:
       - name: Test Semgrep fixtures
         run: go test ./internal/compiler/semgrep -count=1
         env:
-          ERGO_SEMGREP: "1"
+          IPSO_SEMGREP: "1"
 
   archunit:
     name: ci / archunit
@@ -154,7 +154,7 @@ jobs:
       - name: Evaluate the fixture subjects
         run: go test ./internal/compiler/archunit ./internal/cli -count=1
         env:
-          ERGO_ARCHUNIT: "1"
+          IPSO_ARCHUNIT: "1"
 
   conformance:
     name: ci / conformance

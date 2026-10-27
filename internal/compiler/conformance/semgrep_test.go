@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/semgrep"
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/semgrep"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 func TestSemgrep(t *testing.T) {
@@ -62,7 +62,7 @@ func compileSemgrep(t *testing.T, id string) []byte {
 	t.Helper()
 	artifacts, err := semgrep.New().Compile(compiler.Input{
 		Record: edr.Record{Criticality: "blocking"},
-		Check:  edr.Check{Engine: "semgrep", Ref: "ergo:" + id, Mode: "block"},
+		Check:  edr.Check{Engine: "semgrep", Ref: "ipso:" + id, Mode: "block"},
 	})
 	if err != nil {
 		t.Fatal(err)

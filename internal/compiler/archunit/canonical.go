@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 // Canonical is what evaluation needs to know about a generated ArchitectureTest.java.
@@ -29,7 +29,7 @@ var (
 	layerLine       = regexp.MustCompile(`^\s+\.layer\("([^"]*)"\)\.definedBy\((.*)\)$`)
 	asLine          = regexp.MustCompile(`^\s+\.as\("([^"]*)"\)$`)
 	quotedString    = regexp.MustCompile(`"([^"]*)"`)
-	errNotCanonical = errors.New("ArchitectureTest.java is not the test ergo compiles")
+	errNotCanonical = errors.New("ArchitectureTest.java is not the test ipso compiles")
 )
 
 // ReadCanonical checks that src is exactly what compile writes for this decision and check index.

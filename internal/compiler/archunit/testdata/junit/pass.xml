@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuite name="JUnit Jupiter" tests="2" skipped="0" failures="0" errors="0" time="0.001" hostname="localhost" timestamp="2026-10-27T00:00:00">
-<testcase name="rule_layers()" classname="ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest" time="0.001">
+<testcase name="rule_layers()" classname="ipso.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest" time="0.001">
 <system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest]/[method:rule_layers()]
+unique-id: [engine:junit-jupiter]/[class:ipso.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest]/[method:rule_layers()]
 display-name: JUnit Jupiter > ArchitectureTest > rule_layers()
 ]]></system-out>
 </testcase>
-<testcase name="rule_domain_not_to_adapters()" classname="ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest" time="0.001">
+<testcase name="rule_domain_not_to_adapters()" classname="ipso.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest" time="0.001">
 <system-out><![CDATA[
-unique-id: [engine:junit-jupiter]/[class:ergo.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest]/[method:rule_domain_not_to_adapters()]
+unique-id: [engine:junit-jupiter]/[class:ipso.d01m5wvyech306k6ddjxr2vapcs.c0.ArchitectureTest]/[method:rule_domain_not_to_adapters()]
 display-name: JUnit Jupiter > ArchitectureTest > rule_domain_not_to_adapters()
 ]]></system-out>
 </testcase>

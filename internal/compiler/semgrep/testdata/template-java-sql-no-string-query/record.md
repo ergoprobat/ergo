@@ -14,7 +14,7 @@ supersedes: []
 criticality: blocking
 checks:
   - engine: semgrep
-    ref: ergo:java/sql-no-string-query
+    ref: ipso:java/sql-no-string-query
     mode: block
 waivers: []
 sources:

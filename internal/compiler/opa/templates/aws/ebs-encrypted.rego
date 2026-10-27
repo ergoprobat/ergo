@@ -7,9 +7,9 @@
 #     - aws_ebs_volume
 #     - aws_instance
 #     - aws_launch_template
-package ergo.templates.aws.ebs_encrypted
+package ipso.templates.aws.ebs_encrypted
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(rc, msg) if {
 	some rc in tf.resources("aws_ebs_volume")

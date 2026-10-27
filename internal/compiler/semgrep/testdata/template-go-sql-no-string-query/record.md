@@ -14,7 +14,7 @@ supersedes: []
 criticality: blocking
 checks:
   - engine: semgrep
-    ref: ergo:go/sql-no-string-query
+    ref: ipso:go/sql-no-string-query
     mode: block
 waivers: []
 sources:

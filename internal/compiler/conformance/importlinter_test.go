@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/importlinter"
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/importlinter"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 var contractSummary = regexp.MustCompile(`Contracts:\s+(\d+) kept,\s+(\d+) broken`)

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 // goldenTests are the fixtures whose golden directory holds a generated test.
@@ -47,7 +47,7 @@ func TestReadCanonicalGolden(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if want := "ergo.d" + strings.ToLower(id) + ".c0.ArchitectureTest"; got.Class != want {
+			if want := "ipso.d" + strings.ToLower(id) + ".c0.ArchitectureTest"; got.Class != want {
 				t.Fatalf("class %q, want %q", got.Class, want)
 			}
 			if len(got.Packages) == 0 || len(got.Rules) == 0 {
@@ -103,8 +103,8 @@ func TestReadCanonicalRejectsTamperedSource(t *testing.T) {
 			"import org.junit.jupiter.api.Test;\nimport java.io.File;\n", 1),
 		"string breakout": strings.Replace(text, `.importPackages("com.acme.billing")`,
 			`.importPackages("com.acme.billing"); Runtime.getRuntime().exit(0); ("")`, 1),
-		"other decision": strings.Replace(text, "ergo.d01m5wvyech306k6ddjxr2vapcs.c0",
-			"ergo.d01m5wvyech306k6ddjxr2vapct.c0", 1),
+		"other decision": strings.Replace(text, "ipso.d01m5wvyech306k6ddjxr2vapcs.c0",
+			"ipso.d01m5wvyech306k6ddjxr2vapct.c0", 1),
 		"allow empty": strings.Replace(text, `                .as("layers")`,
 			"                .allowEmptyShould(true)\n                .as(\"layers\")", 1),
 		"second import": strings.Replace(text, "    }\n\n    @Test\n",

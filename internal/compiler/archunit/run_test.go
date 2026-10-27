@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 var testNow = time.Date(2026, 2, 1, 12, 0, 0, 0, time.UTC)
@@ -66,7 +66,7 @@ func TestJDKMajor(t *testing.T) {
 		"openjdk x.y":                0,
 		"openjdk 0.1":                0,
 		"openjdk -1":                 0,
-		// java -version prints this form. ergo runs java --version, so a tool that prints it is refused.
+		// java -version prints this form. ipso runs java --version, so a tool that prints it is refused.
 		`openjdk version "17.0.13" 2024-10-15`: 0,
 	} {
 		got, ok := jdkMajor(output)
@@ -220,7 +220,7 @@ func TestEvaluateRunsTheCanonicalTest(t *testing.T) {
 	t.Setenv("_JAVA_OPTIONS", "-Xmx1k")
 	t.Setenv("JDK_JAVAC_OPTIONS", "-processorpath /tmp")
 	t.Setenv("CLASSPATH", "/tmp/evil")
-	t.Setenv("ERGO_TEST_KEEP", "kept")
+	t.Setenv("IPSO_TEST_KEEP", "kept")
 	fakeReport(t, "pass")
 
 	out := env.Evaluate(context.Background(), billingEntry(), billingArtifacts(t), testNow)

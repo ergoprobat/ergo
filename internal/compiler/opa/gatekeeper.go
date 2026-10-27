@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/strictyaml"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/strictyaml"
 	"gopkg.in/yaml.v3"
 )
 

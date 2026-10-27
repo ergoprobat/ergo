@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 func TestMain(m *testing.M) {

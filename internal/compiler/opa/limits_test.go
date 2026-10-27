@@ -5,8 +5,8 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/edr"
 )
 
 func TestDeniedBuiltins(t *testing.T) {
@@ -57,9 +57,9 @@ func TestExprBudget(t *testing.T) {
 }
 
 func TestDeepPathAndModule(t *testing.T) {
-	policy := `package ergo.templates.test.deep
+	policy := `package ipso.templates.test.deep
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(rc, msg) if {
 	some rc in tf.resources("demo_resource")
@@ -86,7 +86,7 @@ paired(bucket) if {
 	    "change": {"actions": ["create"], "after": {"a": {"b": {"c": {"d": {"e": {"f": {"g": "ok"}}}}}}}}
 	  }]
 	}`
-	if got := denials(t, "data.ergo.templates.test.deep", policy, lib, []byte(known)); len(got) != 0 {
+	if got := denials(t, "data.ipso.templates.test.deep", policy, lib, []byte(known)); len(got) != 0 {
 		t.Fatalf("deep known value denied %#v", got)
 	}
 	unknown := `{
@@ -101,7 +101,7 @@ paired(bucket) if {
 	    }
 	  }]
 	}`
-	got := denials(t, "data.ergo.templates.test.deep", policy, lib, []byte(unknown))
+	got := denials(t, "data.ipso.templates.test.deep", policy, lib, []byte(unknown))
 	msgs := got["demo_resource.x"]
 	if len(msgs) == 0 || !strings.Contains(msgs[0], "unknown") {
 		t.Fatalf("deep unknown %#v", got)
@@ -117,7 +117,7 @@ paired(bucket) if {
 	    {"address": "` + deep + `.aws_s3_bucket_server_side_encryption_configuration.data", "mode": "managed", "type": "aws_s3_bucket_server_side_encryption_configuration", "change": {"actions": ["create"], "after": {"bucket": "data", "rule": [{"apply_server_side_encryption_by_default": [{"sse_algorithm": "aws:kms", "kms_master_key_id": "alias/custom"}]}]}}}
 	  ]
 	}`
-	got = denials(t, "data.ergo.templates.test.deep", policy, lib, []byte(plan))
+	got = denials(t, "data.ipso.templates.test.deep", policy, lib, []byte(plan))
 	if _, ok := got[deep+".aws_s3_bucket.data"]; ok {
 		t.Fatalf("same-module bucket denied %#v", got)
 	}

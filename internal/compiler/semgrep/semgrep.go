@@ -6,7 +6,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 const (
@@ -40,7 +40,7 @@ func (Compiler) Engine() string { return "semgrep" }
 func (Compiler) Version() string { return version }
 
 // Compile writes semgrep.yaml for one rule file.
-// A ref that starts with ergo: selects a built-in template.
+// A ref that starts with ipso: selects a built-in template.
 // Any other ref is one repository .yaml or .yml file.
 // Severity follows the effective check mode. target is not read.
 // The framework stamps it on the manifest unchanged.

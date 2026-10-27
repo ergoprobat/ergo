@@ -14,7 +14,7 @@ supersedes: []
 criticality: blocking
 checks:
   - engine: semgrep
-    ref: ergo:go/http-client-timeout
+    ref: ipso:go/http-client-timeout
     mode: block
 waivers: []
 sources:

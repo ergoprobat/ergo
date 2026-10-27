@@ -6,9 +6,9 @@
 #   resources:
 #     - aws_s3_bucket
 #     - aws_s3_bucket_server_side_encryption_configuration
-package ergo.templates.aws.s3_kms_cmk
+package ipso.templates.aws.s3_kms_cmk
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(bucket, msg) if {
 	some bucket in tf.resources("aws_s3_bucket")

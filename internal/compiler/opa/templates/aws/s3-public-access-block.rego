@@ -6,9 +6,9 @@
 #   resources:
 #     - aws_s3_bucket
 #     - aws_s3_bucket_public_access_block
-package ergo.templates.aws.s3_public_access_block
+package ipso.templates.aws.s3_public_access_block
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 pab_attrs := ["block_public_acls", "block_public_policy", "ignore_public_acls", "restrict_public_buckets"]
 

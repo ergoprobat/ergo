@@ -14,8 +14,8 @@ import (
 	"github.com/open-policy-agent/opa/v1/ast"
 	"github.com/open-policy-agent/opa/v1/rego"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/compilertest"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/compilertest"
 )
 
 func TestTemplates(t *testing.T) {
@@ -335,7 +335,7 @@ func checkDoc(t *testing.T, rows []docRow) {
 func renderDoc(rows []docRow) string {
 	var b strings.Builder
 	b.WriteString("# Terraform plan templates\n\n")
-	b.WriteString("A check with `engine: opa` and `ref: ergo:<id>` compiles one of these templates. The check `target` must be `terraform-plan`. Each template reads a Terraform or OpenTofu plan and denies with an object that carries `msg` and `address`.\n\n")
+	b.WriteString("A check with `engine: opa` and `ref: ipso:<id>` compiles one of these templates. The check `target` must be `terraform-plan`. Each template reads a Terraform or OpenTofu plan and denies with an object that carries `msg` and `address`.\n\n")
 	b.WriteString("Schemas are hashicorp/aws 6.x and hashicorp/azurerm 5.x.\n\n")
 	b.WriteString("| id | title | resources |\n")
 	b.WriteString("| --- | --- | --- |\n")

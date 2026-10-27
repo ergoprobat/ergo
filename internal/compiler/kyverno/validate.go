@@ -3,7 +3,7 @@ package kyverno
 import (
 	"regexp"
 
-	"github.com/ergoprobat/ergo/internal/compiler/strictyaml"
+	"github.com/ipsofacto-io/ipso/internal/compiler/strictyaml"
 	"gopkg.in/yaml.v3"
 )
 

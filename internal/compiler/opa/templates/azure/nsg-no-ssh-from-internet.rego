@@ -6,9 +6,9 @@
 #   resources:
 #     - azurerm_network_security_group
 #     - azurerm_network_security_rule
-package ergo.templates.azure.nsg_no_ssh_from_internet
+package ipso.templates.azure.nsg_no_ssh_from_internet
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(rc, msg) if {
 	some rc in tf.resources("azurerm_network_security_group")

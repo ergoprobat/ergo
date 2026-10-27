@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 func TestStageClassesRefusesAClassThatIsNotARegularFile(t *testing.T) {

@@ -327,7 +327,7 @@ func newULID(now time.Time) string {
 	raw[4] = byte(ms >> 8)
 	raw[5] = byte(ms)
 	if _, err := rand.Read(raw[6:]); err != nil {
-		copy(raw[6:], []byte("ergoproba"))
+		copy(raw[6:], []byte("ipsoproba"))
 	}
 	var number big.Int
 	number.SetBytes(raw[:])

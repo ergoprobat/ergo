@@ -1,6 +1,6 @@
 # Terraform plan templates
 
-A check with `engine: opa` and `ref: ergo:<id>` compiles one of these templates. The check `target` must be `terraform-plan`. Each template reads a Terraform or OpenTofu plan and denies with an object that carries `msg` and `address`.
+A check with `engine: opa` and `ref: ipso:<id>` compiles one of these templates. The check `target` must be `terraform-plan`. Each template reads a Terraform or OpenTofu plan and denies with an object that carries `msg` and `address`.
 
 Schemas are hashicorp/aws 6.x and hashicorp/azurerm 5.x.
 

@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/toolrun"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/toolrun"
 )
 
 const (
@@ -53,7 +53,7 @@ func FindTool(ctx context.Context) (Tool, error) {
 }
 
 // Cruise runs depcruise on a temporary copy of config.
-// The copy is the artifact LoadBuild verified, so a later change under .ergo/build is not what runs.
+// The copy is the artifact LoadBuild verified, so a later change under .ipso/build is not what runs.
 func (t Tool) Cruise(ctx context.Context, root string, config []byte, paths []string) ([]byte, error) {
 	cleaned, err := toolrun.NormalizePaths(paths)
 	if err != nil {
@@ -62,7 +62,7 @@ func (t Tool) Cruise(ctx context.Context, root string, config []byte, paths []st
 	if err := toolrun.WithinRoot(root, cleaned); err != nil {
 		return nil, &compiler.Error{Code: CodePath, Err: err}
 	}
-	dir, err := os.MkdirTemp("", "ergo-depcruise-")
+	dir, err := os.MkdirTemp("", "ipso-depcruise-")
 	if err != nil {
 		return nil, &compiler.Error{Code: CodeRun, Err: err}
 	}

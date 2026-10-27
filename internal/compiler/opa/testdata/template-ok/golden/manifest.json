@@ -16,11 +16,11 @@
       "artifacts": [
         {
           "name": "policy.rego",
-          "sha256": "b42d5987a61c0f6e1a20fe95c93590d89fab9ba0189ec49b66b9673bce38e840"
+          "sha256": "a5bd995c7f228e19eb2a1ebaf4ebbc273c9efdfe950adbd9325f93969a52ae8c"
         },
         {
           "name": "terraform.rego",
-          "sha256": "4f605e0da4ab006c6c85b9b6546a29ff1914ca9c04a684d860c3246bed61099e"
+          "sha256": "61be94c344f8603f3e8ac349709a110f665388f9f52df56d5a05d6045416410e"
         }
       ]
     }

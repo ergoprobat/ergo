@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 const (
@@ -17,7 +17,7 @@ const (
 	CodeVersion = "semgrep-version"
 	// CodeRun means the scan did not finish.
 	CodeRun = "semgrep-run"
-	// CodeOutput means the scan output is not a report ergo can read, or it is larger than the cap.
+	// CodeOutput means the scan output is not a report ipso can read, or it is larger than the cap.
 	CodeOutput = "semgrep-output"
 	// CodeIncomplete means Semgrep reported an error or skipped a rule, so some code was not checked.
 	CodeIncomplete = "semgrep-incomplete"
@@ -34,7 +34,7 @@ type Finding struct {
 	Line int
 }
 
-// Result is the part of a scan report ergo evaluates.
+// Result is the part of a scan report ipso evaluates.
 type Result struct {
 	Version  string
 	Scanned  int

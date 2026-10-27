@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/builtin"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/builtin"
 )
 
 func TestInitCheckExplain(t *testing.T) {
@@ -22,7 +22,7 @@ func TestInitCheckExplain(t *testing.T) {
 	if code := Run([]string{"init"}, &stdout, &stderr); code != 0 {
 		t.Fatalf("init code %d stderr %s", code, stderr.String())
 	}
-	if !strings.Contains(stdout.String(), ".ergo/config.yaml") {
+	if !strings.Contains(stdout.String(), ".ipso/config.yaml") {
 		t.Fatalf("init output %q", stdout.String())
 	}
 	stdout.Reset()
@@ -104,7 +104,7 @@ func TestHelpVersion(t *testing.T) {
 	if code := Run([]string{"version"}, &stdout, &stderr); code != 0 {
 		t.Fatalf("code %d", code)
 	}
-	if !strings.Contains(stdout.String(), "ergo dev") || !strings.Contains(stdout.String(), "ergo compile") {
+	if !strings.Contains(stdout.String(), "ipso dev") || !strings.Contains(stdout.String(), "ipso compile") {
 		t.Fatalf("output %q", stdout.String())
 	}
 }
@@ -174,7 +174,7 @@ func TestCompile(t *testing.T) {
 			t.Fatalf("gitignore %q", readBuild(t, root, ".gitignore"))
 		}
 		first := readBuild(t, root, "manifest.json")
-		writeRepoFile(t, root, ".ergo/build/stale.txt", "old")
+		writeRepoFile(t, root, ".ipso/build/stale.txt", "old")
 		stdout, stderr, code = compileAt(t, now, reg)
 		if code != 0 {
 			t.Fatalf("rerun code %d\n%s\n%s", code, stdout, stderr)
@@ -183,7 +183,7 @@ func TestCompile(t *testing.T) {
 		if first != second {
 			t.Fatalf("manifest changed\n%s\n%s", first, second)
 		}
-		if _, err := os.Stat(filepath.Join(root, ".ergo", "build", "stale.txt")); !os.IsNotExist(err) {
+		if _, err := os.Stat(filepath.Join(root, ".ipso", "build", "stale.txt")); !os.IsNotExist(err) {
 			t.Fatal("stale artifact survived the rerun")
 		}
 	})
@@ -192,7 +192,7 @@ func TestCompile(t *testing.T) {
 		invalid := string(readFixture(t, "invalid.md"))
 		root := t.TempDir()
 		withDir(t, root)
-		writeRepoFile(t, root, ".ergo/build/stale.txt", "keep")
+		writeRepoFile(t, root, ".ipso/build/stale.txt", "keep")
 		writeRepoFile(t, root, "docs/decisions/bad.md", invalid)
 		stdout, _, code := compileAt(t, now, reg)
 		if code != 1 {
@@ -206,7 +206,7 @@ func TestCompile(t *testing.T) {
 	t.Run("duplicate id", func(t *testing.T) {
 		root := t.TempDir()
 		withDir(t, root)
-		writeRepoFile(t, root, ".ergo/build/stale.txt", "keep")
+		writeRepoFile(t, root, ".ipso/build/stale.txt", "keep")
 		writeRepoFile(t, root, "docs/decisions/a.md", compileRecord(idA, "one", "accepted", "blocking", "2026-01-01", "", ""))
 		writeRepoFile(t, root, "docs/decisions/b.md", compileRecord(idA, "two", "accepted", "blocking", "2026-01-01", "", ""))
 		stdout, _, code := compileAt(t, now, reg)
@@ -228,10 +228,10 @@ func TestCompile(t *testing.T) {
 		if err := os.WriteFile(filepath.Join(elsewhere, "keep.txt"), []byte("keep"), 0o644); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.MkdirAll(filepath.Join(root, ".ergo"), 0o755); err != nil {
+		if err := os.MkdirAll(filepath.Join(root, ".ipso"), 0o755); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.Symlink(elsewhere, filepath.Join(root, ".ergo", "build")); err != nil {
+		if err := os.Symlink(elsewhere, filepath.Join(root, ".ipso", "build")); err != nil {
 			t.Fatal(err)
 		}
 		writeRepoFile(t, root, "policies/rule.txt", "rule-body\n")
@@ -270,7 +270,7 @@ func TestCompile(t *testing.T) {
 	t.Run("usage", func(t *testing.T) {
 		var stdout, stderr bytes.Buffer
 		code := run([]string{"compile", "extra"}, &stdout, &stderr, deps{now: func() time.Time { return now }, registry: reg})
-		if code != 2 || !strings.Contains(stderr.String(), "usage: ergo compile") {
+		if code != 2 || !strings.Contains(stderr.String(), "usage: ipso compile") {
 			t.Fatalf("code %d stderr %s", code, stderr.String())
 		}
 	})
@@ -280,7 +280,7 @@ func TestCompileBuiltinTemplate(t *testing.T) {
 	now := time.Date(2026, 2, 1, 12, 0, 0, 0, time.UTC)
 	root := t.TempDir()
 	withDir(t, root)
-	writeRepoFile(t, root, "docs/decisions/s3.md", compileRecord(idA, "s3-kms", "accepted", "blocking", "2026-01-01", "", "  - engine: opa\n    target: terraform-plan\n    ref: ergo:aws/s3-kms-cmk\n"))
+	writeRepoFile(t, root, "docs/decisions/s3.md", compileRecord(idA, "s3-kms", "accepted", "blocking", "2026-01-01", "", "  - engine: opa\n    target: terraform-plan\n    ref: ipso:aws/s3-kms-cmk\n"))
 	stdout, stderr, code := compileAt(t, now, builtin.Registry())
 	if code != 0 {
 		t.Fatalf("code %d\n%s\n%s", code, stdout, stderr)
@@ -288,10 +288,10 @@ func TestCompileBuiltinTemplate(t *testing.T) {
 	if !strings.Contains(stdout, "docs/decisions/s3.md: checks[0] (opa): compiled 2 artifacts") {
 		t.Fatalf("stdout %s", stdout)
 	}
-	if !strings.Contains(readBuild(t, root, idA+"/0/policy.rego"), "package ergo.templates.aws.s3_kms_cmk") {
+	if !strings.Contains(readBuild(t, root, idA+"/0/policy.rego"), "package ipso.templates.aws.s3_kms_cmk") {
 		t.Fatal("policy.rego is not the S3 template")
 	}
-	if !strings.Contains(readBuild(t, root, idA+"/0/terraform.rego"), "package ergo.lib.terraform") {
+	if !strings.Contains(readBuild(t, root, idA+"/0/terraform.rego"), "package ipso.lib.terraform") {
 		t.Fatal("terraform.rego is not the helper module")
 	}
 }
@@ -316,7 +316,7 @@ func writeRepoFile(t *testing.T, root, rel, body string) {
 
 func readBuild(t *testing.T, root, rel string) string {
 	t.Helper()
-	raw, err := os.ReadFile(filepath.Join(root, ".ergo", "build", filepath.FromSlash(rel)))
+	raw, err := os.ReadFile(filepath.Join(root, ".ipso", "build", filepath.FromSlash(rel)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -392,7 +392,7 @@ Compile the checks that are in force.
 
 ## Consequences
 
-ergo compile writes one manifest entry per compiled check.
+ipso compile writes one manifest entry per compiled check.
 
 ## Verification
 

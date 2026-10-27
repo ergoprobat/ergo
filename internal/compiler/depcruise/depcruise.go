@@ -8,7 +8,7 @@ import (
 	"io/fs"
 	"path"
 
-	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
 )
 
 const (

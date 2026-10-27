@@ -5,9 +5,9 @@
 #   provider: azure
 #   resources:
 #     - azurerm_kubernetes_cluster
-package ergo.templates.azure.aks_private_cluster
+package ipso.templates.azure.aks_private_cluster
 
-import data.ergo.lib.terraform as tf
+import data.ipso.lib.terraform as tf
 
 deny contains tf.violation(rc, msg) if {
 	some rc in tf.resources("azurerm_kubernetes_cluster")

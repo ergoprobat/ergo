@@ -1,20 +1,20 @@
-// Package builtin is the compiler registry linked into the ergo binary.
+// Package builtin is the compiler registry linked into the ipso binary.
 package builtin
 
 import (
-	"github.com/ergoprobat/ergo/internal/compiler"
-	"github.com/ergoprobat/ergo/internal/compiler/archunit"
-	"github.com/ergoprobat/ergo/internal/compiler/checkov"
-	"github.com/ergoprobat/ergo/internal/compiler/cibinding"
-	"github.com/ergoprobat/ergo/internal/compiler/depcruise"
-	"github.com/ergoprobat/ergo/internal/compiler/eslint"
-	"github.com/ergoprobat/ergo/internal/compiler/importlinter"
-	"github.com/ergoprobat/ergo/internal/compiler/kyverno"
-	"github.com/ergoprobat/ergo/internal/compiler/opa"
-	"github.com/ergoprobat/ergo/internal/compiler/semgrep"
+	"github.com/ipsofacto-io/ipso/internal/compiler"
+	"github.com/ipsofacto-io/ipso/internal/compiler/archunit"
+	"github.com/ipsofacto-io/ipso/internal/compiler/checkov"
+	"github.com/ipsofacto-io/ipso/internal/compiler/cibinding"
+	"github.com/ipsofacto-io/ipso/internal/compiler/depcruise"
+	"github.com/ipsofacto-io/ipso/internal/compiler/eslint"
+	"github.com/ipsofacto-io/ipso/internal/compiler/importlinter"
+	"github.com/ipsofacto-io/ipso/internal/compiler/kyverno"
+	"github.com/ipsofacto-io/ipso/internal/compiler/opa"
+	"github.com/ipsofacto-io/ipso/internal/compiler/semgrep"
 )
 
-// Registry returns the compilers linked into the ergo binary.
+// Registry returns the compilers linked into the ipso binary.
 // Adding an engine means appending its constructor here.
 func Registry() compiler.Registry {
 	return compiler.NewRegistry(opa.New(), depcruise.New(), semgrep.New(), cibinding.New(), checkov.New(), archunit.New(), importlinter.New(), kyverno.New(), eslint.New())

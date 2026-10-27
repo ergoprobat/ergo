@@ -1,6 +1,6 @@
 //go:build unix
 
-package depcruise
+package toolrun
 
 import (
 	"errors"
@@ -8,9 +8,9 @@ import (
 	"syscall"
 )
 
-// prepareCommand puts the process in its own group and kills that group when the context ends.
-// Killing only the shell would leave a child, such as a sleep or a worker, running past the deadline.
-func prepareCommand(cmd *exec.Cmd) {
+// prepare puts the process in its own group and kills that group when the context ends.
+// Killing only the parent would leave a child running past the deadline.
+func prepare(cmd *exec.Cmd) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Cancel = func() error {
 		if cmd.Process == nil {

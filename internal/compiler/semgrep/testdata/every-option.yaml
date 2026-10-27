@@ -1,0 +1,49 @@
+rules:
+  - id: sample
+    message: sample rule
+    languages:
+      - generic
+    pattern: sample(...)
+    options:
+      ac_matching: true
+      arrow_is_function: true
+      attr_expr: true
+      commutative_boolop: false
+      constant_propagation: true
+      cpp_parsing_pref: as_vardef_with_ctor
+      decorators_order_matters: false
+      flddef_assign: false
+      generic_braces:
+        - ["(", ")"]
+      generic_caseless: false
+      generic_comment_style: c
+      generic_ellipsis_max_span: 10
+      generic_engine: spacegrep
+      generic_extra_braces:
+        - ["<", ">"]
+      generic_extra_word_characters:
+        - "-"
+      generic_multiline: true
+      go_deeper_expr: true
+      go_deeper_stmt: true
+      implicit_deep_exprstmt: true
+      implicit_ellipsis: true
+      implicit_return: true
+      let_is_var: true
+      strict_mvar_name_binding: false
+      symbolic_propagation: false
+      symmetric_eq: false
+      taint_assume_safe_booleans: false
+      taint_assume_safe_comparisons: false
+      taint_assume_safe_functions: false
+      taint_assume_safe_indexes: false
+      taint_assume_safe_numbers: false
+      taint_focus_on: sink
+      taint_interproc_lambdas: true
+      taint_only_propagate_through_assignments: false
+      taint_unify_mvars: false
+      unify_ids_strictly: true
+      vardef_assign: true
+      xml_attrs_implicit_ellipsis: true
+      xml_children_ordered: true
+      xml_singleton_loose_matching: true

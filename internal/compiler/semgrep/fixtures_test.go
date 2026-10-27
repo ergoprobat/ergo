@@ -147,7 +147,7 @@ func compileTemplate(t *testing.T, id string) []byte {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(artifacts) != 1 || artifacts[0].Name != artifactName {
+	if len(artifacts) != 1 || artifacts[0].Name != ArtifactName {
 		t.Fatalf("artifacts %#v", artifacts)
 	}
 	return artifacts[0].Data

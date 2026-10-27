@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"regexp"
-	"strconv"
 	"time"
 
 	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ergoprobat/ergo/internal/compiler/toolrun"
 )
 
 const (
@@ -25,9 +24,6 @@ const (
 	// CodeEmpty means the cruise found no modules.
 	CodeEmpty = "depcruise-empty"
 )
-
-// semverPattern is MAJOR.MINOR.PATCH with no leading zeros and no prerelease.
-var semverPattern = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$`)
 
 // Violation is one dependency-cruiser finding whose severity is not ignore.
 type Violation struct {
@@ -46,11 +42,11 @@ type Result struct {
 
 // VersionFits reports whether found satisfies a caret range of pin: the same major, and not lower.
 func VersionFits(found, pin string) bool {
-	fMajor, fMinor, fPatch, ok := parseSemver(found)
+	fMajor, fMinor, fPatch, ok := toolrun.ParseSemver(found)
 	if !ok {
 		return false
 	}
-	pMajor, pMinor, pPatch, ok := parseSemver(pin)
+	pMajor, pMinor, pPatch, ok := toolrun.ParseSemver(pin)
 	if !ok {
 		return false
 	}
@@ -61,26 +57,6 @@ func VersionFits(found, pin string) bool {
 		return false
 	}
 	return true
-}
-
-func parseSemver(value string) (major, minor, patch int, ok bool) {
-	parts := semverPattern.FindStringSubmatch(value)
-	if parts == nil {
-		return 0, 0, 0, false
-	}
-	major, err := strconv.Atoi(parts[1])
-	if err != nil {
-		return 0, 0, 0, false
-	}
-	minor, err = strconv.Atoi(parts[2])
-	if err != nil {
-		return 0, 0, 0, false
-	}
-	patch, err = strconv.Atoi(parts[3])
-	if err != nil {
-		return 0, 0, 0, false
-	}
-	return major, minor, patch, true
 }
 
 type cruiseSummary struct {

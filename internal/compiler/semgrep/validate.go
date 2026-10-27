@@ -38,6 +38,53 @@ var allowedRuleKeys = map[string]struct{}{
 	"severity":            {},
 }
 
+// allowedOptionKeys are the Semgrep rule options compile keeps.
+// The names are the fields of Rule_options.atd at Semgrep 1.182.0, except
+// interfile (Pro analysis, while evaluation runs the OSS engine) and the
+// deprecated taint_match_on and commutative_compop. Values are left to Semgrep.
+// A value Semgrep rejects fails the scan, and that fails the check.
+var allowedOptionKeys = map[string]struct{}{
+	"ac_matching":                              {},
+	"arrow_is_function":                        {},
+	"attr_expr":                                {},
+	"commutative_boolop":                       {},
+	"constant_propagation":                     {},
+	"cpp_parsing_pref":                         {},
+	"decorators_order_matters":                 {},
+	"flddef_assign":                            {},
+	"generic_braces":                           {},
+	"generic_caseless":                         {},
+	"generic_comment_style":                    {},
+	"generic_ellipsis_max_span":                {},
+	"generic_engine":                           {},
+	"generic_extra_braces":                     {},
+	"generic_extra_word_characters":            {},
+	"generic_multiline":                        {},
+	"go_deeper_expr":                           {},
+	"go_deeper_stmt":                           {},
+	"implicit_deep_exprstmt":                   {},
+	"implicit_ellipsis":                        {},
+	"implicit_return":                          {},
+	"let_is_var":                               {},
+	"strict_mvar_name_binding":                 {},
+	"symbolic_propagation":                     {},
+	"symmetric_eq":                             {},
+	"taint_assume_safe_booleans":               {},
+	"taint_assume_safe_comparisons":            {},
+	"taint_assume_safe_functions":              {},
+	"taint_assume_safe_indexes":                {},
+	"taint_assume_safe_numbers":                {},
+	"taint_focus_on":                           {},
+	"taint_interproc_lambdas":                  {},
+	"taint_only_propagate_through_assignments": {},
+	"taint_unify_mvars":                        {},
+	"unify_ids_strictly":                       {},
+	"vardef_assign":                            {},
+	"xml_attrs_implicit_ellipsis":              {},
+	"xml_children_ordered":                     {},
+	"xml_singleton_loose_matching":             {},
+}
+
 var rejectedRuleKeys = map[string]string{
 	"fix":         "autofix",
 	"fix-regex":   "autofix",
@@ -140,7 +187,7 @@ func checkRule(rule *yaml.Node, seen map[string]struct{}) error {
 	if err := checkMappingField(fields, "metadata", id); err != nil {
 		return err
 	}
-	if err := checkMappingField(fields, "options", id); err != nil {
+	if err := checkOptions(fields, id); err != nil {
 		return err
 	}
 	if node, ok := fields["severity"]; ok && !isString(node) {
@@ -336,6 +383,28 @@ func checkPaths(fields map[string]*yaml.Node, id string) error {
 		if err := stringItems(node.Content[i+1], true); err != nil {
 			return ruleErr(id, fmt.Errorf("paths.%s: %w", key, err))
 		}
+	}
+	return nil
+}
+
+func checkOptions(fields map[string]*yaml.Node, id string) error {
+	node, ok := fields["options"]
+	if !ok {
+		return nil
+	}
+	if node.Kind != yaml.MappingNode {
+		return ruleErr(id, errors.New("options is not a mapping"))
+	}
+	keys := make([]string, 0, len(node.Content)/2)
+	for i := 0; i < len(node.Content); i += 2 {
+		keys = append(keys, node.Content[i].Value)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		if _, ok := allowedOptionKeys[key]; ok {
+			continue
+		}
+		return keyErr(id, fmt.Errorf("options.%s", key))
 	}
 	return nil
 }

@@ -1,20 +1,17 @@
 package depcruise
 
 import (
-	"bytes"
 	"context"
-	"crypto/sha256"
 	"errors"
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"time"
 
 	"github.com/ergoprobat/ergo/internal/compiler"
+	"github.com/ergoprobat/ergo/internal/compiler/toolrun"
 )
 
 const (
@@ -25,11 +22,6 @@ const (
 	stderrLimit    = 1024
 	versionLimit   = 32
 )
-
-// pathSegment is one slash-separated piece of a cruise path.
-// A hyphen is allowed inside a segment. A path that starts with a hyphen is rejected separately,
-// because dependency-cruiser would read it as a flag.
-var pathSegment = regexp.MustCompile(`^[A-Za-z0-9._@+-]+$`)
 
 // Tool is the depcruise binary resolved from PATH.
 type Tool struct {
@@ -49,18 +41,12 @@ func FindTool(ctx context.Context) (Tool, error) {
 	ctx, cancel := context.WithTimeout(ctx, versionTimeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "depcruise", "--version")
-	cmd.Stdin = bytes.NewReader(nil)
-	cmd.WaitDelay = commandWait
-	prepareCommand(cmd)
-	stdout := &cappedBuffer{max: versionLimit + 1}
-	stderr := &cappedBuffer{max: stderrLimit}
-	cmd.Stdout = stdout
-	cmd.Stderr = stderr
-	if err := cmd.Run(); err != nil || ctx.Err() != nil || stdout.over {
-		return Tool{}, &compiler.Error{Code: CodeMissing, Err: fmt.Errorf("depcruise --version: %s", stderrExcerpt(stderr.buf.Bytes()))}
+	out, err := toolrun.Run(ctx, cmd, toolrun.Limits{Stdout: versionLimit, Stderr: stderrLimit, Wait: commandWait})
+	if err != nil {
+		return Tool{}, &compiler.Error{Code: CodeMissing, Err: fmt.Errorf("depcruise --version: %s", toolrun.Excerpt(toolrun.Stderr(err), "depcruise failed"))}
 	}
-	version := strings.TrimSpace(stdout.buf.String())
-	if _, _, _, ok := parseSemver(version); !ok {
+	version := strings.TrimSpace(string(out.Stdout))
+	if _, _, _, ok := toolrun.ParseSemver(version); !ok {
 		return Tool{}, &compiler.Error{Code: CodeVersion, Err: fmt.Errorf("version %q", version)}
 	}
 	return Tool{Version: version}, nil
@@ -69,14 +55,11 @@ func FindTool(ctx context.Context) (Tool, error) {
 // Cruise runs depcruise on a temporary copy of config.
 // The copy is the artifact LoadBuild verified, so a later change under .ergo/build is not what runs.
 func (t Tool) Cruise(ctx context.Context, root string, config []byte, paths []string) ([]byte, error) {
-	cleaned, err := NormalizePaths(paths)
+	cleaned, err := toolrun.NormalizePaths(paths)
 	if err != nil {
 		return nil, &compiler.Error{Code: CodeRun, Err: err}
 	}
-	if err := withinRoot(root, cleaned); err != nil {
-		if compiler.CodeOf(err) != "" {
-			return nil, err
-		}
+	if err := toolrun.WithinRoot(root, cleaned); err != nil {
 		return nil, &compiler.Error{Code: CodePath, Err: err}
 	}
 	dir, err := os.MkdirTemp("", "ergo-depcruise-")
@@ -95,54 +78,45 @@ func (t Tool) Cruise(ctx context.Context, root string, config []byte, paths []st
 	args = append(args, cleaned...)
 	cmd := exec.CommandContext(ctx, "depcruise", args...)
 	cmd.Dir = root
-	cmd.Stdin = bytes.NewReader(nil)
-	cmd.WaitDelay = t.waitDelay()
-	prepareCommand(cmd)
-	stdout := &cappedBuffer{max: t.outputMax() + 1}
-	stderr := &cappedBuffer{max: stderrLimit}
-	cmd.Stdout = stdout
-	cmd.Stderr = stderr
-	runErr := cmd.Run()
-	if ctx.Err() != nil {
-		return nil, &compiler.Error{Code: CodeRun, Err: errors.New("timed out")}
+	out, err := toolrun.Run(ctx, cmd, toolrun.Limits{Stdout: t.outputMax(), Stderr: stderrLimit, Wait: t.waitDelay()})
+	if err != nil {
+		return nil, cruiseErr(err, t.outputMax())
 	}
-	if stdout.over {
-		return nil, &compiler.Error{Code: CodeOutput, Err: fmt.Errorf("output is larger than %d bytes", t.outputMax())}
+	return out.Stdout, nil
+}
+
+func cruiseErr(err error, max int) error {
+	var timeout *toolrun.TimeoutError
+	var over *toolrun.OutputError
+	switch {
+	case errors.As(err, &timeout):
+		return &compiler.Error{Code: CodeRun, Err: errors.New("timed out")}
+	case errors.As(err, &over):
+		return &compiler.Error{Code: CodeOutput, Err: fmt.Errorf("output is larger than %d bytes", max)}
+	default:
+		return &compiler.Error{Code: CodeRun, Err: fmt.Errorf("%s", toolrun.Excerpt(toolrun.Stderr(err), "depcruise failed"))}
 	}
-	// A non-zero exit is a failed cruise, even when stdout looks like JSON.
-	// The JSON reporter exits 0 and records violations in the summary.
-	// A crash can print a partial report, and that report must not become a verdict.
-	if runErr != nil {
-		return nil, &compiler.Error{Code: CodeRun, Err: fmt.Errorf("%s", stderrExcerpt(stderr.buf.Bytes()))}
-	}
-	return stdout.buf.Bytes(), nil
 }
 
 // Memo runs one cruise per distinct config. Checks that compiled to the same bytes share that result.
 type Memo struct {
-	Tool  Tool
-	Root  string
-	Paths []string
-	hits  map[[sha256.Size]byte]memoResult
-}
-
-type memoResult struct {
-	raw []byte
-	err error
+	Tool   Tool
+	Root   string
+	Paths  []string
+	shared toolrun.Memo
 }
 
 // Cruise returns the cruise for config, reusing an earlier cruise of the same bytes.
 func (m *Memo) Cruise(ctx context.Context, config []byte) ([]byte, error) {
-	if m.hits == nil {
-		m.hits = map[[sha256.Size]byte]memoResult{}
+	if m.shared.Run == nil {
+		tool := m.Tool
+		root := m.Root
+		paths := append([]string(nil), m.Paths...)
+		m.shared.Run = func(ctx context.Context, config []byte) ([]byte, error) {
+			return tool.Cruise(ctx, root, config, paths)
+		}
 	}
-	key := sha256.Sum256(config)
-	if hit, ok := m.hits[key]; ok {
-		return append([]byte(nil), hit.raw...), hit.err
-	}
-	raw, err := m.Tool.Cruise(ctx, m.Root, config, m.Paths)
-	m.hits[key] = memoResult{raw: append([]byte(nil), raw...), err: err}
-	return raw, err
+	return m.shared.Do(ctx, config)
 }
 
 func (t Tool) cruiseLimit() time.Duration {
@@ -164,129 +138,4 @@ func (t Tool) outputMax() int {
 		return t.outputLimit
 	}
 	return maxStdoutBytes
-}
-
-// withinRoot reports whether every path stays inside root after symlink resolution.
-// A missing path is left for dependency-cruiser. A symlink that leaves root is depcruise-path.
-func withinRoot(root string, paths []string) error {
-	abs, err := filepath.Abs(root)
-	if err != nil {
-		return err
-	}
-	rootResolved, err := filepath.EvalSymlinks(abs)
-	if err != nil {
-		return err
-	}
-	for _, rel := range paths {
-		// "." is the repository root. Walking it for every symlink is the cruise itself.
-		// A named path is rejected when that path resolves outside root.
-		if rel == "." {
-			continue
-		}
-		current := rootResolved
-		for _, segment := range strings.Split(rel, "/") {
-			next := filepath.Join(current, segment)
-			info, err := os.Lstat(next)
-			if errors.Is(err, os.ErrNotExist) {
-				break
-			}
-			if err != nil {
-				return err
-			}
-			if info.Mode()&os.ModeSymlink == 0 {
-				current = next
-				continue
-			}
-			resolved, err := filepath.EvalSymlinks(next)
-			if err != nil {
-				return err
-			}
-			if !insideRoot(rootResolved, resolved) {
-				return &compiler.Error{Code: CodePath, Err: fmt.Errorf("%s leaves the repository", rel)}
-			}
-			current = resolved
-		}
-	}
-	return nil
-}
-
-func insideRoot(root, candidate string) bool {
-	rel, err := filepath.Rel(root, candidate)
-	if err != nil {
-		return false
-	}
-	return rel != ".." && !strings.HasPrefix(rel, ".."+string(os.PathSeparator))
-}
-
-// NormalizePath checks one cruise path and returns its cleaned form.
-// A path that starts with a hyphen is rejected so it cannot be read as a flag.
-func NormalizePath(value string) (string, error) {
-	if value == "" || strings.HasPrefix(value, "-") || strings.HasPrefix(value, "/") || strings.Contains(value, `\`) {
-		return "", fmt.Errorf("path %q", value)
-	}
-	for _, segment := range strings.Split(value, "/") {
-		if segment == "" || segment == ".." || !pathSegment.MatchString(segment) {
-			return "", fmt.Errorf("path %q", value)
-		}
-	}
-	cleaned := path.Clean(value)
-	if cleaned == ".." || strings.HasPrefix(cleaned, "../") || strings.HasPrefix(cleaned, "/") || strings.HasPrefix(cleaned, "-") {
-		return "", fmt.Errorf("path %q", value)
-	}
-	return cleaned, nil
-}
-
-// NormalizePaths checks every cruise path. The order is kept.
-func NormalizePaths(values []string) ([]string, error) {
-	if len(values) == 0 {
-		return nil, errors.New("no paths")
-	}
-	out := make([]string, len(values))
-	for i, value := range values {
-		cleaned, err := NormalizePath(value)
-		if err != nil {
-			return nil, err
-		}
-		out[i] = cleaned
-	}
-	return out, nil
-}
-
-func stderrExcerpt(raw []byte) string {
-	if len(raw) == 0 {
-		return "depcruise failed"
-	}
-	text := compiler.EscapeControls(string(raw))
-	if len(text) > 200 {
-		text = text[:200]
-	}
-	return text
-}
-
-type cappedBuffer struct {
-	buf  bytes.Buffer
-	max  int
-	over bool
-}
-
-func (c *cappedBuffer) Write(p []byte) (int, error) {
-	if c.max <= 0 {
-		return 0, errors.New("output cap is unset")
-	}
-	if c.buf.Len() >= c.max {
-		c.over = true
-		return len(p), nil
-	}
-	room := c.max - c.buf.Len()
-	if len(p) > room {
-		if _, err := c.buf.Write(p[:room]); err != nil {
-			return 0, err
-		}
-		c.over = true
-		return len(p), nil
-	}
-	if _, err := c.buf.Write(p); err != nil {
-		return 0, err
-	}
-	return len(p), nil
 }

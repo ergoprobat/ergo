@@ -14,6 +14,8 @@ import (
 type Document struct {
 	Front map[string]any
 	Body  string
+	// front is the YAML mapping, kept so an equals value can be encoded in file order.
+	front *yaml.Node
 }
 
 // Slug returns the frontmatter slug, or an empty string when it is absent.
@@ -47,6 +49,14 @@ func Parse(text string) (Document, error) {
 	}
 	raw := text[4 : 4+end]
 	body := text[4+end+5:]
+	var root yaml.Node
+	if err := yaml.Unmarshal([]byte(raw), &root); err != nil {
+		return Document{}, fmt.Errorf("frontmatter: %w", err)
+	}
+	frontNode := mappingNode(&root)
+	if frontNode == nil {
+		return Document{}, fmt.Errorf("frontmatter must be a mapping")
+	}
 	var front any
 	if err := yaml.Unmarshal([]byte(raw), &front); err != nil {
 		return Document{}, fmt.Errorf("frontmatter: %w", err)
@@ -63,7 +73,7 @@ func Parse(text string) (Document, error) {
 	if !ok {
 		return Document{}, fmt.Errorf("frontmatter must be a mapping")
 	}
-	return Document{Front: asMap, Body: body}, nil
+	return Document{Front: asMap, Body: body, front: frontNode}, nil
 }
 
 func coerce(value any) any {

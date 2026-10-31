@@ -369,7 +369,7 @@ func premiseHook(t *testing.T, handler http.Handler, ips []net.IP, dialed *int) 
 		t.Fatal(err)
 	}
 	srv := httptest.NewUnstartedServer(handler)
-	srv.TLS = &tls.Config{Certificates: []tls.Certificate{cert}}
+	srv.TLS = &tls.Config{Certificates: []tls.Certificate{cert}, MinVersion: tls.VersionTLS12}
 	srv.StartTLS()
 	t.Cleanup(srv.Close)
 	if ips == nil {

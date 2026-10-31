@@ -327,8 +327,7 @@ type semver struct {
 }
 
 func parseConstraint(text string) (semver, string, bool) {
-	op := ""
-	rest := text
+	var op, rest string
 	switch {
 	case strings.HasPrefix(text, ">="):
 		op, rest = ">=", text[2:]

@@ -108,7 +108,9 @@ func TestCheckNonJSON(t *testing.T) {
 func TestCheckBodyTooLarge(t *testing.T) {
 	payload := bytes.Repeat([]byte("a"), BodyLimit+1)
 	srv, pool := premiseServer(t, "example.com", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write(payload)
+		for range payload {
+			_, _ = w.Write([]byte("a"))
+		}
 	}))
 	got := pinnedClient(srv, pool).Check(context.Background(), Spec{
 		URL: "https://example.com/a.json", Pointer: "", Equals: "a", HasEquals: true,
@@ -141,7 +143,7 @@ func premiseServer(t *testing.T, host string, handler http.Handler) (*httptest.S
 		t.Fatal(err)
 	}
 	srv := httptest.NewUnstartedServer(handler)
-	srv.TLS = &tls.Config{Certificates: []tls.Certificate{cert}}
+	srv.TLS = &tls.Config{Certificates: []tls.Certificate{cert}, MinVersion: tls.VersionTLS12}
 	srv.StartTLS()
 	t.Cleanup(srv.Close)
 	return srv, pool

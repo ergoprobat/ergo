@@ -26,13 +26,16 @@ import (
 	"github.com/ipsofacto-io/ipso/internal/compiler/toolrun"
 	"github.com/ipsofacto-io/ipso/internal/config"
 	"github.com/ipsofacto-io/ipso/internal/edr"
+	"github.com/ipsofacto-io/ipso/internal/premise"
 )
 
-// deps is the clock and compiler registry for one invocation.
-// Tests inject both. The binary uses the local clock and the built-in registry.
+// deps is the clock, compiler registry, and premise client for one invocation.
+// Tests inject them. The binary uses the local clock, the built-in registry,
+// and a premise client that dials only a public address.
 type deps struct {
-	now      func() time.Time
-	registry compiler.Registry
+	now         func() time.Time
+	registry    compiler.Registry
+	probeClient premise.Client
 }
 
 // Run executes one CLI invocation. args excludes the program name.
@@ -77,6 +80,8 @@ func run(args []string, stdout, stderr io.Writer, d deps) int {
 			return 2
 		}
 		return compileCmd(root, stdout, stderr, d)
+	case "premise":
+		return premiseCmd(root, args[1:], stdout, stderr, d)
 	case "-h", "--help", "help", "version", "--version", "-v":
 		fprintln(stdout, helpText())
 		return 0
@@ -114,6 +119,7 @@ usage:
   ipso check eslint <path>... [--env name] [--report file]
   ipso explain <slug>
   ipso import [path...]
+  ipso premise check [--report file]
   ipso compile`
 
 func initCmd(root string, stdout, stderr io.Writer) int {

@@ -20,6 +20,7 @@ var requiredHeadings = []string{
 func Validate(doc Document) []string {
 	var problems []string
 	problems = append(problems, schemaErrors(doc.Front)...)
+	problems = append(problems, premiseProblems(doc.front)...)
 	problems = append(problems, bodyErrors(doc.Body)...)
 	return problems
 }

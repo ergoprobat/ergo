@@ -2,6 +2,7 @@ package edr
 
 import (
 	"fmt"
+	"math"
 	"time"
 )
 
@@ -27,6 +28,20 @@ type Waiver struct {
 	ValidTo   time.Time
 }
 
+// Premise is one object from the premises array.
+// HasEquals is set when the probe uses equals, including when that value is null.
+// Semver is set when the probe uses a semver constraint. Exactly one is set.
+type Premise struct {
+	ID        string
+	Statement string
+	Every     int
+	URL       string
+	Pointer   string
+	Equals    any
+	HasEquals bool
+	Semver    string
+}
+
 // Record is the frontmatter a compiler needs from a validated document.
 type Record struct {
 	ID          string
@@ -38,6 +53,7 @@ type Record struct {
 	Scope       []ScopeItem
 	Checks      []Check
 	Waivers     []Waiver
+	Premises    []Premise
 }
 
 // RecordFrom decodes a document that has already passed validation.
@@ -88,6 +104,10 @@ func RecordFrom(doc Document) (Record, error) {
 		return Record{}, err
 	}
 	rec.Waivers, err = waiversFrom(doc.Front["waivers"])
+	if err != nil {
+		return Record{}, err
+	}
+	rec.Premises, err = premisesFrom(doc.Front["premises"])
 	if err != nil {
 		return Record{}, err
 	}
@@ -237,6 +257,80 @@ func stringList(raw any) ([]string, error) {
 		out = append(out, text)
 	}
 	return out, nil
+}
+
+func premisesFrom(raw any) ([]Premise, error) {
+	if raw == nil {
+		return nil, nil
+	}
+	items, ok := raw.([]any)
+	if !ok {
+		return nil, fmt.Errorf("premises: not an array")
+	}
+	out := make([]Premise, 0, len(items))
+	for i, item := range items {
+		mapping, ok := item.(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("premises[%d]: not an object", i)
+		}
+		premise := Premise{}
+		var err error
+		if premise.ID, err = requireString(mapping, "id"); err != nil {
+			return nil, fmt.Errorf("premises[%d]: %w", i, err)
+		}
+		if premise.Statement, err = requireString(mapping, "statement"); err != nil {
+			return nil, fmt.Errorf("premises[%d]: %w", i, err)
+		}
+		every, ok := wholeInt(mapping["every"])
+		if !ok {
+			return nil, fmt.Errorf("premises[%d]: every: not an integer", i)
+		}
+		premise.Every = every
+		probe, ok := mapping["probe"].(map[string]any)
+		if !ok {
+			return nil, fmt.Errorf("premises[%d]: probe: not an object", i)
+		}
+		if premise.URL, err = requireString(probe, "url"); err != nil {
+			return nil, fmt.Errorf("premises[%d]: probe: %w", i, err)
+		}
+		pointer, ok := probe["pointer"]
+		if !ok || pointer == nil {
+			return nil, fmt.Errorf("premises[%d]: probe: pointer: missing", i)
+		}
+		text, ok := pointer.(string)
+		if !ok {
+			return nil, fmt.Errorf("premises[%d]: probe: pointer: not a string", i)
+		}
+		premise.Pointer = text
+		_, hasEquals := probe["equals"]
+		_, hasSemver := probe["semver"]
+		if hasEquals == hasSemver {
+			return nil, fmt.Errorf("premises[%d]: probe: comparison", i)
+		}
+		if hasEquals {
+			premise.HasEquals = true
+			premise.Equals = probe["equals"]
+		} else {
+			semver, ok := probe["semver"].(string)
+			if !ok || semver == "" {
+				return nil, fmt.Errorf("premises[%d]: probe: semver: missing", i)
+			}
+			premise.Semver = semver
+		}
+		out = append(out, premise)
+	}
+	return out, nil
+}
+
+func wholeInt(raw any) (int, bool) {
+	number, ok := raw.(float64)
+	if !ok || math.IsNaN(number) || math.IsInf(number, 0) || number != math.Trunc(number) {
+		return 0, false
+	}
+	if number < 1 || number > 365 {
+		return 0, false
+	}
+	return int(number), true
 }
 
 func checksFrom(raw any) ([]Check, error) {

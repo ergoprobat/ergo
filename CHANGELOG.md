@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/ipsofacto-io/ipso/compare/v0.2.0...v0.3.0) (2026-10-31)
+
+
+### Features
+
+* **cli:** check premises on in-force decisions ([#37](https://github.com/ipsofacto-io/ipso/issues/37)) ([39e6847](https://github.com/ipsofacto-io/ipso/commit/39e68475d662f99b9bcb5c3d3b27a9adc9b8401b))
+* **cli:** evaluate ESLint checks ([#36](https://github.com/ipsofacto-io/ipso/issues/36)) ([7a49ed8](https://github.com/ipsofacto-io/ipso/commit/7a49ed89ce2ec10e1fe07c348c21b97ef7c666ea))
+* **cli:** evaluate Gatekeeper checks ([#35](https://github.com/ipsofacto-io/ipso/issues/35)) ([a3f7d94](https://github.com/ipsofacto-io/ipso/commit/a3f7d9459eaabcce1179f9951dc193f1c77d7d67))
+* **cli:** evaluate import-linter checks ([#32](https://github.com/ipsofacto-io/ipso/issues/32)) ([f16745d](https://github.com/ipsofacto-io/ipso/commit/f16745d4ad828beb40fe6f3af450c4c10da8f0c8))
+* **cli:** evaluate Kyverno checks ([#34](https://github.com/ipsofacto-io/ipso/issues/34)) ([9e56ff0](https://github.com/ipsofacto-io/ipso/commit/9e56ff0c814cb7a3eb15e79118b18d6a1425e564))
+
 ## [0.2.0](https://github.com/ipsofacto-io/ipso/compare/v0.1.1...v0.2.0) (2026-10-27)
 
 
